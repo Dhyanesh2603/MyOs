@@ -6,6 +6,7 @@ import { Dock } from '@shell/dock/Dock';
 import { WindowFrame } from '@shell/window/WindowFrame';
 import { DesktopSurface } from '@shell/desktop/DesktopSurface';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
+import { ContextMenu } from '@shell/context-menu/ContextMenu';
 import {
   Layers,
   Cpu,
@@ -209,6 +210,9 @@ export const App: React.FC = () => {
 
       {/* Fluid Magnetic Dock */}
       <Dock />
+
+      {/* Global Context Menu */}
+      <ContextMenu />
     </DesktopSurface>
   );
 };

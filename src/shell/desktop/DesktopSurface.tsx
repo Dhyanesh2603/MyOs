@@ -1,15 +1,90 @@
 import React, { useState, useRef } from 'react';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { useWindowStore } from '@core/window/windowStore';
+import { useProcessStore } from '@core/process/processStore';
+import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { SelectionMarquee } from './SelectionMarquee';
+import { FileText, Settings, Image, Minus, X } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
 }
 
 export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
-  const wallpaper = useWallpaperStore((state) => state.getCurrentWallpaper());
-  const { activeWindowId, focusWindow } = useWindowStore();
+  const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
+  const wallpaper = wallpapers.find((w) => w.id === currentWallpaperId) ?? wallpapers[0]!;
+  const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
+  const { launchApp } = useProcessStore();
+  const openMenu = useContextMenuStore((state) => state.openMenu);
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    e.preventDefault();
+
+    const currentIdx = wallpapers.findIndex((w) => w.id === wallpaper.id);
+    const nextWallpaper = wallpapers[(currentIdx + 1) % wallpapers.length];
+
+    openMenu(
+      { x: e.clientX, y: e.clientY },
+      [
+        {
+          type: 'item',
+          item: {
+            id: 'new-note',
+            label: 'New Scratchpad Note',
+            icon: FileText,
+            shortcut: 'Alt+N',
+            action: () => launchApp('notes'),
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'settings',
+            label: 'System Settings',
+            icon: Settings,
+            action: () => launchApp('system-settings'),
+          },
+        },
+        { type: 'separator', id: 'sep-1' },
+        {
+          type: 'item',
+          item: {
+            id: 'change-wallpaper',
+            label: `Next Wallpaper (${nextWallpaper?.name ?? 'Cycle'})`,
+            icon: Image,
+            action: () => {
+              if (nextWallpaper) setWallpaper(nextWallpaper.id);
+            },
+          },
+        },
+        { type: 'separator', id: 'sep-2' },
+        {
+          type: 'item',
+          item: {
+            id: 'minimize-all',
+            label: 'Minimize All Windows',
+            icon: Minus,
+            action: () => {
+              Object.keys(windows).forEach((id) => minimizeWindow(id));
+            },
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'close-all',
+            label: 'Close All Windows',
+            icon: X,
+            danger: true,
+            action: () => {
+              Object.keys(windows).forEach((id) => closeWindow(id));
+            },
+          },
+        },
+      ]
+    );
+  };
 
   const [selectionStart, setSelectionStart] = useState<{
     x: number;
@@ -67,6 +142,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
+      onContextMenu={handleContextMenu}
       style={wallpaper.style}
       className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none"
     >
