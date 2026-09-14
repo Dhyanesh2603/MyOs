@@ -4,6 +4,8 @@ import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { Dock } from '@shell/dock/Dock';
 import { WindowFrame } from '@shell/window/WindowFrame';
+import { DesktopSurface } from '@shell/desktop/DesktopSurface';
+import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import {
   Layers,
   Cpu,
@@ -41,18 +43,10 @@ export const App: React.FC = () => {
 
   const windowList = Object.values(windows);
   const processList = Object.values(processes);
+  const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary">
-      {/* Background Subtle Spatial Grid */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-15"
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-        }}
-      />
+    <DesktopSurface>
 
       {/* Real-time Headless Diagnostics HUD */}
       <aside className="absolute left-6 top-6 z-10 w-96 max-h-[92vh] flex flex-col gap-4 overflow-y-auto rounded-window border border-white/10 bg-surface-panel/85 p-5 shadow-window backdrop-blur-window text-xs">
@@ -97,6 +91,28 @@ export const App: React.FC = () => {
           >
             Cycle Focus (Alt+Tab simulation)
           </button>
+        </div>
+
+        {/* Wallpaper Engine Selector */}
+        <div className="rounded-control border border-white/5 bg-surface-overlay/40 p-3">
+          <label className="text-[11px] font-mono uppercase text-content-tertiary">
+            Wallpaper Engine
+          </label>
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            {wallpapers.map((w) => (
+              <button
+                key={w.id}
+                onClick={() => setWallpaper(w.id)}
+                className={`truncate rounded px-2 py-1 font-mono text-[10px] text-left transition-colors ${
+                  w.id === currentWallpaperId
+                    ? 'border border-accent-primary/50 bg-accent-primary/20 text-content-primary'
+                    : 'bg-white/5 text-content-secondary hover:bg-white/10'
+                }`}
+              >
+                {w.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Focus Stack Inspector */}
@@ -193,7 +209,7 @@ export const App: React.FC = () => {
 
       {/* Fluid Magnetic Dock */}
       <Dock />
-    </div>
+    </DesktopSurface>
   );
 };
 
