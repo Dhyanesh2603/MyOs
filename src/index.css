@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Color Tokens (RGB values for Tailwind alpha-channel support) */
+    /* Dark Theme Default — Clean, deep obsidian with subtle chromatic balance */
+    --surface-canvas: 10 10 13;
+    --surface-panel: 18 19 24;
+    --surface-overlay: 26 27 34;
+    --surface-glass: 20 22 28;
+    --surface-subtle: 32 34 44;
+
+    --content-primary: 245 245 247;
+    --content-secondary: 160 163 177;
+    --content-tertiary: 102 105 120;
+    --content-inverse: 12 12 15;
+
+    --accent-primary: 99 102 241;   /* Modern Indigo / Flow Kinetic Blue */
+    --accent-hover: 129 140 248;
+    --accent-muted: 49 46 129;
+
+    --border-subtle: 255 255 255;
+    --border-subtle-alpha: 0.08;
+    --border-strong: 255 255 255;
+    --border-strong-alpha: 0.18;
+
+    /* Geometry & Dimension Tokens */
+    --radius-window: 16px;
+    --radius-dock: 20px;
+    --radius-control: 8px;
+
+    /* Blur & Materiality */
+    --blur-window: 24px;
+    --blur-dock: 28px;
+
+    /* Shadows */
+    --shadow-window: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --shadow-dock: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --shadow-glow: 0 0 24px -4px rgba(99, 102, 241, 0.35);
+
+    /* Kinetic Spring Constants */
+    --spring-bounce: 0.2;
+    --spring-duration: 0.35s;
+  }
+
+  /* Light Theme Variant */
+  [data-theme='light'] {
+    --surface-canvas: 243 244 246;
+    --surface-panel: 255 255 255;
+    --surface-overlay: 249 250 251;
+    --surface-glass: 255 255 255;
+    --surface-subtle: 229 231 235;
+
+    --content-primary: 17 24 39;
+    --content-secondary: 75 85 99;
+    --content-tertiary: 156 163 175;
+    --content-inverse: 255 255 255;
+
+    --accent-primary: 79 70 229;
+    --accent-hover: 67 56 202;
+    --accent-muted: 224 231 255;
+
+    --border-subtle: 0 0 0;
+    --border-subtle-alpha: 0.06;
+    --border-strong: 0 0 0;
+    --border-strong-alpha: 0.14;
+
+    --shadow-window: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    --shadow-dock: 0 12px 30px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  /* High Contrast Accessibility Theme */
+  [data-theme='high-contrast'] {
+    --surface-canvas: 0 0 0;
+    --surface-panel: 0 0 0;
+    --surface-overlay: 12 12 12;
+    --surface-glass: 0 0 0;
+    --surface-subtle: 40 40 40;
+
+    --content-primary: 255 255 255;
+    --content-secondary: 220 220 220;
+    --content-tertiary: 180 180 180;
+    --content-inverse: 0 0 0;
+
+    --accent-primary: 255 255 0; /* Pure High-contrast Yellow */
+    --accent-hover: 230 230 0;
+    --accent-muted: 60 60 0;
+
+    --border-subtle: 255 255 255;
+    --border-subtle-alpha: 0.8;
+    --border-strong: 255 255 255;
+    --border-strong-alpha: 1.0;
+
+    --blur-window: 0px;
+    --blur-dock: 0px;
+    --shadow-window: 0 0 0 2px #fff;
+  }
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* OS Window Chrome Dragging Prevent Default Selection */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
