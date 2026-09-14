@@ -7,11 +7,14 @@ import { WindowFrame } from '@shell/window/WindowFrame';
 import { DesktopSurface } from '@shell/desktop/DesktopSurface';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { ContextMenu } from '@shell/context-menu/ContextMenu';
+import { CommandPalette } from '@shell/command/CommandPalette';
+import { useCommandStore } from '@core/command/commandStore';
 import {
   Layers,
   Cpu,
   Play,
   CheckCircle2,
+  Search,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -45,6 +48,7 @@ export const App: React.FC = () => {
   const windowList = Object.values(windows);
   const processList = Object.values(processes);
   const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
+  const openSpotlight = useCommandStore((state) => state.open);
 
   return (
     <DesktopSurface>
@@ -91,6 +95,18 @@ export const App: React.FC = () => {
             className="mt-2 w-full rounded-control border border-white/5 bg-surface-overlay/40 py-1.5 font-mono text-[11px] text-content-secondary hover:bg-surface-subtle disabled:opacity-40 transition-colors"
           >
             Cycle Focus (Alt+Tab simulation)
+          </button>
+          <button
+            onClick={openSpotlight}
+            className="mt-2 flex w-full items-center justify-between rounded-control border border-accent-primary/40 bg-accent-primary/15 px-3 py-1.5 font-mono text-[11px] text-accent-hover hover:bg-accent-primary/25 transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <Search className="h-3 w-3" />
+              Spotlight Palette
+            </span>
+            <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] text-content-tertiary">
+              Ctrl+K
+            </kbd>
           </button>
         </div>
 
@@ -213,6 +229,9 @@ export const App: React.FC = () => {
 
       {/* Global Context Menu */}
       <ContextMenu />
+
+      {/* Global Spotlight / Command Palette */}
+      <CommandPalette />
     </DesktopSurface>
   );
 };
