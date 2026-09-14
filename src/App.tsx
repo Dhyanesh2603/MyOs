@@ -9,17 +9,21 @@ import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { ContextMenu } from '@shell/context-menu/ContextMenu';
 import { CommandPalette } from '@shell/command/CommandPalette';
 import { useCommandStore } from '@core/command/commandStore';
+import { useVFSStore } from '@core/vfs/vfsStore';
 import {
   Layers,
   Cpu,
   Play,
   CheckCircle2,
   Search,
+  HardDrive,
+  FileText,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
   useEffect(() => {
     initializeApplications();
+    useVFSStore.getState().init();
   }, []);
 
   const { launchApp, terminateProcess, processes } = useProcessStore();
@@ -49,6 +53,7 @@ export const App: React.FC = () => {
   const processList = Object.values(processes);
   const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
   const openSpotlight = useCommandStore((state) => state.open);
+  const vfsNodes = useVFSStore((state) => state.nodes);
 
   return (
     <DesktopSurface>
@@ -198,6 +203,39 @@ export const App: React.FC = () => {
                   </button>
                 </div>
               ))
+            )}
+          </div>
+        </div>
+
+        {/* Virtual File System Storage Inspector */}
+        <div className="rounded-control border border-white/5 bg-surface-overlay/40 p-3">
+          <div className="flex items-center justify-between text-content-tertiary">
+            <span className="flex items-center gap-1.5 font-mono">
+              <HardDrive className="h-3.5 w-3.5" />
+              IndexedDB VFS
+            </span>
+            <span className="text-[10px] font-mono text-emerald-400">Persisted</span>
+          </div>
+          <div className="mt-2 flex flex-col gap-1 max-h-36 overflow-y-auto">
+            {Object.values(vfsNodes).length === 0 ? (
+              <span className="font-mono text-[10px] text-content-tertiary">Mounting VFS...</span>
+            ) : (
+              Object.values(vfsNodes)
+                .filter((n) => n.path.startsWith('/home/user'))
+                .map((node) => (
+                  <div
+                    key={node.path}
+                    className="flex items-center justify-between rounded bg-white/5 px-2 py-1 font-mono text-[10px]"
+                  >
+                    <span className="flex items-center gap-1.5 truncate text-content-secondary">
+                      <FileText className="h-3 w-3 text-accent-primary shrink-0" />
+                      {node.name || node.path}
+                    </span>
+                    <span className="text-[9px] text-content-tertiary font-mono">
+                      {node.type === 'directory' ? 'DIR' : `${node.size}B`}
+                    </span>
+                  </div>
+                ))
             )}
           </div>
         </div>
