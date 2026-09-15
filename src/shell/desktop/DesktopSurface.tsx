@@ -4,6 +4,7 @@ import { useWindowStore } from '@core/window/windowStore';
 import { useProcessStore } from '@core/process/processStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { SelectionMarquee } from './SelectionMarquee';
+import { DesktopIcons } from './DesktopIcons';
 import { FileText, Settings, Image, Minus, X } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
@@ -161,6 +162,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         startPos={selectionStart}
         currentPos={selectionCurrent}
       />
+
+      {/* Desktop Icons Spatial Grid */}
+      <DesktopIcons />
 
       {/* Surface Children (Windows, Dock, HUD, Overlays) */}
       {children}
