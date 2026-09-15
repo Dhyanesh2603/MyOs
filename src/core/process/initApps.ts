@@ -3,6 +3,7 @@ import { settingsManifest } from '@apps/system-settings';
 import { notesManifest } from '@apps/notes';
 import { terminalManifest } from '@apps/terminal';
 import { fileExplorerManifest } from '@apps/file-explorer';
+import { calculatorManifest } from '@apps/calculator';
 
 let initialized = false;
 
@@ -17,6 +18,7 @@ export function initializeApplications(): void {
   appRegistry.register(notesManifest);
   appRegistry.register(terminalManifest);
   appRegistry.register(fileExplorerManifest);
+  appRegistry.register(calculatorManifest);
 
   initialized = true;
 }
