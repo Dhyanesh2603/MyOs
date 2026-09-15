@@ -10,7 +10,11 @@ import { ContextMenu } from '@shell/context-menu/ContextMenu';
 import { CommandPalette } from '@shell/command/CommandPalette';
 import { useCommandStore } from '@core/command/commandStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
+import { NotificationToaster } from '@shell/notifications/NotificationToaster';
+import { NotificationCenter } from '@shell/notifications/NotificationCenter';
+import { useNotificationStore } from '@core/notifications/notificationStore';
 import {
+  Bell,
   Layers,
   Cpu,
   Play,
@@ -21,9 +25,21 @@ import {
 } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const openNotificationCenter = useNotificationStore((state) => state.openCenter);
+
   useEffect(() => {
     initializeApplications();
     useVFSStore.getState().init();
+
+    const timer = setTimeout(() => {
+      useNotificationStore.getState().notify({
+        title: 'FlowOS Initialized',
+        message: 'All kernel subsystems operational. Press Ctrl+K for Spotlight.',
+        type: 'success',
+      });
+    }, 600);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const { launchApp, terminateProcess, processes } = useProcessStore();
@@ -68,9 +84,19 @@ export const App: React.FC = () => {
               FlowOS // Kernel HUD
             </span>
           </div>
-          <span className="rounded bg-accent-muted/40 px-2 py-0.5 text-[10px] font-mono text-accent-hover">
-            Phase 2 Verified
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openNotificationCenter}
+              title="Open Control Shade"
+              className="flex items-center gap-1 rounded bg-white/10 px-2 py-0.5 font-mono text-[10px] text-content-secondary hover:bg-white/20 transition-colors"
+            >
+              <Bell className="h-3 w-3 text-accent-primary" />
+              Shade
+            </button>
+            <span className="rounded bg-accent-muted/40 px-2 py-0.5 text-[10px] font-mono text-accent-hover">
+              Kernel Active
+            </span>
+          </div>
         </div>
 
         {/* Launch Control Panel */}
@@ -270,6 +296,10 @@ export const App: React.FC = () => {
 
       {/* Global Spotlight / Command Palette */}
       <CommandPalette />
+
+      {/* Notifications & System Shade */}
+      <NotificationToaster />
+      <NotificationCenter />
     </DesktopSurface>
   );
 };
