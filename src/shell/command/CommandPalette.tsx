@@ -4,6 +4,7 @@ import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
+import { useStatusSidebarStore } from '@core/status/statusStore';
 import type { CommandAction } from '@contracts/command';
 import {
   Search,
@@ -13,12 +14,14 @@ import {
   X,
   Play,
   ArrowRight,
+  Activity,
 } from 'lucide-react';
 
 export const CommandPalette: React.FC = () => {
   const { isOpen, query, selectedIndex, close, toggle, setQuery, setSelectedIndex } =
     useCommandStore();
 
+  const toggleStatusSidebar = useStatusSidebarStore((state) => state.toggle);
   const { launchApp } = useProcessStore();
   const { windows, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
   const { wallpapers, currentWallpaperId, setWallpaper } = useWallpaperStore();
@@ -115,8 +118,19 @@ export const CommandPalette: React.FC = () => {
       },
     });
 
+    list.push({
+      id: 'sys-toggle-status',
+      title: 'Toggle System Status Bar',
+      subtitle: 'Slide open Kernel HUD diagnostics and process controls',
+      category: 'system',
+      icon: Activity,
+      handler: () => {
+        toggleStatusSidebar();
+      },
+    });
+
     return list;
-  }, [launchApp, windows, focusWindow, minimizeWindow, closeWindow, wallpapers, currentWallpaperId, setWallpaper]);
+  }, [launchApp, windows, focusWindow, minimizeWindow, closeWindow, wallpapers, currentWallpaperId, setWallpaper, toggleStatusSidebar]);
 
   // Filter actions based on query
   const filteredActions = useMemo(() => {
