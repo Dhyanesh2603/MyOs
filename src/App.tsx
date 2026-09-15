@@ -13,6 +13,7 @@ import { useVFSStore } from '@core/vfs/vfsStore';
 import { NotificationToaster } from '@shell/notifications/NotificationToaster';
 import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
+import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import {
   Bell,
   Layers,
@@ -300,6 +301,9 @@ export const App: React.FC = () => {
       {/* Notifications & System Shade */}
       <NotificationToaster />
       <NotificationCenter />
+
+      {/* Visual Alt+Tab Task Switcher */}
+      <TaskSwitcher />
     </DesktopSurface>
   );
 };
