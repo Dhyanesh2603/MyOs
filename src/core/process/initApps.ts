@@ -4,6 +4,7 @@ import { notesManifest } from '@apps/notes';
 import { terminalManifest } from '@apps/terminal';
 import { fileExplorerManifest } from '@apps/file-explorer';
 import { calculatorManifest } from '@apps/calculator';
+import { musicManifest } from '@apps/music';
 
 let initialized = false;
 
@@ -19,6 +20,7 @@ export function initializeApplications(): void {
   appRegistry.register(terminalManifest);
   appRegistry.register(fileExplorerManifest);
   appRegistry.register(calculatorManifest);
+  appRegistry.register(musicManifest);
 
   initialized = true;
 }
