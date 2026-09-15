@@ -5,6 +5,7 @@ import { useProcessStore } from '@core/process/processStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { SelectionMarquee } from './SelectionMarquee';
 import { DesktopIcons } from './DesktopIcons';
+import { DesktopWidgets } from '../widgets/DesktopWidgets';
 import { FileText, Settings, Image, Minus, X } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
@@ -165,6 +166,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
 
       {/* Desktop Icons Spatial Grid */}
       <DesktopIcons />
+
+      {/* Persistent Desktop HUD Widgets */}
+      <DesktopWidgets />
 
       {/* Surface Children (Windows, Dock, HUD, Overlays) */}
       {children}
