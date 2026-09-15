@@ -8,6 +8,7 @@ import {
   Terminal,
   Folder,
   File,
+  Calculator,
   ExternalLink,
 } from 'lucide-react';
 
@@ -28,6 +29,13 @@ export const DesktopIcons: React.FC = () => {
   // Default system shortcuts + desktop files
   const shortcuts: DesktopShortcut[] = [
     {
+      id: 'sc-explorer',
+      name: 'Files',
+      type: 'app',
+      target: 'file-explorer',
+      icon: Folder,
+    },
+    {
       id: 'sc-notes',
       name: 'Notes',
       type: 'app',
@@ -40,6 +48,13 @@ export const DesktopIcons: React.FC = () => {
       type: 'app',
       target: 'terminal',
       icon: Terminal,
+    },
+    {
+      id: 'sc-calculator',
+      name: 'Calculator',
+      type: 'app',
+      target: 'calculator',
+      icon: Calculator,
     },
     {
       id: 'sc-settings',
@@ -86,8 +101,8 @@ export const DesktopIcons: React.FC = () => {
       // Launch Notes to view/edit the file
       launchApp('notes');
     } else if (item.type === 'folder') {
-      // Launch Terminal navigated to the folder
-      launchApp('terminal');
+      // Launch File Explorer navigated to the folder
+      launchApp('file-explorer');
     }
   };
 
