@@ -36,9 +36,9 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const { wallpapers, currentWallpaperId, setWallpaper } = useWallpaperStore();
 
   return (
-    <div className="flex h-full w-full bg-[#0c0e12] text-content-primary">
+    <div className="flex h-full w-full bg-surface-panel text-content-primary">
       {/* Linear-Style Left Navigation Rail */}
-      <aside className="w-44 border-r border-white/[0.06] bg-[#090a0d]/90 p-2.5 flex flex-col justify-between select-none">
+      <aside className="w-44 border-r border-border-subtle bg-surface-overlay/80 p-2.5 flex flex-col justify-between select-none">
         <div className="space-y-1">
           <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-content-primary">
             <SettingsIcon className="h-3.5 w-3.5 text-accent-primary" />
@@ -49,8 +49,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             onClick={() => setActiveTab('appearance')}
             className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'appearance'
-                ? 'bg-white/[0.08] text-content-primary font-semibold'
-                : 'text-content-secondary hover:bg-white/[0.04]'
+                ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                : 'text-content-secondary hover:bg-surface-subtle/50'
             }`}
           >
             <Palette className="h-3.5 w-3.5" />
@@ -61,8 +61,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             onClick={() => setActiveTab('geometry')}
             className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'geometry'
-                ? 'bg-white/[0.08] text-content-primary font-semibold'
-                : 'text-content-secondary hover:bg-white/[0.04]'
+                ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                : 'text-content-secondary hover:bg-surface-subtle/50'
             }`}
           >
             <Sliders className="h-3.5 w-3.5" />
@@ -73,8 +73,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             onClick={() => setActiveTab('accessibility')}
             className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'accessibility'
-                ? 'bg-white/[0.08] text-content-primary font-semibold'
-                : 'text-content-secondary hover:bg-white/[0.04]'
+                ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                : 'text-content-secondary hover:bg-surface-subtle/50'
             }`}
           >
             <Accessibility className="h-3.5 w-3.5" />
@@ -85,8 +85,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             onClick={() => setActiveTab('about')}
             className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'about'
-                ? 'bg-white/[0.08] text-content-primary font-semibold'
-                : 'text-content-secondary hover:bg-white/[0.04]'
+                ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                : 'text-content-secondary hover:bg-surface-subtle/50'
             }`}
           >
             <Info className="h-3.5 w-3.5" />
@@ -101,13 +101,13 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
       </aside>
 
       {/* Main Settings Content Viewport */}
-      <main className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#0e1014]">
+      <main className="flex-1 overflow-y-auto p-5 space-y-5 bg-surface-panel">
         {activeTab === 'appearance' && (
           <div className="space-y-5">
             <div>
               <h3 className="text-xs font-semibold tracking-tight text-content-primary">Theme Mode</h3>
               <p className="text-[11px] text-content-secondary mt-0.5">
-                Switch between high-contrast and natural dark architectures.
+                Switch between high-contrast, paper daylight, and natural dark architectures.
               </p>
               <div className="mt-2.5 grid grid-cols-3 gap-2">
                 {[
@@ -123,8 +123,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                       onClick={() => setTheme(item.id as ThemeId)}
                       className={`flex flex-col items-center gap-1.5 rounded-lg border p-2.5 text-xs transition-all ${
                         isSelected
-                          ? 'border-white/[0.2] bg-white/[0.08] text-content-primary shadow-sm'
-                          : 'border-white/[0.06] bg-white/[0.02] text-content-secondary hover:bg-white/[0.04]'
+                          ? 'border-accent-primary bg-accent-primary/10 text-content-primary shadow-sm ring-1 ring-accent-primary/30'
+                          : 'border-border-subtle bg-surface-subtle/40 text-content-secondary hover:bg-surface-subtle/80'
                       }`}
                     >
                       <Icon className="h-3.5 w-3.5" />
@@ -135,7 +135,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </div>
             </div>
 
-            <div className="border-t border-white/[0.06] pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <h3 className="text-xs font-semibold tracking-tight text-content-primary">Accent Color Spectrum</h3>
               <p className="text-[11px] text-content-secondary mt-0.5">
                 Real-time DOM CSS variable injection with zero React re-renders.
@@ -150,8 +150,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                       onClick={() => setAccentColor(key)}
                       className={`flex flex-col items-center gap-1.5 rounded-lg border p-2 text-[10px] font-mono transition-all ${
                         isSelected
-                          ? 'border-white/[0.25] bg-white/[0.08] text-content-primary'
-                          : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary hover:bg-white/[0.04]'
+                          ? 'border-accent-primary/60 bg-accent-primary/10 text-content-primary'
+                          : 'border-border-subtle bg-surface-subtle/40 text-content-tertiary hover:bg-surface-subtle/80'
                       }`}
                     >
                       <div
@@ -167,7 +167,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </div>
             </div>
 
-            <div className="border-t border-white/[0.06] pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <h3 className="text-xs font-semibold tracking-tight text-content-primary">Architectural Backdrops</h3>
               <p className="text-[11px] text-content-secondary mt-0.5">
                 Minimalist carbon lattices and Apple Pro gradient tones.
@@ -180,11 +180,11 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     style={w.style}
                     className={`h-14 rounded-lg border p-2 text-left text-[10px] font-mono transition-all ${
                       w.id === currentWallpaperId
-                        ? 'border-white/[0.3] ring-1 ring-white/20 text-white'
-                        : 'border-white/[0.08] opacity-60 hover:opacity-100'
+                        ? 'border-accent-primary ring-1 ring-accent-primary text-content-primary'
+                        : 'border-border-subtle opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <span className="rounded bg-black/60 px-1.5 py-0.5 backdrop-blur-sm">
+                    <span className="rounded bg-surface-panel/85 text-content-primary border border-border-subtle px-1.5 py-0.5 backdrop-blur-sm">
                       {w.name}
                     </span>
                   </button>
@@ -216,7 +216,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               />
             </div>
 
-            <div className="border-t border-white/[0.06] pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-semibold tracking-tight text-content-primary">Glass Blur Materiality</h3>
                 <span className="font-mono text-[11px] text-accent-primary">
@@ -231,8 +231,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                   onClick={() => setBlurAmount(16)}
                   className={`rounded border px-3 py-1 text-xs font-mono transition-colors ${
                     blurEnabled
-                      ? 'border-white/[0.2] bg-white/[0.08] text-content-primary'
-                      : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary'
+                      ? 'border-accent-primary/60 bg-accent-primary/10 text-content-primary'
+                      : 'border-border-subtle bg-surface-subtle/40 text-content-tertiary'
                   }`}
                 >
                   Enabled (16px)
@@ -241,8 +241,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                   onClick={() => setBlurAmount(0)}
                   className={`rounded border px-3 py-1 text-xs font-mono transition-colors ${
                     !blurEnabled
-                      ? 'border-white/[0.2] bg-white/[0.08] text-content-primary'
-                      : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary'
+                      ? 'border-accent-primary/60 bg-accent-primary/10 text-content-primary'
+                      : 'border-border-subtle bg-surface-subtle/40 text-content-tertiary'
                   }`}
                 >
                   Disabled (High Performance)
@@ -264,8 +264,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                   onClick={() => setReducedMotion(!reducedMotion)}
                   className={`rounded border px-3 py-1.5 text-xs font-mono transition-colors ${
                     reducedMotion
-                      ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
-                      : 'border-white/[0.08] bg-white/[0.02] text-content-secondary hover:bg-white/[0.06]'
+                      ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-400'
+                      : 'border-border-subtle bg-surface-subtle/40 text-content-secondary hover:bg-surface-subtle'
                   }`}
                 >
                   {reducedMotion ? 'Reduced Motion: ON' : 'Reduced Motion: OFF'}
@@ -273,14 +273,14 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </div>
             </div>
 
-            <div className="border-t border-white/[0.06] pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <h3 className="text-xs font-semibold tracking-tight text-content-primary">High Contrast Profile</h3>
               <p className="text-[11px] text-content-secondary mt-0.5">
                 Maximum visibility mode with solid pure blacks and high-luminance borders.
               </p>
               <button
                 onClick={() => setTheme('high-contrast')}
-                className="mt-2.5 rounded border border-white/[0.15] bg-white/[0.04] px-3 py-1.5 text-xs font-mono text-content-primary hover:bg-white/[0.08]"
+                className="mt-2.5 rounded border border-border-subtle bg-surface-subtle/50 px-3 py-1.5 text-xs font-mono text-content-primary hover:bg-surface-subtle"
               >
                 Activate High Contrast Theme
               </button>
@@ -297,7 +297,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </p>
             </div>
 
-            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 font-mono text-[10px] space-y-1">
+            <div className="rounded-lg border border-border-subtle bg-surface-subtle/30 p-3 font-mono text-[10px] space-y-1">
               <div><span className="text-content-tertiary">Design Language:</span> Linear Obsidian Carbon</div>
               <div><span className="text-content-tertiary">Command Engine:</span> Raycast Spotlight</div>
               <div><span className="text-content-tertiary">Workspace Navigation:</span> Arc Nested Spaces</div>

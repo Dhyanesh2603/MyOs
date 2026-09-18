@@ -96,9 +96,9 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const pathSegments = currentPath.split('/').filter(Boolean);
 
   return (
-    <div className="flex h-full w-full bg-[#0c0e12] text-content-primary">
+    <div className="flex h-full w-full bg-surface-panel text-content-primary">
       {/* Arc-Style Fluid Spaces & Places Sidebar */}
-      <aside className="w-44 border-r border-white/[0.06] bg-[#090a0d]/90 p-2.5 flex flex-col justify-between select-none">
+      <aside className="w-44 border-r border-border-subtle bg-surface-overlay/80 p-2.5 flex flex-col justify-between select-none">
         <div className="space-y-3">
           {/* Arc Workspace Header */}
           <div className="flex items-center gap-1.5 px-2 pt-1 font-mono text-[10px] text-content-tertiary uppercase tracking-wider">
@@ -111,8 +111,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/home/user')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                 currentPath === '/home/user'
-                  ? 'bg-white/[0.08] text-content-primary font-semibold'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <Home className="h-3.5 w-3.5 text-accent-primary" />
@@ -123,8 +123,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/home/user/Documents')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                 currentPath === '/home/user/Documents'
-                  ? 'bg-white/[0.08] text-content-primary font-semibold'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <FileText className="h-3.5 w-3.5 text-emerald-400" />
@@ -135,8 +135,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/home/user/Desktop')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                 currentPath === '/home/user/Desktop'
-                  ? 'bg-white/[0.08] text-content-primary font-semibold'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <Monitor className="h-3.5 w-3.5 text-cyan-400" />
@@ -147,8 +147,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/home/user/Pictures')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                 currentPath === '/home/user/Pictures'
-                  ? 'bg-white/[0.08] text-content-primary font-semibold'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <ImageIcon className="h-3.5 w-3.5 text-purple-400" />
@@ -159,8 +159,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/home/user/Music')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                 currentPath === '/home/user/Music'
-                  ? 'bg-white/[0.08] text-content-primary font-semibold'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary font-semibold shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <MusicIcon className="h-3.5 w-3.5 text-amber-400" />
@@ -169,7 +169,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           </div>
 
           {/* System Roots */}
-          <div className="pt-2 border-t border-white/[0.04]">
+          <div className="pt-2 border-t border-border-subtle">
             <div className="px-2 pb-1 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
               Volumes
             </div>
@@ -177,8 +177,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               onClick={() => navigateTo('/')}
               className={`flex w-full items-center gap-2 rounded-md px-2 py-1 text-xs transition-colors ${
                 currentPath === '/'
-                  ? 'bg-white/[0.08] text-content-primary'
-                  : 'text-content-secondary hover:bg-white/[0.04]'
+                  ? 'bg-surface-subtle text-content-primary shadow-sm'
+                  : 'text-content-secondary hover:bg-surface-subtle/50'
               }`}
             >
               <HardDrive className="h-3.5 w-3.5 text-rose-400" />
@@ -193,30 +193,30 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
       </aside>
 
       {/* Main Browser Canvas */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-[#0e1014]">
+      <main className="flex-1 flex flex-col overflow-hidden bg-surface-panel">
         {/* Apple Pro Apps Toolbar & Breadcrumbs */}
-        <header className="flex h-10 items-center justify-between border-b border-white/[0.06] bg-[#0c0d10] px-3 select-none">
+        <header className="flex h-10 items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3 select-none">
           {/* Back/Forward buttons + Breadcrumbs */}
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="flex items-center gap-0.5">
               <button
                 onClick={goBack}
                 disabled={historyIdx === 0}
-                className="rounded p-1 text-content-tertiary hover:bg-white/[0.06] hover:text-content-primary disabled:opacity-30 transition-colors"
+                className="rounded p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary disabled:opacity-30 transition-colors"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={goForward}
                 disabled={historyIdx >= history.length - 1}
-                className="rounded p-1 text-content-tertiary hover:bg-white/[0.06] hover:text-content-primary disabled:opacity-30 transition-colors"
+                className="rounded p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary disabled:opacity-30 transition-colors"
               >
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
 
             {/* Clickable Breadcrumbs Rail */}
-            <div className="flex items-center gap-1 rounded border border-white/[0.06] bg-white/[0.02] px-2 py-0.5 font-mono text-[11px] text-content-secondary">
+            <div className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-0.5 font-mono text-[11px] text-content-secondary">
               <span
                 onClick={() => navigateTo('/')}
                 className="cursor-pointer hover:text-content-primary transition-colors"
@@ -243,13 +243,13 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           {/* Action Controls & View Switcher (Apple Pro Apps Restraint) */}
           <div className="flex items-center gap-2">
             {/* View Mode Toggle: Grid vs Table */}
-            <div className="flex items-center rounded border border-white/[0.08] bg-white/[0.03] p-0.5">
+            <div className="flex items-center rounded border border-border-subtle bg-surface-subtle/50 p-0.5">
               <button
                 onClick={() => setViewMode('grid')}
                 title="Grid View"
                 className={`rounded p-1 transition-colors ${
                   viewMode === 'grid'
-                    ? 'bg-white/[0.1] text-content-primary'
+                    ? 'bg-surface-panel text-content-primary shadow-sm'
                     : 'text-content-tertiary hover:text-content-secondary'
                 }`}
               >
@@ -260,7 +260,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                 title="High-Density List Table"
                 className={`rounded p-1 transition-colors ${
                   viewMode === 'table'
-                    ? 'bg-white/[0.1] text-content-primary'
+                    ? 'bg-surface-panel text-content-primary shadow-sm'
                     : 'text-content-tertiary hover:text-content-secondary'
                 }`}
               >
@@ -271,7 +271,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             <button
               onClick={handleCreateFolder}
               title="New Folder"
-              className="flex items-center gap-1 rounded border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-white/[0.08] hover:text-content-primary transition-colors"
+              className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
             >
               <FolderPlus className="h-3 w-3 text-accent-primary" />
               <span>Folder</span>
@@ -280,7 +280,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             <button
               onClick={handleCreateFile}
               title="New File"
-              className="flex items-center gap-1 rounded border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-white/[0.08] hover:text-content-primary transition-colors"
+              className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
             >
               <FilePlus className="h-3 w-3 text-accent-primary" />
               <span>File</span>
@@ -327,15 +327,15 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                     }}
                     className={`flex flex-col items-center gap-1.5 rounded-lg p-2.5 cursor-pointer transition-all border ${
                       isSelected
-                        ? 'bg-white/[0.08] border-white/[0.14] text-content-primary'
-                        : 'border-transparent hover:bg-white/[0.04] text-content-secondary'
+                        ? 'bg-surface-subtle border-border-subtle text-content-primary shadow-sm'
+                        : 'border-transparent hover:bg-surface-subtle/50 text-content-secondary'
                     }`}
                   >
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
                         isDir
                           ? 'border-accent-primary/20 bg-accent-primary/10 text-accent-primary'
-                          : 'border-white/[0.06] bg-white/[0.03] text-content-tertiary'
+                          : 'border-border-subtle bg-surface-subtle/60 text-content-tertiary'
                       }`}
                     >
                       {isDir ? (
@@ -355,13 +355,13 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           ) : (
             /* Apple Pro Apps High-Density Table View */
             <div className="w-full text-xs font-mono">
-              <div className="grid grid-cols-12 border-b border-white/[0.06] pb-1.5 text-[10px] text-content-tertiary uppercase tracking-wider">
+              <div className="grid grid-cols-12 border-b border-border-subtle pb-1.5 text-[10px] text-content-tertiary uppercase tracking-wider">
                 <span className="col-span-6">Name</span>
                 <span className="col-span-2">Kind</span>
                 <span className="col-span-2">Size</span>
                 <span className="col-span-2 text-right">Modified</span>
               </div>
-              <div className="divide-y divide-white/[0.03]">
+              <div className="divide-y divide-border-subtle/50">
                 {currentNodes.map((node) => {
                   const isSelected = selectedPath === node.path;
                   const isDir = node.type === 'directory';
@@ -379,8 +379,8 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                       }}
                       className={`grid grid-cols-12 items-center py-1.5 px-1 cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-white/[0.08] text-content-primary'
-                          : 'hover:bg-white/[0.03] text-content-secondary'
+                          ? 'bg-surface-subtle text-content-primary'
+                          : 'hover:bg-surface-subtle/40 text-content-secondary'
                       }`}
                     >
                       <div className="col-span-6 flex items-center gap-2 truncate">

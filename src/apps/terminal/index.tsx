@@ -112,10 +112,10 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
   return (
     <div
       onClick={() => inputRef.current?.focus()}
-      className="flex h-full w-full flex-col bg-[#090a0d] text-content-primary select-text"
+      className="flex h-full w-full flex-col bg-surface-canvas text-content-primary select-text"
     >
       {/* Warp Top Session Bar */}
-      <div className="flex items-center justify-between border-b border-white/[0.06] bg-[#0c0d10] px-3.5 py-1.5 font-mono text-[10px] text-content-tertiary select-none">
+      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3.5 py-1.5 font-mono text-[10px] text-content-tertiary select-none">
         <div className="flex items-center gap-2">
           <TerminalIcon className="h-3.5 w-3.5 text-accent-primary" />
           <span className="text-content-primary font-medium">flowsh</span>
@@ -143,10 +143,10 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
         {blocks.map((block) => (
           <div
             key={block.id}
-            className="group relative rounded-lg border border-white/[0.06] bg-[#0f1116]/80 shadow-sm transition-all hover:border-white/[0.12]"
+            className="group relative rounded-lg border border-border-subtle bg-surface-panel/90 shadow-sm transition-all hover:border-border-strong"
           >
             {/* Warp Block Header Bar */}
-            <div className="flex items-center justify-between border-b border-white/[0.04] bg-white/[0.02] px-3 py-1.5 text-[10px] text-content-tertiary select-none">
+            <div className="flex items-center justify-between border-b border-border-subtle/60 bg-surface-subtle/30 px-3 py-1.5 text-[10px] text-content-tertiary select-none">
               <div className="flex items-center gap-2 truncate">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <span className="flex items-center gap-1 text-content-secondary">
@@ -172,7 +172,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
                     handleCopyOutput(block);
                   }}
                   title="Copy Block Output"
-                  className="ml-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded bg-white/[0.06] px-1.5 py-0.5 text-[9px] text-content-secondary hover:bg-white/[0.12] hover:text-content-primary transition-all"
+                  className="ml-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded bg-surface-subtle border border-border-subtle px-1.5 py-0.5 text-[9px] text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-all"
                 >
                   {copiedBlockId === block.id ? (
                     <>
@@ -200,10 +200,10 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       </div>
 
       {/* Warp Prompt Bar (Modern Developer Input) */}
-      <div className="border-t border-white/[0.06] bg-[#0c0d10] p-2.5">
-        <div className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#12141a] px-3 py-2 shadow-inner focus-within:border-accent-primary/60 focus-within:ring-1 focus-within:ring-accent-primary/30 transition-all">
+      <div className="border-t border-border-subtle bg-surface-overlay/90 p-2.5">
+        <div className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-panel px-3 py-2 shadow-inner focus-within:border-accent-primary/60 focus-within:ring-1 focus-within:ring-accent-primary/30 transition-all">
           {/* Path Badge */}
-          <div className="flex items-center gap-1 rounded bg-white/[0.06] px-2 py-0.5 font-mono text-[10px] text-content-secondary select-none shrink-0">
+          <div className="flex items-center gap-1 rounded bg-surface-subtle border border-border-subtle px-2 py-0.5 font-mono text-[10px] text-content-secondary select-none shrink-0">
             <Folder className="h-3 w-3 text-accent-primary" />
             <span>{cwd.replace('/home/user', '~')}</span>
           </div>

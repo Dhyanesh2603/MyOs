@@ -94,9 +94,9 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (!analyser || !isPlaying) {
-        // Flatline idle wave
+        // Flatline idle wave (neutral grey works in dark and light modes)
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.strokeStyle = 'rgba(128, 128, 128, 0.25)';
         ctx.lineWidth = 2;
         ctx.moveTo(0, canvas.height / 2);
         ctx.lineTo(canvas.width, canvas.height / 2);
@@ -148,7 +148,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
   return (
     <div className="flex h-full w-full flex-col justify-between bg-surface-panel p-5 text-content-primary select-none">
       {/* Visualizer Canvas Card */}
-      <div className="relative flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/10 bg-surface-overlay/40 p-4 overflow-hidden">
+      <div className="relative flex flex-1 flex-col items-center justify-center rounded-2xl border border-border-subtle bg-surface-overlay/50 p-4 overflow-hidden">
         <canvas
           ref={canvasRef}
           width={440}
@@ -182,11 +182,11 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
       </div>
 
       {/* Playback Controls & Volume */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
+      <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-4">
         <div className="flex items-center gap-3">
           <button
             onClick={handlePrev}
-            className="rounded-full p-2 text-content-secondary hover:bg-white/10 hover:text-content-primary active:scale-95 transition-all"
+            className="rounded-full p-2 text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:scale-95 transition-all"
           >
             <SkipBack className="h-4 w-4" />
           </button>
@@ -204,7 +204,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
 
           <button
             onClick={handleNext}
-            className="rounded-full p-2 text-content-secondary hover:bg-white/10 hover:text-content-primary active:scale-95 transition-all"
+            className="rounded-full p-2 text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:scale-95 transition-all"
           >
             <SkipForward className="h-4 w-4" />
           </button>

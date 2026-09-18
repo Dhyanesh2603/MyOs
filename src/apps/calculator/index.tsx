@@ -105,7 +105,7 @@ const CalculatorApp: React.FC<AppProps> = ({ windowId }) => {
   return (
     <div className="flex h-full w-full flex-col bg-surface-panel p-4 text-content-primary select-none">
       {/* Expression Tape Display */}
-      <div className="flex flex-1 flex-col justify-end rounded-2xl border border-white/5 bg-surface-overlay/40 p-4 font-mono text-right">
+      <div className="flex flex-1 flex-col justify-end rounded-2xl border border-border-subtle bg-surface-overlay/50 p-4 font-mono text-right">
         <div className="h-6 truncate text-xs text-content-tertiary">
           {expression || ' '}
         </div>
@@ -118,25 +118,25 @@ const CalculatorApp: React.FC<AppProps> = ({ windowId }) => {
       <div className="mt-4 grid grid-cols-4 gap-2 text-sm font-medium">
         <button
           onClick={handleClear}
-          className="rounded-xl border border-white/5 bg-white/5 p-3 text-rose-400 hover:bg-rose-500/10 active:scale-95 transition-all"
+          className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-rose-500 hover:bg-rose-500/15 active:scale-95 transition-all"
         >
           AC
         </button>
         <button
           onClick={handleBackspace}
-          className="rounded-xl border border-white/5 bg-white/5 p-3 flex items-center justify-center text-content-secondary hover:bg-white/10 active:scale-95 transition-all"
+          className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 flex items-center justify-center text-content-secondary hover:bg-surface-subtle active:scale-95 transition-all"
         >
           <Delete className="h-4 w-4" />
         </button>
         <button
           onClick={() => handleOperator('%')}
-          className="rounded-xl border border-white/5 bg-white/5 p-3 text-content-secondary hover:bg-white/10 active:scale-95 transition-all"
+          className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-secondary hover:bg-surface-subtle active:scale-95 transition-all"
         >
           %
         </button>
         <button
           onClick={() => handleOperator('÷')}
-          className="rounded-xl border border-accent-primary/20 bg-accent-muted/40 p-3 text-accent-hover hover:bg-accent-primary/30 active:scale-95 transition-all"
+          className="rounded-xl border border-accent-primary/20 bg-accent-muted/30 p-3 text-accent-hover hover:bg-accent-primary/20 active:scale-95 transition-all"
         >
           ÷
         </button>
@@ -145,14 +145,14 @@ const CalculatorApp: React.FC<AppProps> = ({ windowId }) => {
           <button
             key={d}
             onClick={() => handleDigit(d)}
-            className="rounded-xl border border-white/5 bg-white/[0.04] p-3 text-content-primary hover:bg-white/10 active:scale-95 transition-all"
+            className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-primary hover:bg-surface-subtle active:scale-95 transition-all"
           >
             {d}
           </button>
         ))}
         <button
           onClick={() => handleOperator('×')}
-          className="rounded-xl border border-accent-primary/20 bg-accent-muted/40 p-3 text-accent-hover hover:bg-accent-primary/30 active:scale-95 transition-all"
+          className="rounded-xl border border-accent-primary/20 bg-accent-muted/30 p-3 text-accent-hover hover:bg-accent-primary/20 active:scale-95 transition-all"
         >
           ×
         </button>
@@ -161,14 +161,14 @@ const CalculatorApp: React.FC<AppProps> = ({ windowId }) => {
           <button
             key={d}
             onClick={() => handleDigit(d)}
-            className="rounded-xl border border-white/5 bg-white/[0.04] p-3 text-content-primary hover:bg-white/10 active:scale-95 transition-all"
+            className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-primary hover:bg-surface-subtle active:scale-95 transition-all"
           >
             {d}
           </button>
         ))}
         <button
           onClick={() => handleOperator('-')}
-          className="rounded-xl border border-accent-primary/20 bg-accent-muted/40 p-3 text-accent-hover hover:bg-accent-primary/30 active:scale-95 transition-all"
+          className="rounded-xl border border-accent-primary/20 bg-accent-muted/30 p-3 text-accent-hover hover:bg-accent-primary/20 active:scale-95 transition-all"
         >
           -
         </button>
@@ -177,27 +177,27 @@ const CalculatorApp: React.FC<AppProps> = ({ windowId }) => {
           <button
             key={d}
             onClick={() => handleDigit(d)}
-            className="rounded-xl border border-white/5 bg-white/[0.04] p-3 text-content-primary hover:bg-white/10 active:scale-95 transition-all"
+            className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-primary hover:bg-surface-subtle active:scale-95 transition-all"
           >
             {d}
           </button>
         ))}
         <button
           onClick={() => handleOperator('+')}
-          className="rounded-xl border border-accent-primary/20 bg-accent-muted/40 p-3 text-accent-hover hover:bg-accent-primary/30 active:scale-95 transition-all"
+          className="rounded-xl border border-accent-primary/20 bg-accent-muted/30 p-3 text-accent-hover hover:bg-accent-primary/20 active:scale-95 transition-all"
         >
           +
         </button>
 
         <button
           onClick={() => handleDigit('0')}
-          className="col-span-2 rounded-xl border border-white/5 bg-white/[0.04] p-3 text-content-primary hover:bg-white/10 active:scale-95 transition-all text-left pl-6"
+          className="col-span-2 rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-primary hover:bg-surface-subtle active:scale-95 transition-all text-left pl-6"
         >
           0
         </button>
         <button
           onClick={() => handleDigit('.')}
-          className="rounded-xl border border-white/5 bg-white/[0.04] p-3 text-content-primary hover:bg-white/10 active:scale-95 transition-all"
+          className="rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 text-content-primary hover:bg-surface-subtle active:scale-95 transition-all"
         >
           .
         </button>

@@ -61,7 +61,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
     return lines.map((line, idx) => {
       if (line.startsWith('# ')) {
         return (
-          <h1 key={idx} className="text-xl font-semibold tracking-tight text-content-primary mb-3 mt-4 border-b border-white/[0.08] pb-1.5">
+          <h1 key={idx} className="text-xl font-semibold tracking-tight text-content-primary mb-3 mt-4 border-b border-border-subtle pb-1.5">
             {line.slice(2)}
           </h1>
         );
@@ -82,7 +82,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
       }
       if (line.startsWith('> ')) {
         return (
-          <blockquote key={idx} className="border-l-2 border-accent-primary/60 pl-3.5 py-1 text-content-secondary italic text-xs my-2 bg-white/[0.02] rounded-r">
+          <blockquote key={idx} className="border-l-2 border-accent-primary pl-3.5 py-1 text-content-secondary italic text-xs my-2 bg-surface-subtle/40 rounded-r">
             {line.slice(2)}
           </blockquote>
         );
@@ -98,7 +98,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
       if (line.startsWith('- [ ] ')) {
         return (
           <div key={idx} className="flex items-center gap-2 text-xs text-content-primary my-1">
-            <span className="h-3.5 w-3.5 rounded border border-white/20 bg-white/[0.04]" />
+            <span className="h-3.5 w-3.5 rounded border border-border-subtle bg-surface-subtle/50" />
             <span>{line.slice(6)}</span>
           </div>
         );
@@ -113,7 +113,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
       }
       if (line.startsWith('```')) {
         return (
-          <div key={idx} className="my-1 font-mono text-[10px] text-accent-primary/70">
+          <div key={idx} className="my-1 font-mono text-[10px] text-accent-primary">
             {line}
           </div>
         );
@@ -130,28 +130,28 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#0f1115] text-content-primary">
+    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary">
       {/* Obsidian Document Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.06] bg-[#0c0d10] px-3.5 py-2 text-xs select-none">
+      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3.5 py-2 text-xs select-none">
         <div className="flex items-center gap-2">
           <BookOpen className="h-3.5 w-3.5 text-accent-primary" />
           <span className="font-mono text-[11px] font-medium text-content-primary">
             {filePath.split('/').pop()}
           </span>
-          <span className="font-mono text-[9px] text-content-tertiary bg-white/[0.04] px-1.5 py-0.5 rounded">
+          <span className="font-mono text-[9px] text-content-tertiary bg-surface-subtle border border-border-subtle px-1.5 py-0.5 rounded">
             MD
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Mode Switcher: Edit vs Reading View */}
-          <div className="flex items-center rounded-md border border-white/[0.08] bg-white/[0.03] p-0.5">
+          <div className="flex items-center rounded-md border border-border-subtle bg-surface-subtle/50 p-0.5">
             <button
               onClick={() => setViewMode('edit')}
               title="Edit Mode"
               className={`flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-mono transition-colors ${
                 viewMode === 'edit'
-                  ? 'bg-white/[0.1] text-content-primary'
+                  ? 'bg-surface-panel text-content-primary shadow-sm'
                   : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
@@ -162,7 +162,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
               title="Reading View"
               className={`flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-mono transition-colors ${
                 viewMode === 'preview'
-                  ? 'bg-white/[0.1] text-content-primary'
+                  ? 'bg-surface-panel text-content-primary shadow-sm'
                   : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
@@ -173,10 +173,10 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
           {/* Save Button */}
           <button
             onClick={handleSave}
-            className={`flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px] transition-colors ${
+            className={`flex items-center gap-1 rounded border px-2 py-1 font-mono text-[10px] transition-colors ${
               isSaved
-                ? 'bg-white/[0.04] text-emerald-400'
-                : 'bg-accent-primary text-white hover:bg-accent-hover'
+                ? 'bg-surface-subtle text-emerald-400 border-border-subtle'
+                : 'bg-accent-primary border-accent-primary text-white hover:bg-accent-hover'
             }`}
           >
             {isSaved ? (
@@ -193,14 +193,14 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
       </div>
 
       {/* Obsidian Frontmatter Metadata Bar */}
-      <div className="flex items-center gap-2 border-b border-white/[0.04] bg-white/[0.015] px-4 py-1.5 select-none overflow-x-auto text-[10px] font-mono text-content-tertiary">
+      <div className="flex items-center gap-2 border-b border-border-subtle bg-surface-subtle/20 px-4 py-1.5 select-none overflow-x-auto text-[10px] font-mono text-content-tertiary">
         <span className="flex items-center gap-1 text-content-secondary">
           <Tag className="h-2.5 w-2.5" /> Tags:
         </span>
         {tags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-0.5 rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.2 text-accent-primary"
+            className="flex items-center gap-0.5 rounded border border-border-subtle bg-surface-subtle/60 px-1.5 py-0.2 text-accent-primary"
           >
             <Hash className="h-2 w-2 opacity-50" />
             {tag.replace('#', '')}
@@ -218,16 +218,17 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
             className="h-full w-full resize-none bg-transparent font-mono text-xs leading-relaxed text-content-primary outline-none placeholder:text-content-tertiary"
             placeholder="Type your markdown notes here..."
             autoFocus
+            spellCheck={false}
           />
         ) : (
-          <div className="prose prose-invert max-w-none text-xs leading-relaxed">
+          <div className="h-full w-full font-sans select-text">
             {renderMarkdown(content)}
           </div>
         )}
       </div>
 
-      {/* Obsidian Status Bar at Bottom */}
-      <div className="flex items-center justify-between border-t border-white/[0.06] bg-[#0c0d10] px-3.5 py-1 text-[9px] font-mono text-content-tertiary select-none">
+      {/* Obsidian Technical Status Bar */}
+      <div className="flex items-center justify-between border-t border-border-subtle bg-surface-overlay/90 px-3.5 py-1 text-[9px] font-mono text-content-tertiary select-none">
         <div className="flex items-center gap-3">
           <span>{wordsCount} words</span>
           <span>{charsCount} characters</span>
