@@ -22,40 +22,40 @@ export const SystemStatsWidget: React.FC = () => {
   const fileCount = Object.keys(fs.nodes).length;
 
   return (
-    <div className="flex w-64 flex-col rounded-3xl border border-white/10 bg-surface-panel/50 p-4 shadow-xl backdrop-blur-md text-content-primary select-none transition-all hover:bg-surface-panel/60">
-      <div className="flex items-center justify-between border-b border-white/5 pb-2">
-        <div className="flex items-center gap-1.5 font-mono text-xs text-emerald-400">
-          <Activity className="h-3.5 w-3.5 animate-pulse" />
-          <span>Kernel Monitor</span>
+    <div className="flex w-60 flex-col rounded-xl border border-white/[0.08] bg-[#0c0e12]/85 p-3.5 shadow-xl backdrop-blur-md text-content-primary select-none transition-all hover:border-white/[0.14]">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+        <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-content-secondary">
+          <Activity className="h-3 w-3 text-emerald-400" />
+          <span>KERNEL TELEMETRY</span>
         </div>
-        <span className="font-mono text-[10px] text-content-tertiary">
+        <span className="font-mono text-[9px] text-content-tertiary">
           {formatUptime(uptimeSec)}
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-        <div className="flex flex-col items-center rounded-xl bg-white/5 p-2 font-mono">
-          <Cpu className="h-3.5 w-3.5 text-accent-primary opacity-70" />
-          <span className="mt-1 text-sm font-semibold text-content-primary">
+      <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-center">
+        <div className="flex flex-col items-center rounded-lg border border-white/[0.05] bg-white/[0.02] p-1.5 font-mono">
+          <Cpu className="h-3 w-3 text-content-tertiary" />
+          <span className="mt-0.5 text-xs font-semibold text-content-primary">
             {runningProcesses.length}
           </span>
-          <span className="text-[9px] text-content-tertiary uppercase">Procs</span>
+          <span className="text-[8px] text-content-tertiary uppercase tracking-wider">Procs</span>
         </div>
 
-        <div className="flex flex-col items-center rounded-xl bg-white/5 p-2 font-mono">
-          <Layers className="h-3.5 w-3.5 text-cyan-400 opacity-70" />
-          <span className="mt-1 text-sm font-semibold text-content-primary">
+        <div className="flex flex-col items-center rounded-lg border border-white/[0.05] bg-white/[0.02] p-1.5 font-mono">
+          <Layers className="h-3 w-3 text-content-tertiary" />
+          <span className="mt-0.5 text-xs font-semibold text-content-primary">
             {windows.length}
           </span>
-          <span className="text-[9px] text-content-tertiary uppercase">Wins</span>
+          <span className="text-[8px] text-content-tertiary uppercase tracking-wider">Wins</span>
         </div>
 
-        <div className="flex flex-col items-center rounded-xl bg-white/5 p-2 font-mono">
-          <HardDrive className="h-3.5 w-3.5 text-amber-400 opacity-70" />
-          <span className="mt-1 text-sm font-semibold text-content-primary">
+        <div className="flex flex-col items-center rounded-lg border border-white/[0.05] bg-white/[0.02] p-1.5 font-mono">
+          <HardDrive className="h-3 w-3 text-content-tertiary" />
+          <span className="mt-0.5 text-xs font-semibold text-content-primary">
             {fileCount}
           </span>
-          <span className="text-[9px] text-content-tertiary uppercase">Inodes</span>
+          <span className="text-[8px] text-content-tertiary uppercase tracking-wider">Inodes</span>
         </div>
       </div>
     </div>

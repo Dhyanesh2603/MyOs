@@ -21,26 +21,30 @@ export const ClockWidget: React.FC = () => {
   });
 
   return (
-    <div className="flex w-64 flex-col rounded-3xl border border-white/10 bg-surface-panel/50 p-4 shadow-xl backdrop-blur-md text-content-primary select-none transition-all hover:bg-surface-panel/60">
-      <div className="flex items-baseline justify-between">
-        <span className="font-mono text-xs uppercase tracking-widest text-accent-primary">
-          Flow Time
-        </span>
-        <span className="font-mono text-[10px] text-content-tertiary">
+    <div className="flex w-60 flex-col rounded-xl border border-white/[0.08] bg-[#0c0e12]/85 p-3.5 shadow-xl backdrop-blur-md text-content-primary select-none transition-all hover:border-white/[0.14]">
+      <div className="flex items-center justify-between">
+        {/* Nothing OS Solitary Red Accent Dot */}
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#d71921] animate-pulse" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-content-secondary">
+            FLOW TIME
+          </span>
+        </div>
+        <span className="font-mono text-[9px] text-content-tertiary">
           UTC{time.getTimezoneOffset() > 0 ? '-' : '+'}{Math.abs(time.getTimezoneOffset() / 60)}
         </span>
       </div>
 
       <div className="mt-2 flex items-baseline gap-1 font-mono">
-        <span className="text-4xl font-light tracking-tight text-content-primary">
+        <span className="text-3xl font-light tracking-tight text-content-primary">
           {hours}:{minutes}
         </span>
-        <span className="text-xs font-light text-content-tertiary">
+        <span className="text-xs text-content-tertiary">
           :{seconds}
         </span>
       </div>
 
-      <div className="mt-1 font-mono text-xs text-content-secondary">
+      <div className="mt-1 font-mono text-[11px] text-content-secondary">
         {dateStr}
       </div>
     </div>
