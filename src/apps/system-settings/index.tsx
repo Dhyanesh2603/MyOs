@@ -36,21 +36,21 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const { wallpapers, currentWallpaperId, setWallpaper } = useWallpaperStore();
 
   return (
-    <div className="flex h-full w-full bg-surface-panel text-content-primary">
-      {/* Settings Navigation Rail */}
-      <aside className="w-48 border-r border-white/5 bg-surface-overlay/30 p-3 flex flex-col justify-between">
+    <div className="flex h-full w-full bg-[#0c0e12] text-content-primary">
+      {/* Linear-Style Left Navigation Rail */}
+      <aside className="w-44 border-r border-white/[0.06] bg-[#090a0d]/90 p-2.5 flex flex-col justify-between select-none">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 px-2 py-2 text-xs font-semibold text-content-secondary">
-            <SettingsIcon className="h-4 w-4 text-accent-primary" />
+          <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-content-primary">
+            <SettingsIcon className="h-3.5 w-3.5 text-accent-primary" />
             <span>Preferences</span>
           </div>
 
           <button
             onClick={() => setActiveTab('appearance')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'appearance'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
+                ? 'bg-white/[0.08] text-content-primary font-semibold'
+                : 'text-content-secondary hover:bg-white/[0.04]'
             }`}
           >
             <Palette className="h-3.5 w-3.5" />
@@ -59,22 +59,22 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
 
           <button
             onClick={() => setActiveTab('geometry')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'geometry'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
+                ? 'bg-white/[0.08] text-content-primary font-semibold'
+                : 'text-content-secondary hover:bg-white/[0.04]'
             }`}
           >
             <Sliders className="h-3.5 w-3.5" />
-            Window & Blur
+            Geometry & Blur
           </button>
 
           <button
             onClick={() => setActiveTab('accessibility')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'accessibility'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
+                ? 'bg-white/[0.08] text-content-primary font-semibold'
+                : 'text-content-secondary hover:bg-white/[0.04]'
             }`}
           >
             <Accessibility className="h-3.5 w-3.5" />
@@ -83,10 +83,10 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
 
           <button
             onClick={() => setActiveTab('about')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
               activeTab === 'about'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
+                ? 'bg-white/[0.08] text-content-primary font-semibold'
+                : 'text-content-secondary hover:bg-white/[0.04]'
             }`}
           >
             <Info className="h-3.5 w-3.5" />
@@ -94,22 +94,22 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
           </button>
         </div>
 
-        <div className="space-y-0.5 px-2 py-1 font-mono text-[10px] text-content-tertiary">
-          <div>proc: {processId.slice(-6)}</div>
-          <div>win: {windowId.slice(-6)}</div>
+        <div className="space-y-0.5 px-2 py-1 font-mono text-[9px] text-content-tertiary">
+          <div>proc: {processId.slice(-4)}</div>
+          <div>win: {windowId.slice(-4)}</div>
         </div>
       </aside>
 
       {/* Main Settings Content Viewport */}
-      <main className="flex-1 overflow-y-auto p-6 space-y-6">
+      <main className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#0e1014]">
         {activeTab === 'appearance' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <h3 className="text-sm font-semibold">Theme Mode</h3>
-              <p className="text-xs text-content-secondary mt-0.5">
-                Switch the operating system color space.
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">Theme Mode</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Switch between high-contrast and natural dark architectures.
               </p>
-              <div className="mt-3 grid grid-cols-3 gap-2.5">
+              <div className="mt-2.5 grid grid-cols-3 gap-2">
                 {[
                   { id: 'dark', label: 'Dark Obsidian', icon: Moon },
                   { id: 'light', label: 'Light Daylight', icon: Sun },
@@ -121,26 +121,26 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     <button
                       key={item.id}
                       onClick={() => setTheme(item.id as ThemeId)}
-                      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-xs transition-all ${
+                      className={`flex flex-col items-center gap-1.5 rounded-lg border p-2.5 text-xs transition-all ${
                         isSelected
-                          ? 'border-accent-primary bg-accent-primary/15 text-content-primary shadow-sm'
-                          : 'border-white/10 bg-white/5 text-content-secondary hover:bg-white/10'
+                          ? 'border-white/[0.2] bg-white/[0.08] text-content-primary shadow-sm'
+                          : 'border-white/[0.06] bg-white/[0.02] text-content-secondary hover:bg-white/[0.04]'
                       }`}
                     >
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
+                      <Icon className="h-3.5 w-3.5" />
+                      <span className="text-[11px] font-medium">{item.label}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="border-t border-white/5 pt-5">
-              <h3 className="text-sm font-semibold">Accent Color Spectrum</h3>
-              <p className="text-xs text-content-secondary mt-0.5">
-                Updates CSS variables in real time with zero React re-render delay.
+            <div className="border-t border-white/[0.06] pt-4">
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">Accent Color Spectrum</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Real-time DOM CSS variable injection with zero React re-renders.
               </p>
-              <div className="mt-3 grid grid-cols-3 gap-2.5 sm:grid-cols-6">
+              <div className="mt-2.5 grid grid-cols-3 gap-2 sm:grid-cols-6">
                 {(Object.keys(ACCENT_COLORS) as AccentColorId[]).map((key) => {
                   const def = ACCENT_COLORS[key];
                   const isSelected = accentColor === key;
@@ -148,17 +148,17 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     <button
                       key={key}
                       onClick={() => setAccentColor(key)}
-                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-2.5 text-[11px] transition-all ${
+                      className={`flex flex-col items-center gap-1.5 rounded-lg border p-2 text-[10px] font-mono transition-all ${
                         isSelected
-                          ? 'border-white/30 bg-white/10 text-content-primary'
-                          : 'border-white/5 bg-white/5 text-content-tertiary hover:bg-white/10'
+                          ? 'border-white/[0.25] bg-white/[0.08] text-content-primary'
+                          : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary hover:bg-white/[0.04]'
                       }`}
                     >
                       <div
                         style={{ backgroundColor: `rgb(${def.primary})` }}
-                        className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm"
+                        className="flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
                       >
-                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                        {isSelected && <Check className="h-2.5 w-2.5 text-white" />}
                       </div>
                       <span className="truncate">{def.label.split(' ')[0]}</span>
                     </button>
@@ -167,21 +167,21 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </div>
             </div>
 
-            <div className="border-t border-white/5 pt-5">
-              <h3 className="text-sm font-semibold">Wallpaper Backdrop</h3>
-              <p className="text-xs text-content-secondary mt-0.5">
-                Curated geometric and kinetic ambient backdrops.
+            <div className="border-t border-white/[0.06] pt-4">
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">Architectural Backdrops</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Minimalist carbon lattices and Apple Pro gradient tones.
               </p>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {wallpapers.map((w) => (
                   <button
                     key={w.id}
                     onClick={() => setWallpaper(w.id)}
                     style={w.style}
-                    className={`h-16 rounded-xl border p-2 text-left text-[11px] font-medium transition-all ${
+                    className={`h-14 rounded-lg border p-2 text-left text-[10px] font-mono transition-all ${
                       w.id === currentWallpaperId
-                        ? 'border-accent-primary ring-2 ring-accent-primary/40 text-white'
-                        : 'border-white/10 opacity-70 hover:opacity-100'
+                        ? 'border-white/[0.3] ring-1 ring-white/20 text-white'
+                        : 'border-white/[0.08] opacity-60 hover:opacity-100'
                     }`}
                   >
                     <span className="rounded bg-black/60 px-1.5 py-0.5 backdrop-blur-sm">
@@ -195,98 +195,77 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
         )}
 
         {activeTab === 'geometry' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Window Corner Radius</h3>
-                <span className="font-mono text-xs text-accent-primary">
+                <h3 className="text-xs font-semibold tracking-tight text-content-primary">Window Corner Radius</h3>
+                <span className="font-mono text-[11px] text-accent-primary">
                   {windowRadius}px
                 </span>
               </div>
-              <p className="text-xs text-content-secondary mt-0.5">
+              <p className="text-[11px] text-content-secondary mt-0.5">
                 Adjust window curvature globally via CSS variables.
               </p>
               <input
                 type="range"
-                min="8"
-                max="28"
+                min="6"
+                max="24"
                 value={windowRadius}
                 onChange={(e) => setWindowRadius(Number(e.target.value))}
                 className="mt-3 w-full accent-accent-primary cursor-pointer"
               />
             </div>
 
-            <div className="border-t border-white/5 pt-5">
+            <div className="border-t border-white/[0.06] pt-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Glass Frosted Blur Intensity</h3>
-                <span className="font-mono text-xs text-accent-primary">
-                  {blurEnabled ? '24px' : '0px (Disabled)'}
+                <h3 className="text-xs font-semibold tracking-tight text-content-primary">Glass Blur Materiality</h3>
+                <span className="font-mono text-[11px] text-accent-primary">
+                  {blurEnabled ? '16px' : '0px (Disabled)'}
                 </span>
               </div>
-              <p className="text-xs text-content-secondary mt-0.5">
-                Adjust backdrop-filter blur for low-end GPU performance.
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Backdrop-filter blur for low-end GPU performance.
               </p>
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-2.5 flex items-center gap-2">
                 <button
-                  onClick={() => setBlurAmount(24)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs ${
+                  onClick={() => setBlurAmount(16)}
+                  className={`rounded border px-3 py-1 text-xs font-mono transition-colors ${
                     blurEnabled
-                      ? 'border-accent-primary bg-accent-primary/20 text-content-primary'
-                      : 'border-white/10 bg-white/5 text-content-secondary'
+                      ? 'border-white/[0.2] bg-white/[0.08] text-content-primary'
+                      : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary'
                   }`}
                 >
-                  Enable Frosted Blur (24px)
+                  Enabled (16px)
                 </button>
                 <button
                   onClick={() => setBlurAmount(0)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs ${
+                  className={`rounded border px-3 py-1 text-xs font-mono transition-colors ${
                     !blurEnabled
-                      ? 'border-accent-primary bg-accent-primary/20 text-content-primary'
-                      : 'border-white/10 bg-white/5 text-content-secondary'
+                      ? 'border-white/[0.2] bg-white/[0.08] text-content-primary'
+                      : 'border-white/[0.06] bg-white/[0.02] text-content-tertiary'
                   }`}
                 >
-                  Disable Blur (Max Performance)
+                  Disabled (High Performance)
                 </button>
-              </div>
-            </div>
-
-            {/* Live Token Preview Box */}
-            <div className="border-t border-white/5 pt-5">
-              <h4 className="text-xs font-mono uppercase text-content-tertiary">
-                Live Dynamic Token Preview
-              </h4>
-              <div
-                style={{ borderRadius: `${windowRadius}px` }}
-                className="mt-3 border border-white/15 bg-surface-overlay/80 p-4 shadow-window backdrop-blur-window transition-all"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-accent-primary" />
-                  <span className="text-xs font-semibold text-content-primary">
-                    Real-Time Token Mutation
-                  </span>
-                </div>
-                <p className="mt-1 text-[11px] text-content-secondary">
-                  Notice how adjusting the radius slider changes this preview and all open windows instantly without full page reloads.
-                </p>
               </div>
             </div>
           </div>
         )}
 
         {activeTab === 'accessibility' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <h3 className="text-sm font-semibold">Reduced Motion</h3>
-              <p className="text-xs text-content-secondary mt-0.5">
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">Reduced Motion</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
                 Disable heavy spring animations for vestibular comfort.
               </p>
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-2.5">
                 <button
                   onClick={() => setReducedMotion(!reducedMotion)}
-                  className={`rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors ${
+                  className={`rounded border px-3 py-1.5 text-xs font-mono transition-colors ${
                     reducedMotion
                       ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
-                      : 'border-white/10 bg-white/5 text-content-secondary hover:bg-white/10'
+                      : 'border-white/[0.08] bg-white/[0.02] text-content-secondary hover:bg-white/[0.06]'
                   }`}
                 >
                   {reducedMotion ? 'Reduced Motion: ON' : 'Reduced Motion: OFF'}
@@ -294,14 +273,14 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               </div>
             </div>
 
-            <div className="border-t border-white/5 pt-5">
-              <h3 className="text-sm font-semibold">High Contrast Profile</h3>
-              <p className="text-xs text-content-secondary mt-0.5">
+            <div className="border-t border-white/[0.06] pt-4">
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">High Contrast Profile</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
                 Maximum visibility mode with solid pure blacks and high-luminance borders.
               </p>
               <button
                 onClick={() => setTheme('high-contrast')}
-                className="mt-3 rounded-lg border border-white/20 bg-white/5 px-3.5 py-2 text-xs text-content-primary hover:bg-white/10"
+                className="mt-2.5 rounded border border-white/[0.15] bg-white/[0.04] px-3 py-1.5 text-xs font-mono text-content-primary hover:bg-white/[0.08]"
               >
                 Activate High Contrast Theme
               </button>
@@ -310,25 +289,23 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
         )}
 
         {activeTab === 'about' && (
-          <div className="space-y-4 text-xs leading-relaxed text-content-secondary">
+          <div className="space-y-3 text-xs text-content-secondary leading-relaxed">
             <div>
-              <h3 className="text-sm font-semibold text-content-primary">FlowOS v0.1.0</h3>
-              <p className="text-[11px] text-accent-primary font-mono mt-0.5">
-                Browser-Based Desktop Operating System
+              <h3 className="text-sm font-semibold tracking-tight text-content-primary">FlowOS v0.2.0</h3>
+              <p className="text-[11px] text-accent-primary font-mono">
+                Linear · Raycast · Arc · Warp · Apple Pro Apps · Obsidian · Nothing OS
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-surface-overlay/40 p-4 font-mono text-[11px] space-y-1.5">
-              <div><span className="text-content-tertiary">Kernel:</span> React 19 + TypeScript + Zustand</div>
-              <div><span className="text-content-tertiary">Motion Engine:</span> Motion (GPU-compositor spring values)</div>
-              <div><span className="text-content-tertiary">Storage:</span> IndexedDB POSIX Virtual File System</div>
-              <div><span className="text-content-tertiary">Window Geometry:</span> 8-Axis Pointer Capture Frame</div>
-              <div><span className="text-content-tertiary">Focus Stack:</span> Bounded Array Stacking Engine</div>
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 font-mono text-[10px] space-y-1">
+              <div><span className="text-content-tertiary">Design Language:</span> Linear Obsidian Carbon</div>
+              <div><span className="text-content-tertiary">Command Engine:</span> Raycast Spotlight</div>
+              <div><span className="text-content-tertiary">Workspace Navigation:</span> Arc Nested Spaces</div>
+              <div><span className="text-content-tertiary">Terminal Shell:</span> Warp Block Cards</div>
+              <div><span className="text-content-tertiary">Hierarchy & Titlebars:</span> Apple Pro Apps Restraint</div>
+              <div><span className="text-content-tertiary">Notes & Markdown:</span> Obsidian Reading Views</div>
+              <div><span className="text-content-tertiary">Micro-Details:</span> Nothing OS Restrained Dot</div>
             </div>
-
-            <p>
-              Designed and built as a long-term flagship showcase of elite frontend engineering, interaction design, performance optimization, and scalable modular architecture.
-            </p>
           </div>
         )}
       </main>
@@ -342,8 +319,8 @@ export const settingsManifest: AppManifest = {
   description: 'Customize FlowOS preferences, appearance, window physics, and accessibility.',
   category: 'system',
   icon: SettingsIcon,
-  defaultSize: { width: 660, height: 490 },
-  constraints: { minWidth: 520, minHeight: 380, maxWidth: 960, maxHeight: 760 },
+  defaultSize: { width: 620, height: 460 },
+  constraints: { minWidth: 500, minHeight: 360, maxWidth: 960, maxHeight: 760 },
   allowMultipleInstances: false,
   permissions: ['notifications'],
   component: SettingsApp,
