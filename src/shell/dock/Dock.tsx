@@ -62,10 +62,10 @@ export const Dock: React.FC<DockProps> = ({
       aria-label="Application Dock"
       onMouseMove={(e) => mouseX.set(e.clientX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500] flex items-end gap-2.5 rounded-dock border border-white/10 bg-surface-panel/70 px-3 py-2 shadow-dock backdrop-blur-dock"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500] flex items-end gap-2 rounded-dock border border-white/[0.08] bg-[#0c0e12]/85 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
       style={{
         boxShadow:
-          '0 20px 40px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+          '0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)',
       }}
     >
       {/* Pinned Applications */}

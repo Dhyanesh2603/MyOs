@@ -54,10 +54,10 @@ export const DockItem: React.FC<DockItemProps> = ({
 
   return (
     <div className="relative flex flex-col items-center">
-      {/* Sleek Floated Tooltip */}
+      {/* Sleek Linear Floated Tooltip */}
       <div
         role="tooltip"
-        className={`pointer-events-none absolute -top-10 z-50 rounded-full border border-white/10 bg-surface-overlay/95 px-2.5 py-1 text-[11px] font-medium tracking-wide text-content-primary shadow-lg backdrop-blur-md transition-all duration-150 ${
+        className={`pointer-events-none absolute -top-9 z-50 rounded border border-white/10 bg-[#121316]/95 px-2 py-0.5 text-[10px] font-mono tracking-tight text-content-primary shadow-lg backdrop-blur-md transition-all duration-150 ${
           isHovered
             ? 'opacity-100 -translate-y-1 scale-100'
             : 'opacity-0 translate-y-1 scale-95'
@@ -75,20 +75,20 @@ export const DockItem: React.FC<DockItemProps> = ({
         onMouseLeave={() => setIsHovered(false)}
         onFocus={() => setIsHovered(true)}
         onBlur={() => setIsHovered(false)}
-        whileTap={{ scale: 0.88 }}
+        whileTap={{ scale: 0.9 }}
         aria-label={`Open ${manifest.name}`}
         aria-haspopup="false"
-        className="relative flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-content-primary shadow-sm backdrop-blur-md transition-colors hover:border-white/25 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+        className="relative flex items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-content-primary shadow-sm backdrop-blur-md transition-colors hover:border-white/[0.18] hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
       >
-        <IconComponent className="h-5 w-5 transition-transform duration-150" />
+        <IconComponent className="h-4.5 w-4.5 transition-transform duration-150" />
 
-        {/* Dynamic Running / Focus Indicator */}
+        {/* Linear / Nothing OS Active Indicator Pip */}
         {isRunning && (
           <span
-            className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 transition-all duration-200 ${
+            className={`absolute -bottom-1 left-1/2 -translate-x-1/2 transition-all duration-200 ${
               isFocused
-                ? 'h-1 w-3 rounded-full bg-accent-primary shadow-[0_0_8px_rgba(99,102,241,0.85)]'
-                : 'h-1 w-1 rounded-full bg-white/60'
+                ? 'h-1 w-2.5 rounded-full bg-accent-primary'
+                : 'h-1 w-1 rounded-full bg-white/40'
             }`}
           />
         )}

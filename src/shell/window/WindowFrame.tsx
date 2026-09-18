@@ -53,10 +53,10 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
           height: `${windowState.size.height}px`,
           zIndex,
         }}
-        className={`group flex flex-col overflow-hidden rounded-window border transition-colors duration-150 ${
+        className={`group flex flex-col overflow-hidden rounded-window border transition-all duration-150 ${
           windowState.isFocused
-            ? 'border-accent-primary/50 shadow-window ring-1 ring-accent-primary/20'
-            : 'border-white/10 shadow-lg opacity-[0.96]'
+            ? 'border-white/[0.18] shadow-window'
+            : 'border-white/[0.07] shadow-lg opacity-[0.98]'
         } ${windowState.isDragging ? 'select-none pointer-events-auto' : ''}`}
       >
         {/* 8-Axis Resize Frame */}

@@ -103,17 +103,17 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onDoubleClick={handleDoubleClick}
-      className={`no-select relative flex h-10 select-none items-center justify-between border-b px-3.5 transition-colors ${
+      className={`no-select relative flex h-9 select-none items-center justify-between border-b px-3 transition-colors ${
         windowState.isFocused
-          ? 'border-white/10 bg-surface-overlay/90'
-          : 'border-white/5 bg-surface-panel/75'
+          ? 'border-white/[0.08] bg-surface-overlay/95'
+          : 'border-white/[0.04] bg-surface-panel/80'
       } ${windowState.isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
-      {/* Title & App Metadata */}
-      <div className="flex items-center gap-2.5 overflow-hidden">
+      {/* Title & App Metadata (Apple Pro Apps Restraint) */}
+      <div className="flex items-center gap-2 overflow-hidden">
         {IconComponent && (
           <IconComponent
-            className={`h-4 w-4 shrink-0 transition-colors ${
+            className={`h-3.5 w-3.5 shrink-0 transition-colors ${
               windowState.isFocused
                 ? 'text-accent-primary'
                 : 'text-content-tertiary'
@@ -121,7 +121,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
           />
         )}
         <span
-          className={`truncate text-xs font-medium transition-colors ${
+          className={`truncate text-xs font-medium tracking-tight transition-colors ${
             windowState.isFocused
               ? 'text-content-primary'
               : 'text-content-secondary'
@@ -129,13 +129,13 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
         >
           {windowState.title}
         </span>
-        <span className="hidden font-mono text-[10px] text-content-tertiary sm:inline-block">
-          {windowState.processId.slice(-6)}
+        <span className="hidden font-mono text-[9px] text-content-tertiary bg-white/[0.04] px-1 py-0.2 rounded sm:inline-block">
+          {windowState.processId.slice(-4)}
         </span>
       </div>
 
-      {/* Original FlowOS Spatial Control Rail */}
-      <div className="flex items-center gap-1">
+      {/* Bespoke Restrained Window Control Rail */}
+      <div className="flex items-center gap-0.5">
         {/* Minimize Button */}
         <button
           onClick={(e) => {
@@ -143,9 +143,9 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
-          className="flex h-6 w-6 items-center justify-center rounded-md text-content-secondary transition-colors hover:bg-white/10 hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-white/[0.08] hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
         >
-          <Minus className="h-3.5 w-3.5" />
+          <Minus className="h-3 w-3" />
         </button>
 
         {/* Maximize / Restore Button */}
@@ -158,25 +158,25 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             });
           }}
           aria-label={windowState.isMaximized ? 'Restore Window' : 'Maximize Window'}
-          className="flex h-6 w-6 items-center justify-center rounded-md text-content-secondary transition-colors hover:bg-white/10 hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-white/[0.08] hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
         >
           {windowState.isMaximized ? (
-            <Copy className="h-3 w-3" />
+            <Copy className="h-2.5 w-2.5" />
           ) : (
-            <Square className="h-3 w-3" />
+            <Square className="h-2.5 w-2.5" />
           )}
         </button>
 
-        {/* Close Button with subtle crimson glow */}
+        {/* Close Button with subtle crimson dissipation */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             closeWindow(windowState.id);
           }}
           aria-label="Close Window"
-          className="flex h-6 w-6 items-center justify-center rounded-md text-content-secondary transition-colors hover:bg-rose-500/20 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-rose-500/15 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-3 w-3" />
         </button>
       </div>
     </header>
