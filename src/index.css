@@ -4,74 +4,77 @@
 
 @layer base {
   :root {
-    /* Color Tokens (RGB values for Tailwind alpha-channel support) */
-    /* Dark Theme Default — Clean, deep obsidian with subtle chromatic balance */
-    --surface-canvas: 10 10 13;
-    --surface-panel: 18 19 24;
-    --surface-overlay: 26 27 34;
-    --surface-glass: 20 22 28;
-    --surface-subtle: 32 34 44;
+    /* Color Tokens — Linear Obsidian Carbon Architecture */
+    --surface-canvas: 8 9 10;        /* #08090a - Deepest Obsidian Base */
+    --surface-panel: 17 18 21;       /* #111215 - Elevated Window & Card Surface */
+    --surface-overlay: 23 24 28;     /* #17181c - Toolbars & Active Controls */
+    --surface-glass: 17 18 21;
+    --surface-subtle: 31 32 38;      /* #1f2026 - Subtle Dividers & Hover */
 
-    --content-primary: 245 245 247;
-    --content-secondary: 160 163 177;
-    --content-tertiary: 102 105 120;
-    --content-inverse: 12 12 15;
+    /* Typography Hierarchy — Crisp High Contrast */
+    --content-primary: 247 248 248;  /* #f7f8f8 - Stark Legibility */
+    --content-secondary: 140 144 153;/* #8c9099 - Refined Subtext */
+    --content-tertiary: 92 95 104;   /* #5c5f68 - Metadata & Inactive */
+    --content-inverse: 8 9 10;
 
-    --accent-primary: 99 102 241;   /* Modern Indigo / Flow Kinetic Blue */
-    --accent-hover: 129 140 248;
-    --accent-muted: 49 46 129;
+    /* Accents — Linear Electric Cobalt & Nothing Red Micro-Detail */
+    --accent-primary: 94 106 210;    /* #5E6AD2 - Linear Electric Cobalt */
+    --accent-hover: 124 135 224;
+    --accent-muted: 38 42 78;
+    --accent-red: 215 25 33;         /* #d71921 - Nothing OS Restrained Red Dot */
 
+    /* Sub-pixel Hairline Borders (Apple Pro Apps / Linear) */
     --border-subtle: 255 255 255;
-    --border-subtle-alpha: 0.08;
+    --border-subtle-alpha: 0.07;
     --border-strong: 255 255 255;
-    --border-strong-alpha: 0.18;
+    --border-strong-alpha: 0.14;
 
-    /* Geometry & Dimension Tokens */
-    --radius-window: 16px;
-    --radius-dock: 20px;
-    --radius-control: 8px;
+    /* Architectural Geometry */
+    --radius-window: 12px;
+    --radius-dock: 14px;
+    --radius-control: 6px;
 
-    /* Blur & Materiality */
-    --blur-window: 24px;
-    --blur-dock: 28px;
+    /* Material Translucency & Contact Shadows */
+    --blur-window: 16px;
+    --blur-dock: 20px;
 
-    /* Shadows */
-    --shadow-window: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
-    --shadow-dock: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    --shadow-glow: 0 0 24px -4px rgba(99, 102, 241, 0.35);
+    --shadow-window: 0 16px 36px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --shadow-dock: 0 12px 28px -6px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.09);
+    --shadow-glow: none;             /* Eradicate generic AI slop neon halos */
 
-    /* Kinetic Spring Constants */
-    --spring-bounce: 0.2;
-    --spring-duration: 0.35s;
+    /* Kinetic Motion Constants */
+    --spring-bounce: 0.15;
+    --spring-duration: 0.28s;
   }
 
-  /* Light Theme Variant */
+  /* Light Theme Variant (Refined Paper Architecture) */
   [data-theme='light'] {
-    --surface-canvas: 243 244 246;
+    --surface-canvas: 245 245 247;
     --surface-panel: 255 255 255;
-    --surface-overlay: 249 250 251;
+    --surface-overlay: 240 241 243;
     --surface-glass: 255 255 255;
-    --surface-subtle: 229 231 235;
+    --surface-subtle: 228 230 234;
 
-    --content-primary: 17 24 39;
-    --content-secondary: 75 85 99;
-    --content-tertiary: 156 163 175;
+    --content-primary: 15 16 18;
+    --content-secondary: 85 88 98;
+    --content-tertiary: 142 145 156;
     --content-inverse: 255 255 255;
 
-    --accent-primary: 79 70 229;
-    --accent-hover: 67 56 202;
-    --accent-muted: 224 231 255;
+    --accent-primary: 78 89 184;
+    --accent-hover: 65 74 160;
+    --accent-muted: 228 231 252;
+    --accent-red: 215 25 33;
 
     --border-subtle: 0 0 0;
-    --border-subtle-alpha: 0.06;
+    --border-subtle-alpha: 0.07;
     --border-strong: 0 0 0;
     --border-strong-alpha: 0.14;
 
-    --shadow-window: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
-    --shadow-dock: 0 12px 30px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    --shadow-window: 0 16px 32px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    --shadow-dock: 0 12px 24px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.09);
   }
 
-  /* High Contrast Accessibility Theme */
+  /* High Contrast Technical Theme */
   [data-theme='high-contrast'] {
     --surface-canvas: 0 0 0;
     --surface-panel: 0 0 0;
@@ -81,12 +84,13 @@
 
     --content-primary: 255 255 255;
     --content-secondary: 220 220 220;
-    --content-tertiary: 180 180 180;
+    --content-tertiary: 170 170 170;
     --content-inverse: 0 0 0;
 
-    --accent-primary: 255 255 0; /* Pure High-contrast Yellow */
-    --accent-hover: 230 230 0;
-    --accent-muted: 60 60 0;
+    --accent-primary: 255 255 255;
+    --accent-hover: 230 230 230;
+    --accent-muted: 60 60 60;
+    --accent-red: 255 50 50;
 
     --border-subtle: 255 255 255;
     --border-subtle-alpha: 0.8;
@@ -95,7 +99,13 @@
 
     --blur-window: 0px;
     --blur-dock: 0px;
-    --shadow-window: 0 0 0 2px #fff;
+    --shadow-window: 0 0 0 1px #fff;
+  }
+
+  body {
+    letter-spacing: -0.012em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 

@@ -148,15 +148,22 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       style={wallpaper.style}
       className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none"
     >
-      {/* Subtle Geometric Depth Grid */}
+      {/* Architectural Sub-pixel Dot Matrix Grid (Linear / Dieter Rams) */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-15"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
+          backgroundImage: `radial-gradient(circle, rgba(255, 255, 255, 0.85) 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
         }}
       />
+
+      {/* Nothing OS Restrained Micro-Telemetry Stamp (Bottom Left Margin) */}
+      <div className="pointer-events-none absolute bottom-5 left-6 z-10 flex items-center gap-2 font-mono text-[10px] tracking-wider text-content-tertiary select-none opacity-40">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#d71921]" />
+        <span>FLOW_OS v0.2.0</span>
+        <span className="opacity-50">//</span>
+        <span>SYS_OK</span>
+      </div>
 
       {/* Marquee Drag-Selection Box */}
       <SelectionMarquee
