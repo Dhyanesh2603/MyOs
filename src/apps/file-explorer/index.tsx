@@ -12,6 +12,11 @@ import {
   Home,
   Monitor,
   FileText,
+  LayoutGrid,
+  List,
+  Sparkles,
+  Music as MusicIcon,
+  Image as ImageIcon,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
@@ -27,6 +32,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const [history, setHistory] = useState<string[]>(['/home/user']);
   const [historyIdx, setHistoryIdx] = useState<number>(0);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   const navigateTo = (path: string) => {
     const normalized = normalizePath(path);
@@ -62,7 +68,6 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
     if (node.type === 'directory') {
       navigateTo(node.path);
     } else {
-      // Open in Notes editor
       launchApp('notes');
     }
   };
@@ -88,97 +93,130 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
     }
   };
 
-  // Breadcrumbs
   const pathSegments = currentPath.split('/').filter(Boolean);
 
   return (
-    <div className="flex h-full w-full bg-surface-panel text-content-primary">
-      {/* Sidebar Navigation */}
-      <aside className="w-48 border-r border-white/5 bg-surface-overlay/30 p-3 flex flex-col justify-between select-none">
-        <div className="space-y-1">
-          <span className="px-2 font-mono text-[10px] uppercase text-content-tertiary">
-            Places
-          </span>
+    <div className="flex h-full w-full bg-[#0c0e12] text-content-primary">
+      {/* Arc-Style Fluid Spaces & Places Sidebar */}
+      <aside className="w-44 border-r border-white/[0.06] bg-[#090a0d]/90 p-2.5 flex flex-col justify-between select-none">
+        <div className="space-y-3">
+          {/* Arc Workspace Header */}
+          <div className="flex items-center gap-1.5 px-2 pt-1 font-mono text-[10px] text-content-tertiary uppercase tracking-wider">
+            <Sparkles className="h-3 w-3 text-accent-primary" />
+            <span>Workspace</span>
+          </div>
 
-          <button
-            onClick={() => navigateTo('/home/user')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-              currentPath === '/home/user'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
-            }`}
-          >
-            <Home className="h-3.5 w-3.5 text-accent-primary" />
-            Home
-          </button>
+          <div className="space-y-0.5">
+            <button
+              onClick={() => navigateTo('/home/user')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                currentPath === '/home/user'
+                  ? 'bg-white/[0.08] text-content-primary font-semibold'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <Home className="h-3.5 w-3.5 text-accent-primary" />
+              User Home
+            </button>
 
-          <button
-            onClick={() => navigateTo('/home/user/Documents')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-              currentPath === '/home/user/Documents'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
-            }`}
-          >
-            <FileText className="h-3.5 w-3.5 text-emerald-400" />
-            Documents
-          </button>
+            <button
+              onClick={() => navigateTo('/home/user/Documents')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                currentPath === '/home/user/Documents'
+                  ? 'bg-white/[0.08] text-content-primary font-semibold'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <FileText className="h-3.5 w-3.5 text-emerald-400" />
+              Documents
+            </button>
 
-          <button
-            onClick={() => navigateTo('/home/user/Desktop')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-              currentPath === '/home/user/Desktop'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
-            }`}
-          >
-            <Monitor className="h-3.5 w-3.5 text-cyan-400" />
-            Desktop
-          </button>
+            <button
+              onClick={() => navigateTo('/home/user/Desktop')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                currentPath === '/home/user/Desktop'
+                  ? 'bg-white/[0.08] text-content-primary font-semibold'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <Monitor className="h-3.5 w-3.5 text-cyan-400" />
+              Desktop
+            </button>
 
-          <button
-            onClick={() => navigateTo('/')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
-              currentPath === '/'
-                ? 'bg-accent-primary/20 text-content-primary border border-accent-primary/30'
-                : 'text-content-secondary hover:bg-white/5'
-            }`}
-          >
-            <HardDrive className="h-3.5 w-3.5 text-amber-400" />
-            Root System
-          </button>
+            <button
+              onClick={() => navigateTo('/home/user/Pictures')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                currentPath === '/home/user/Pictures'
+                  ? 'bg-white/[0.08] text-content-primary font-semibold'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <ImageIcon className="h-3.5 w-3.5 text-purple-400" />
+              Pictures
+            </button>
+
+            <button
+              onClick={() => navigateTo('/home/user/Music')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                currentPath === '/home/user/Music'
+                  ? 'bg-white/[0.08] text-content-primary font-semibold'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <MusicIcon className="h-3.5 w-3.5 text-amber-400" />
+              Music
+            </button>
+          </div>
+
+          {/* System Roots */}
+          <div className="pt-2 border-t border-white/[0.04]">
+            <div className="px-2 pb-1 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+              Volumes
+            </div>
+            <button
+              onClick={() => navigateTo('/')}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-1 text-xs transition-colors ${
+                currentPath === '/'
+                  ? 'bg-white/[0.08] text-content-primary'
+                  : 'text-content-secondary hover:bg-white/[0.04]'
+              }`}
+            >
+              <HardDrive className="h-3.5 w-3.5 text-rose-400" />
+              Root Inodes
+            </button>
+          </div>
         </div>
 
-        <div className="px-2 font-mono text-[10px] text-content-tertiary">
-          win: {windowId.slice(-6)}
+        <div className="px-2 font-mono text-[9px] text-content-tertiary">
+          win: {windowId.slice(-4)}
         </div>
       </aside>
 
       {/* Main Browser Canvas */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Explorer Toolbar & Breadcrumbs */}
-        <header className="flex h-11 items-center justify-between border-b border-white/5 bg-surface-overlay/50 px-3 select-none">
+      <main className="flex-1 flex flex-col overflow-hidden bg-[#0e1014]">
+        {/* Apple Pro Apps Toolbar & Breadcrumbs */}
+        <header className="flex h-10 items-center justify-between border-b border-white/[0.06] bg-[#0c0d10] px-3 select-none">
           {/* Back/Forward buttons + Breadcrumbs */}
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <button
                 onClick={goBack}
                 disabled={historyIdx === 0}
-                className="rounded p-1 text-content-secondary hover:bg-white/10 disabled:opacity-30 transition-colors"
+                className="rounded p-1 text-content-tertiary hover:bg-white/[0.06] hover:text-content-primary disabled:opacity-30 transition-colors"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={goForward}
                 disabled={historyIdx >= history.length - 1}
-                className="rounded p-1 text-content-secondary hover:bg-white/10 disabled:opacity-30 transition-colors"
+                className="rounded p-1 text-content-tertiary hover:bg-white/[0.06] hover:text-content-primary disabled:opacity-30 transition-colors"
               >
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
 
             {/* Clickable Breadcrumbs Rail */}
-            <div className="flex items-center gap-1 rounded-lg border border-white/5 bg-white/5 px-2 py-1 font-mono text-xs text-content-secondary">
+            <div className="flex items-center gap-1 rounded border border-white/[0.06] bg-white/[0.02] px-2 py-0.5 font-mono text-[11px] text-content-secondary">
               <span
                 onClick={() => navigateTo('/')}
                 className="cursor-pointer hover:text-content-primary transition-colors"
@@ -202,29 +240,57 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             </div>
           </div>
 
-          {/* Action Buttons: New Folder, New File, Delete */}
-          <div className="flex items-center gap-1.5">
+          {/* Action Controls & View Switcher (Apple Pro Apps Restraint) */}
+          <div className="flex items-center gap-2">
+            {/* View Mode Toggle: Grid vs Table */}
+            <div className="flex items-center rounded border border-white/[0.08] bg-white/[0.03] p-0.5">
+              <button
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+                className={`rounded p-1 transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white/[0.1] text-content-primary'
+                    : 'text-content-tertiary hover:text-content-secondary'
+                }`}
+              >
+                <LayoutGrid className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                title="High-Density List Table"
+                className={`rounded p-1 transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white/[0.1] text-content-primary'
+                    : 'text-content-tertiary hover:text-content-secondary'
+                }`}
+              >
+                <List className="h-3 w-3" />
+              </button>
+            </div>
+
             <button
               onClick={handleCreateFolder}
               title="New Folder"
-              className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-content-secondary hover:bg-white/10 hover:text-content-primary transition-colors"
+              className="flex items-center gap-1 rounded border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-white/[0.08] hover:text-content-primary transition-colors"
             >
-              <FolderPlus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Folder</span>
+              <FolderPlus className="h-3 w-3 text-accent-primary" />
+              <span>Folder</span>
             </button>
+
             <button
               onClick={handleCreateFile}
               title="New File"
-              className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-content-secondary hover:bg-white/10 hover:text-content-primary transition-colors"
+              className="flex items-center gap-1 rounded border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-white/[0.08] hover:text-content-primary transition-colors"
             >
-              <FilePlus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">File</span>
+              <FilePlus className="h-3 w-3 text-accent-primary" />
+              <span>File</span>
             </button>
+
             {selectedPath && (
               <button
                 onClick={() => handleDelete(selectedPath)}
                 title="Delete Selected"
-                className="rounded-lg p-1 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                className="rounded p-1 text-rose-400 hover:bg-rose-500/20 transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -232,18 +298,18 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           </div>
         </header>
 
-        {/* Directory Items Grid */}
+        {/* Directory Items Viewport */}
         <div
           onClick={() => setSelectedPath(null)}
           className="flex-1 overflow-y-auto p-4 select-none"
         >
           {currentNodes.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-xs text-content-tertiary">
-              <Folder className="h-8 w-8 opacity-25" />
+            <div className="flex h-48 flex-col items-center justify-center gap-2 font-mono text-xs text-content-tertiary">
+              <Folder className="h-6 w-6 opacity-30" />
               <span>Empty directory</span>
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
               {currentNodes.map((node) => {
                 const isSelected = selectedPath === node.path;
                 const isDir = node.type === 'directory';
@@ -255,44 +321,97 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                       e.stopPropagation();
                       setSelectedPath(node.path);
                     }}
-                    onDoubleClick={() => handleOpenNode(node)}
-                    className={`flex flex-col items-center gap-2 rounded-2xl border p-3 cursor-pointer transition-all ${
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenNode(node);
+                    }}
+                    className={`flex flex-col items-center gap-1.5 rounded-lg p-2.5 cursor-pointer transition-all border ${
                       isSelected
-                        ? 'border-accent-primary bg-accent-primary/20 scale-105 shadow-sm'
-                        : 'border-white/5 bg-white/5 hover:bg-white/10'
+                        ? 'bg-white/[0.08] border-white/[0.14] text-content-primary'
+                        : 'border-transparent hover:bg-white/[0.04] text-content-secondary'
                     }`}
                   >
                     <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                        isDir ? 'text-accent-primary' : 'text-content-secondary'
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
+                        isDir
+                          ? 'border-accent-primary/20 bg-accent-primary/10 text-accent-primary'
+                          : 'border-white/[0.06] bg-white/[0.03] text-content-tertiary'
                       }`}
                     >
                       {isDir ? (
-                        <Folder className="h-7 w-7" />
+                        <Folder className="h-5 w-5" />
                       ) : (
-                        <File className="h-7 w-7" />
+                        <File className="h-5 w-5" />
                       )}
                     </div>
 
-                    <div className="w-full text-center">
-                      <div className="truncate text-xs font-medium text-content-primary">
-                        {node.name}
-                      </div>
-                      <div className="font-mono text-[9px] text-content-tertiary">
-                        {isDir ? 'Folder' : `${node.size}B`}
-                      </div>
-                    </div>
+                    <span className="w-full truncate text-center font-mono text-[11px]">
+                      {node.name}
+                    </span>
                   </div>
                 );
               })}
             </div>
+          ) : (
+            /* Apple Pro Apps High-Density Table View */
+            <div className="w-full text-xs font-mono">
+              <div className="grid grid-cols-12 border-b border-white/[0.06] pb-1.5 text-[10px] text-content-tertiary uppercase tracking-wider">
+                <span className="col-span-6">Name</span>
+                <span className="col-span-2">Kind</span>
+                <span className="col-span-2">Size</span>
+                <span className="col-span-2 text-right">Modified</span>
+              </div>
+              <div className="divide-y divide-white/[0.03]">
+                {currentNodes.map((node) => {
+                  const isSelected = selectedPath === node.path;
+                  const isDir = node.type === 'directory';
+
+                  return (
+                    <div
+                      key={node.path}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPath(node.path);
+                      }}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenNode(node);
+                      }}
+                      className={`grid grid-cols-12 items-center py-1.5 px-1 cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-white/[0.08] text-content-primary'
+                          : 'hover:bg-white/[0.03] text-content-secondary'
+                      }`}
+                    >
+                      <div className="col-span-6 flex items-center gap-2 truncate">
+                        {isDir ? (
+                          <Folder className="h-3.5 w-3.5 text-accent-primary shrink-0" />
+                        ) : (
+                          <File className="h-3.5 w-3.5 text-content-tertiary shrink-0" />
+                        )}
+                        <span className="truncate">{node.name}</span>
+                      </div>
+                      <span className="col-span-2 text-[10px] text-content-tertiary">
+                        {isDir ? 'Folder' : 'File'}
+                      </span>
+                      <span className="col-span-2 text-[10px] text-content-tertiary">
+                        {isDir ? '—' : `${node.size}B`}
+                      </span>
+                      <span className="col-span-2 text-right text-[10px] text-content-tertiary">
+                        {new Date(node.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Status Bar */}
-        <footer className="flex h-7 items-center justify-between border-t border-white/5 bg-surface-overlay/40 px-3 font-mono text-[10px] text-content-tertiary">
+        {/* Directory Footer Status */}
+        <footer className="flex h-7 items-center justify-between border-t border-white/[0.06] bg-[#0c0d10] px-3 font-mono text-[9px] text-content-tertiary select-none">
           <span>{currentNodes.length} items</span>
-          <span>IndexedDB VFS</span>
+          <span>{selectedPath ? selectedPath : currentPath}</span>
         </footer>
       </main>
     </div>
@@ -302,11 +421,11 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
 export const fileExplorerManifest: AppManifest = {
   id: 'file-explorer',
   name: 'Files',
-  description: 'Visual explorer for managing directories and documents in the browser VFS.',
-  category: 'utilities',
+  description: 'Arc-inspired sidebar browser with Apple Pro Apps metadata tables.',
+  category: 'system',
   icon: Folder,
-  defaultSize: { width: 680, height: 460 },
-  constraints: { minWidth: 480, minHeight: 320, maxWidth: 1100, maxHeight: 850 },
+  defaultSize: { width: 660, height: 440 },
+  constraints: { minWidth: 420, minHeight: 300, maxWidth: 1100, maxHeight: 850 },
   allowMultipleInstances: true,
   permissions: ['vfs:read', 'vfs:write'],
   component: FileExplorerApp,
