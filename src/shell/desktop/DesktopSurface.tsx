@@ -3,11 +3,10 @@ import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useProcessStore } from '@core/process/processStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
-import { useStatusSidebarStore } from '@core/status/statusStore';
 import { SelectionMarquee } from './SelectionMarquee';
 import { DesktopIcons } from './DesktopIcons';
 import { DesktopWidgets } from '../widgets/DesktopWidgets';
-import { FileText, Settings, Image, Minus, X, Activity } from 'lucide-react';
+import { FileText, Settings, Image, Minus, X } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
@@ -19,7 +18,6 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
   const { launchApp } = useProcessStore();
   const openMenu = useContextMenuStore((state) => state.openMenu);
-  const toggleStatusSidebar = useStatusSidebarStore((state) => state.toggle);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
@@ -31,15 +29,6 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
     openMenu(
       { x: e.clientX, y: e.clientY },
       [
-        {
-          type: 'item',
-          item: {
-            id: 'status-bar',
-            label: 'System Status Bar',
-            icon: Activity,
-            action: () => toggleStatusSidebar(),
-          },
-        },
         {
           type: 'item',
           item: {

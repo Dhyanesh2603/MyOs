@@ -10,7 +10,6 @@ import { NotificationToaster } from '@shell/notifications/NotificationToaster';
 import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
-import { StatusSidebar } from '@shell/status/StatusSidebar';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -34,9 +33,6 @@ export const App: React.FC = () => {
 
   return (
     <DesktopSurface>
-      {/* Sliding System Status Bar & Kernel HUD (Drawer) */}
-      <StatusSidebar />
-
       {/* Interactive Rendered Windows */}
       {windowList.map((win) => (
         <WindowFrame key={win.id} windowState={win} />
