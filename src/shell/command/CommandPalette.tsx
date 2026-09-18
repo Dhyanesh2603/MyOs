@@ -165,10 +165,10 @@ export const CommandPalette: React.FC = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl overflow-hidden rounded-xl border border-white/[0.12] bg-[#0f1115]/95 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in zoom-in-[0.98] duration-100"
+        className="w-full max-w-xl overflow-hidden rounded-xl border border-border-subtle bg-surface-panel/95 shadow-2xl backdrop-blur-2xl animate-in zoom-in-[0.98] duration-100"
       >
         {/* Raycast Search Input Bar */}
-        <div className="relative flex items-center border-b border-white/[0.07] px-3.5 py-3">
+        <div className="relative flex items-center border-b border-border-subtle px-3.5 py-3">
           <Search className="h-4 w-4 text-content-tertiary mr-3 shrink-0" />
           <input
             ref={inputRef}
@@ -182,7 +182,7 @@ export const CommandPalette: React.FC = () => {
             placeholder="Search commands, applications, or windows..."
             className="flex-1 bg-transparent text-sm tracking-tight text-content-primary placeholder:text-content-tertiary outline-none font-sans"
           />
-          <kbd className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-content-tertiary">
+          <kbd className="rounded border border-border-subtle bg-surface-subtle/60 px-1.5 py-0.5 font-mono text-[9px] text-content-tertiary">
             ESC
           </kbd>
         </div>
@@ -208,16 +208,16 @@ export const CommandPalette: React.FC = () => {
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-white/[0.08] text-content-primary border border-white/[0.08]'
-                      : 'text-content-secondary hover:bg-white/[0.03] border border-transparent'
+                      ? 'bg-surface-subtle text-content-primary border border-border-subtle'
+                      : 'text-content-secondary hover:bg-surface-subtle/50 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 overflow-hidden">
                     <div
                       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
                         isSelected
-                          ? 'bg-accent-primary border-white/20 text-white'
-                          : 'bg-white/[0.04] border-white/[0.06] text-content-tertiary'
+                          ? 'bg-accent-primary border-accent-primary text-white'
+                          : 'bg-surface-subtle/60 border-border-subtle text-content-tertiary'
                       }`}
                     >
                       <IconComponent className="h-3.5 w-3.5" />
@@ -235,11 +235,11 @@ export const CommandPalette: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="rounded bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+                    <span className="rounded bg-surface-subtle/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
                       {action.category}
                     </span>
                     {isSelected && (
-                      <div className="flex items-center gap-1 text-[10px] font-mono text-content-secondary bg-white/[0.06] px-1.5 py-0.5 rounded">
+                      <div className="flex items-center gap-1 text-[10px] font-mono text-content-secondary bg-surface-subtle px-1.5 py-0.5 rounded border border-border-subtle">
                         <span>Open</span>
                         <CornerDownLeft className="h-2.5 w-2.5" />
                       </div>
@@ -252,7 +252,7 @@ export const CommandPalette: React.FC = () => {
         </div>
 
         {/* Raycast Iconic Action Bar Footer */}
-        <div className="flex items-center justify-between border-t border-white/[0.07] bg-[#0c0d10]/90 px-3 py-2 text-[10px] font-mono text-content-tertiary select-none">
+        <div className="flex items-center justify-between border-t border-border-subtle bg-surface-overlay/90 px-3 py-2 text-[10px] font-mono text-content-tertiary select-none">
           <div className="flex items-center gap-2 truncate">
             {activeAction ? (
               <>
@@ -267,13 +267,13 @@ export const CommandPalette: React.FC = () => {
 
           <div className="flex items-center gap-3 shrink-0">
             <span className="flex items-center gap-1">
-              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">↑↓</kbd> Move
+              <kbd className="rounded border border-border-subtle bg-surface-subtle px-1 py-0.2">↑↓</kbd> Move
             </span>
             <span className="flex items-center gap-1 text-content-secondary">
-              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">↵</kbd> Select
+              <kbd className="rounded border border-border-subtle bg-surface-subtle px-1 py-0.2">↵</kbd> Select
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">ESC</kbd> Close
+              <kbd className="rounded border border-border-subtle bg-surface-subtle px-1 py-0.2">ESC</kbd> Close
             </span>
           </div>
         </div>

@@ -63,7 +63,7 @@ export const TaskSwitcher: React.FC = () => {
           initial={{ scale: 0.94, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.94, opacity: 0 }}
-          className="flex max-w-4xl flex-col items-center rounded-3xl border border-white/15 bg-surface-panel/95 p-5 shadow-2xl backdrop-blur-window"
+          className="flex max-w-4xl flex-col items-center rounded-3xl border border-border-subtle bg-surface-panel/95 p-5 shadow-2xl backdrop-blur-window"
         >
           <div className="flex items-center gap-3 overflow-x-auto p-2">
             {windowOrder.map((winId, index) => {
@@ -84,7 +84,7 @@ export const TaskSwitcher: React.FC = () => {
                   className={`flex h-36 w-32 flex-col items-center justify-between rounded-2xl border p-3.5 cursor-pointer transition-all duration-150 ${
                     isSelected
                       ? 'border-accent-primary bg-accent-primary/20 scale-105 shadow-glow'
-                      : 'border-white/5 bg-white/5 opacity-70 hover:opacity-90'
+                      : 'border-border-subtle bg-surface-subtle/50 opacity-70 hover:opacity-100'
                   }`}
                 >
                   <div className="flex flex-1 items-center justify-center">
@@ -92,7 +92,7 @@ export const TaskSwitcher: React.FC = () => {
                       className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
                         isSelected
                           ? 'bg-accent-primary text-white shadow-md'
-                          : 'bg-white/10 text-content-secondary'
+                          : 'bg-surface-subtle/80 text-content-secondary'
                       }`}
                     >
                       <IconComponent className="h-6 w-6" />

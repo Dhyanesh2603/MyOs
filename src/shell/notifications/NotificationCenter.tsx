@@ -65,10 +65,10 @@ export const NotificationCenter: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 350, damping: 32 }}
-            className="fixed top-0 right-0 z-[9995] flex h-screen w-84 max-w-[90vw] flex-col border-l border-white/10 bg-surface-panel/95 p-5 shadow-2xl backdrop-blur-window text-content-primary"
+            className="fixed top-0 right-0 z-[9995] flex h-screen w-84 max-w-[90vw] flex-col border-l border-border-subtle bg-surface-panel/95 p-5 shadow-2xl backdrop-blur-window text-content-primary"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-4">
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4 text-accent-primary" />
                 <h3 className="font-semibold text-sm">Control Shade</h3>
@@ -76,7 +76,7 @@ export const NotificationCenter: React.FC = () => {
               <button
                 onClick={closeCenter}
                 aria-label="Close Shade"
-                className="rounded-lg p-1 text-content-secondary hover:bg-white/10 hover:text-content-primary transition-colors"
+                className="rounded-lg p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -89,7 +89,7 @@ export const NotificationCenter: React.FC = () => {
                 className={`flex flex-col items-center gap-1.5 rounded-xl border p-2.5 text-[11px] font-medium transition-all ${
                   dndEnabled
                     ? 'border-accent-primary bg-accent-primary/20 text-content-primary'
-                    : 'border-white/10 bg-white/5 text-content-secondary hover:bg-white/10'
+                    : 'border-border-subtle bg-surface-subtle/50 text-content-secondary hover:bg-surface-subtle'
                 }`}
               >
                 {dndEnabled ? (
@@ -102,7 +102,7 @@ export const NotificationCenter: React.FC = () => {
 
               <button
                 onClick={() => setTheme(themeId === 'dark' ? 'light' : 'dark')}
-                className="flex flex-col items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 p-2.5 text-[11px] font-medium text-content-secondary hover:bg-white/10 transition-colors"
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-border-subtle bg-surface-subtle/50 p-2.5 text-[11px] font-medium text-content-secondary hover:bg-surface-subtle transition-colors"
               >
                 {themeId === 'dark' ? (
                   <Moon className="h-4 w-4 text-amber-400" />
@@ -117,7 +117,7 @@ export const NotificationCenter: React.FC = () => {
                   closeCenter();
                   openSpotlight();
                 }}
-                className="flex flex-col items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 p-2.5 text-[11px] font-medium text-content-secondary hover:bg-white/10 transition-colors"
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-border-subtle bg-surface-subtle/50 p-2.5 text-[11px] font-medium text-content-secondary hover:bg-surface-subtle transition-colors"
               >
                 <Search className="h-4 w-4" />
                 <span>Search</span>
@@ -151,7 +151,7 @@ export const NotificationCenter: React.FC = () => {
                   return (
                     <div
                       key={notif.id}
-                      className="flex items-start gap-3 rounded-xl border border-white/5 bg-surface-overlay/50 p-3 text-xs"
+                      className="flex items-start gap-3 rounded-xl border border-border-subtle bg-surface-overlay/50 p-3 text-xs"
                     >
                       <div className="mt-0.5 shrink-0 text-content-tertiary">
                         <Icon className="h-3.5 w-3.5" />

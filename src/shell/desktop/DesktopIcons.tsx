@@ -168,20 +168,20 @@ export const DesktopIcons: React.FC = () => {
             className={`group flex w-20 flex-col items-center gap-1.5 rounded-xl p-2 cursor-pointer transition-all outline-none ${
               isSelected
                 ? 'bg-accent-primary/20 ring-1 ring-accent-primary/50 shadow-sm'
-                : 'hover:bg-white/5 focus-visible:ring-1 focus-visible:ring-accent-primary/50'
+                : 'hover:bg-surface-subtle/40 focus-visible:ring-1 focus-visible:ring-accent-primary/50'
             }`}
           >
             <div
-              className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 shadow-md backdrop-blur-md transition-transform group-hover:scale-105 ${
+              className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-border-subtle shadow-md backdrop-blur-md transition-transform group-hover:scale-105 ${
                 isSelected
                   ? 'bg-accent-primary text-white'
-                  : 'bg-white/[0.08] text-content-primary'
+                  : 'bg-surface-panel/70 text-content-primary'
               }`}
             >
               <IconComponent className="h-5 w-5" />
             </div>
 
-            <span className="w-full truncate text-center font-mono text-[11px] text-content-primary drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <span className="w-full truncate text-center font-mono text-[11px] font-medium text-content-primary">
               {item.name}
             </span>
           </div>

@@ -57,7 +57,7 @@ export const ContextMenu: React.FC = () => {
         left: `${adjustedX}px`,
         top: `${adjustedY}px`,
       }}
-      className="fixed z-[9999] min-w-[210px] select-none rounded-xl border border-white/10 bg-surface-panel/90 p-1 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-[9999] min-w-[210px] select-none rounded-xl border border-border-subtle bg-surface-panel/95 p-1 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-100"
     >
       {entries.map((entry) => {
         if (entry.type === 'separator') {
@@ -65,7 +65,7 @@ export const ContextMenu: React.FC = () => {
             <div
               key={entry.id}
               role="separator"
-              className="my-1 h-[1px] bg-white/10"
+              className="my-1 h-[1px] bg-border-subtle"
             />
           );
         }
@@ -88,7 +88,7 @@ export const ContextMenu: React.FC = () => {
                 ? 'cursor-not-allowed opacity-40'
                 : item.danger
                   ? 'text-rose-400 hover:bg-rose-500/20'
-                  : 'text-content-primary hover:bg-white/10'
+                  : 'text-content-primary hover:bg-surface-subtle'
             }`}
           >
             <div className="flex items-center gap-2">

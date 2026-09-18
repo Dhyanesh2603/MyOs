@@ -44,7 +44,7 @@ export const NotificationToaster: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: 24, scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-              className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-white/10 bg-surface-panel/90 p-3.5 shadow-2xl backdrop-blur-window text-xs text-content-primary"
+              className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-border-subtle bg-surface-panel/95 p-3.5 shadow-2xl backdrop-blur-window text-xs text-content-primary"
             >
               <div
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${
@@ -68,7 +68,7 @@ export const NotificationToaster: React.FC = () => {
                       toast.action?.onClick();
                       dismissToast(toast.id);
                     }}
-                    className="mt-1.5 rounded bg-white/10 px-2 py-0.5 font-mono text-[10px] text-content-primary hover:bg-white/20 transition-colors"
+                    className="mt-1.5 rounded bg-surface-subtle border border-border-subtle px-2 py-0.5 font-mono text-[10px] text-content-primary hover:bg-surface-overlay transition-colors"
                   >
                     {toast.action.label}
                   </button>

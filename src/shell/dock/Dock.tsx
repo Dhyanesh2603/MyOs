@@ -62,11 +62,7 @@ export const Dock: React.FC<DockProps> = ({
       aria-label="Application Dock"
       onMouseMove={(e) => mouseX.set(e.clientX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500] flex items-end gap-2 rounded-dock border border-white/[0.08] bg-[#0c0e12]/85 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
-      style={{
-        boxShadow:
-          '0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)',
-      }}
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/85 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
     >
       {/* Pinned Applications */}
       {pinnedAppIds.map((appId) => {
@@ -90,7 +86,7 @@ export const Dock: React.FC<DockProps> = ({
 
       {/* Separator if unpinned apps are running */}
       {unpinnedRunningAppIds.length > 0 && (
-        <div className="mx-1 h-8 w-[1px] self-center bg-white/10" />
+        <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle" />
       )}
 
       {/* Dynamic Unpinned Running Apps */}
