@@ -150,9 +150,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
     >
       {/* Architectural Sub-pixel Dot Matrix Grid (Linear / Dieter Rams) */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
-          backgroundImage: `radial-gradient(circle, rgba(255, 255, 255, 0.85) 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(circle, rgb(var(--content-primary)) 1px, transparent 1px)`,
           backgroundSize: '24px 24px',
         }}
       />

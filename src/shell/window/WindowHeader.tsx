@@ -121,8 +121,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       onDoubleClick={handleDoubleClick}
       className={`no-select relative flex h-9 select-none items-center justify-between border-b px-3 transition-colors ${
         windowState.isFocused
-          ? 'border-white/[0.08] bg-surface-overlay/95'
-          : 'border-white/[0.04] bg-surface-panel/80'
+          ? 'border-border-subtle bg-surface-overlay/95'
+          : 'border-border-subtle bg-surface-panel/80'
       } ${windowState.isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
       {/* Title & App Metadata (Apple Pro Apps Restraint) */}
@@ -145,7 +145,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
         >
           {windowState.title}
         </span>
-        <span className="hidden font-mono text-[9px] text-content-tertiary bg-white/[0.04] px-1 py-0.2 rounded sm:inline-block">
+        <span className="hidden font-mono text-[9px] text-content-tertiary bg-surface-subtle/60 px-1 py-0.2 rounded sm:inline-block">
           {windowState.processId.slice(-4)}
         </span>
       </div>
@@ -159,7 +159,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-white/[0.08] hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
         >
           <Minus className="h-3 w-3" />
         </button>
@@ -174,7 +174,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             });
           }}
           aria-label={windowState.isMaximized ? 'Restore Window' : 'Maximize Window'}
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-white/[0.08] hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
         >
           {windowState.isMaximized ? (
             <Copy className="h-2.5 w-2.5" />
@@ -190,7 +190,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             closeWindow(windowState.id);
           }}
           aria-label="Close Window"
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-rose-500/15 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500"
+          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-rose-500/15 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500"
         >
           <X className="h-3 w-3" />
         </button>

@@ -21,7 +21,7 @@ export const ClockWidget: React.FC = () => {
   });
 
   return (
-    <div className="flex w-60 flex-col rounded-xl border border-white/[0.08] bg-[#0c0e12]/85 p-3.5 shadow-xl backdrop-blur-md text-content-primary select-none transition-all hover:border-white/[0.14]">
+    <div className="flex w-60 flex-col rounded-xl border border-border-subtle bg-surface-panel/85 p-3.5 shadow-lg backdrop-blur-md text-content-primary select-none transition-all hover:border-border-strong">
       <div className="flex items-center justify-between">
         {/* Nothing OS Solitary Red Accent Dot */}
         <div className="flex items-center gap-2">

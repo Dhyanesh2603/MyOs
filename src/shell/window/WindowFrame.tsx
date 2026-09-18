@@ -57,8 +57,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
         }}
         className={`group flex flex-col overflow-hidden rounded-window border transition-colors duration-150 ${
           windowState.isFocused
-            ? 'border-white/[0.18] shadow-window'
-            : 'border-white/[0.07] shadow-lg opacity-[0.98]'
+            ? 'border-border-strong shadow-window'
+            : 'border-border-subtle shadow-lg opacity-[0.99]'
         } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
       >
         {/* 8-Axis Resize Frame */}
@@ -75,7 +75,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
 
         {/* Application Content Viewport (Disable pointer events during drag/resize for 120 FPS performance) */}
         <div
-          className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window ${
+          className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window text-content-primary ${
             isInteracting ? 'pointer-events-none select-none' : ''
           }`}
         >
