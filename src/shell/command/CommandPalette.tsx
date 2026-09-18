@@ -12,7 +12,7 @@ import {
   Minus,
   X,
   Play,
-  ArrowRight,
+  CornerDownLeft,
 } from 'lucide-react';
 
 export const CommandPalette: React.FC = () => {
@@ -26,7 +26,7 @@ export const CommandPalette: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Global Hotkey (Cmd+K / Ctrl+K)
+  // Global hotkey: Cmd+K / Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -45,7 +45,7 @@ export const CommandPalette: React.FC = () => {
   // Focus search input on open
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
+      setTimeout(() => inputRef.current?.focus(), 40);
     }
   }, [isOpen]);
 
@@ -71,9 +71,10 @@ export const CommandPalette: React.FC = () => {
       list.push({
         id: `window-${win.id}`,
         title: `Switch to: ${win.title}`,
-        subtitle: `Window ID: ${win.id.slice(-6)} • Process: ${win.processId.slice(-6)}`,
+        subtitle: `Window ID: ${win.id.slice(-6)} • Process: ${win.processId.slice(-4)}`,
         category: 'windows',
         icon: AppWindow,
+        shortcut: '↵',
         handler: () => focusWindow(win.id),
       });
     });
@@ -84,10 +85,11 @@ export const CommandPalette: React.FC = () => {
 
     list.push({
       id: 'sys-next-wallpaper',
-      title: `Cycle Wallpaper (${nextWallpaper?.name ?? 'Next'})`,
-      subtitle: 'Change desktop aesthetic backdrop',
-      category: 'appearance',
+      title: `Cycle Backdrop (${nextWallpaper?.name ?? 'Next'})`,
+      subtitle: 'Switch desktop carbon theme backdrop',
+      category: 'system',
       icon: Image,
+      shortcut: '↵',
       handler: () => {
         if (nextWallpaper) setWallpaper(nextWallpaper.id);
       },
@@ -96,9 +98,10 @@ export const CommandPalette: React.FC = () => {
     list.push({
       id: 'sys-minimize-all',
       title: 'Minimize All Windows',
-      subtitle: 'Show clean desktop surface',
+      subtitle: 'Clear screen to desktop surface',
       category: 'system',
       icon: Minus,
+      shortcut: '↵',
       handler: () => {
         Object.keys(windows).forEach((id) => minimizeWindow(id));
       },
@@ -110,6 +113,7 @@ export const CommandPalette: React.FC = () => {
       subtitle: 'Terminate running window sessions',
       category: 'system',
       icon: X,
+      shortcut: '↵',
       handler: () => {
         Object.keys(windows).forEach((id) => closeWindow(id));
       },
@@ -139,14 +143,12 @@ export const CommandPalette: React.FC = () => {
       setSelectedIndex((selectedIndex + 1) % filteredActions.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(
-        (selectedIndex - 1 + filteredActions.length) % filteredActions.length
-      );
+      setSelectedIndex((selectedIndex - 1 + filteredActions.length) % filteredActions.length);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      const selectedAction = filteredActions[selectedIndex];
-      if (selectedAction) {
-        selectedAction.handler();
+      const action = filteredActions[selectedIndex];
+      if (action) {
+        action.handler();
         close();
       }
     }
@@ -154,37 +156,42 @@ export const CommandPalette: React.FC = () => {
 
   if (!isOpen) return null;
 
+  const activeAction = filteredActions[selectedIndex];
+
   return (
     <div
       onClick={close}
-      className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/60 p-4 pt-20 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/60 p-4 pt-24 backdrop-blur-[4px] animate-in fade-in duration-100"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-surface-panel/95 shadow-2xl backdrop-blur-window animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl overflow-hidden rounded-xl border border-white/[0.12] bg-[#0f1115]/95 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.85)] backdrop-blur-2xl animate-in zoom-in-[0.98] duration-100"
       >
-        {/* Search Input Bar */}
-        <div className="relative flex items-center border-b border-white/10 px-4 py-3">
-          <Search className="h-5 w-5 text-content-tertiary mr-3" />
+        {/* Raycast Search Input Bar */}
+        <div className="relative flex items-center border-b border-white/[0.07] px-3.5 py-3">
+          <Search className="h-4 w-4 text-content-tertiary mr-3 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             onKeyDown={handleKeyDown}
-            placeholder="Type a command or search apps..."
-            className="flex-1 bg-transparent text-sm text-content-primary placeholder:text-content-tertiary outline-none"
+            placeholder="Search commands, applications, or windows..."
+            className="flex-1 bg-transparent text-sm tracking-tight text-content-primary placeholder:text-content-tertiary outline-none font-sans"
           />
-          <kbd className="rounded border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-content-tertiary">
+          <kbd className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] text-content-tertiary">
             ESC
           </kbd>
         </div>
 
         {/* Action Results List */}
-        <div ref={listRef} className="max-h-80 overflow-y-auto p-2">
+        <div ref={listRef} className="max-h-[320px] overflow-y-auto p-1.5 space-y-0.5">
           {filteredActions.length === 0 ? (
-            <div className="py-8 text-center text-xs text-content-tertiary">
-              No matching commands found.
+            <div className="py-10 text-center font-mono text-xs text-content-tertiary">
+              No matching commands or apps found.
             </div>
           ) : (
             filteredActions.map((action, index) => {
@@ -199,40 +206,43 @@ export const CommandPalette: React.FC = () => {
                     close();
                   }}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-colors ${
+                  className={`flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-accent-primary/20 border border-accent-primary/40 text-content-primary'
-                      : 'text-content-secondary hover:bg-white/5 border border-transparent'
+                      ? 'bg-white/[0.08] text-content-primary border border-white/[0.08]'
+                      : 'text-content-secondary hover:bg-white/[0.03] border border-transparent'
                   }`}
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
                     <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
                         isSelected
-                          ? 'bg-accent-primary text-white'
-                          : 'bg-white/5 text-content-tertiary'
+                          ? 'bg-accent-primary border-white/20 text-white'
+                          : 'bg-white/[0.04] border-white/[0.06] text-content-tertiary'
                       }`}
                     >
-                      <IconComponent className="h-4 w-4" />
+                      <IconComponent className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex flex-col truncate">
-                      <span className="text-xs font-medium text-content-primary truncate">
+                      <span className="text-xs font-medium tracking-tight text-content-primary truncate">
                         {action.title}
                       </span>
                       {action.subtitle && (
-                        <span className="text-[11px] text-content-tertiary truncate">
+                        <span className="text-[10px] text-content-tertiary truncate">
                           {action.subtitle}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="rounded bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
                       {action.category}
                     </span>
                     {isSelected && (
-                      <ArrowRight className="h-3.5 w-3.5 text-accent-primary" />
+                      <div className="flex items-center gap-1 text-[10px] font-mono text-content-secondary bg-white/[0.06] px-1.5 py-0.5 rounded">
+                        <span>Open</span>
+                        <CornerDownLeft className="h-2.5 w-2.5" />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -241,14 +251,31 @@ export const CommandPalette: React.FC = () => {
           )}
         </div>
 
-        {/* Footer Hints */}
-        <div className="flex items-center justify-between border-t border-white/5 bg-surface-overlay/50 px-4 py-2 text-[10px] font-mono text-content-tertiary">
-          <div className="flex items-center gap-2">
-            <span>↑↓ Navigate</span>
-            <span>↵ Select</span>
-            <span>ESC Close</span>
+        {/* Raycast Iconic Action Bar Footer */}
+        <div className="flex items-center justify-between border-t border-white/[0.07] bg-[#0c0d10]/90 px-3 py-2 text-[10px] font-mono text-content-tertiary select-none">
+          <div className="flex items-center gap-2 truncate">
+            {activeAction ? (
+              <>
+                <span className="text-content-secondary truncate">{activeAction.title}</span>
+                <span className="opacity-40">//</span>
+                <span className="uppercase text-[9px] text-accent-primary">{activeAction.category}</span>
+              </>
+            ) : (
+              <span>Navigation</span>
+            )}
           </div>
-          <span>FlowOS Spotlight</span>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="flex items-center gap-1">
+              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">↑↓</kbd> Move
+            </span>
+            <span className="flex items-center gap-1 text-content-secondary">
+              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">↵</kbd> Select
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.2">ESC</kbd> Close
+            </span>
+          </div>
         </div>
       </div>
     </div>
