@@ -21,7 +21,7 @@ const RESIZE_DIRECTIONS: ResizeDirection[] = [
   'sw',
 ];
 
-export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
+export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState }) => {
   const { focusWindow, getZIndex } = useWindowStore();
   const zIndex = getZIndex(windowState.id);
 
@@ -32,6 +32,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
     return null;
   }
 
+  const isInteracting = windowState.isDragging || windowState.isResizing;
+
   return (
     <AnimatePresence>
       <motion.div
@@ -40,9 +42,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{
-          type: 'spring',
-          stiffness: 380,
-          damping: 28,
+          scale: { type: 'spring', stiffness: 400, damping: 30 },
+          opacity: { duration: 0.15 },
         }}
         onPointerDown={() => focusWindow(windowState.id)}
         style={{
@@ -52,12 +53,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
           width: `${windowState.size.width}px`,
           height: `${windowState.size.height}px`,
           zIndex,
+          willChange: isInteracting ? 'left, top, width, height' : 'auto',
         }}
-        className={`group flex flex-col overflow-hidden rounded-window border transition-all duration-150 ${
+        className={`group flex flex-col overflow-hidden rounded-window border transition-colors duration-150 ${
           windowState.isFocused
             ? 'border-white/[0.18] shadow-window'
             : 'border-white/[0.07] shadow-lg opacity-[0.98]'
-        } ${windowState.isDragging ? 'select-none pointer-events-auto' : ''}`}
+        } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
       >
         {/* 8-Axis Resize Frame */}
         {RESIZE_DIRECTIONS.map((dir) => (
@@ -71,8 +73,12 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
         {/* Window Command Rail / Titlebar */}
         <WindowHeader windowState={windowState} />
 
-        {/* Application Content Viewport */}
-        <div className="relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window">
+        {/* Application Content Viewport (Disable pointer events during drag/resize for 120 FPS performance) */}
+        <div
+          className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window ${
+            isInteracting ? 'pointer-events-none select-none' : ''
+          }`}
+        >
           {AppComponent ? (
             <AppComponent
               windowId={windowState.id}
@@ -88,4 +94,6 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({ windowState }) => {
       </motion.div>
     </AnimatePresence>
   );
-};
+});
+
+WindowFrame.displayName = 'WindowFrame';

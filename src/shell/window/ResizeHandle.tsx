@@ -23,12 +23,13 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
   direction,
   windowState,
 }) => {
-  const { updatePosition, updateSize, setResizing, focusWindow } =
-    useWindowStore();
+  const { updateBounds, setResizing, focusWindow } = useWindowStore();
 
   const isResizingRef = useRef(false);
   const startPointerRef = useRef({ x: 0, y: 0 });
   const startRectRef = useRef<Rect>({ x: 0, y: 0, width: 0, height: 0 });
+  const rafRef = useRef<number | null>(null);
+  const pendingRectRef = useRef<Rect | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 || windowState.isMaximized) return;
@@ -47,6 +48,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
       width: windowState.size.width,
       height: windowState.size.height,
     };
+    pendingRectRef.current = null;
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -62,26 +64,37 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
       windowState.constraints
     );
 
-    if (
-      newRect.x !== windowState.position.x ||
-      newRect.y !== windowState.position.y
-    ) {
-      updatePosition(windowState.id, { x: newRect.x, y: newRect.y });
-    }
+    pendingRectRef.current = newRect;
 
-    if (
-      newRect.width !== windowState.size.width ||
-      newRect.height !== windowState.size.height
-    ) {
-      updateSize(windowState.id, {
-        width: newRect.width,
-        height: newRect.height,
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(() => {
+        if (pendingRectRef.current) {
+          updateBounds(
+            windowState.id,
+            { x: pendingRectRef.current.x, y: pendingRectRef.current.y },
+            { width: pendingRectRef.current.width, height: pendingRectRef.current.height }
+          );
+        }
+        rafRef.current = null;
       });
     }
   };
 
   const handlePointerEnd = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isResizingRef.current) return;
+
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (pendingRectRef.current) {
+      updateBounds(
+        windowState.id,
+        { x: pendingRectRef.current.x, y: pendingRectRef.current.y },
+        { width: pendingRectRef.current.width, height: pendingRectRef.current.height }
+      );
+      pendingRectRef.current = null;
+    }
 
     isResizingRef.current = false;
     setResizing(windowState.id, false);

@@ -22,6 +22,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
   const isDraggingRef = useRef(false);
   const startPointerRef = useRef({ x: 0, y: 0 });
   const startPosRef = useRef<WindowPosition>({ x: 0, y: 0 });
+  const rafRef = useRef<number | null>(null);
+  const pendingPosRef = useRef<WindowPosition | null>(null);
 
   const manifest = appRegistry.get(windowState.appId);
   const IconComponent = manifest?.icon;
@@ -42,6 +44,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     isDraggingRef.current = true;
     startPointerRef.current = { x: e.clientX, y: e.clientY };
     startPosRef.current = { ...windowState.position };
+    pendingPosRef.current = null;
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -67,16 +70,29 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       DEFAULT_INSETS
     );
 
-    if (
-      clamped.x !== windowState.position.x ||
-      clamped.y !== windowState.position.y
-    ) {
-      updatePosition(windowState.id, clamped);
+    pendingPosRef.current = clamped;
+
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(() => {
+        if (pendingPosRef.current) {
+          updatePosition(windowState.id, pendingPosRef.current);
+        }
+        rafRef.current = null;
+      });
     }
   };
 
   const handlePointerEnd = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
+
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (pendingPosRef.current) {
+      updatePosition(windowState.id, pendingPosRef.current);
+      pendingPosRef.current = null;
+    }
 
     isDraggingRef.current = false;
     setDragging(windowState.id, false);

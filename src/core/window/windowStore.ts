@@ -43,6 +43,7 @@ export interface WindowStoreState {
   ) => void;
   updatePosition: (id: WindowId, position: WindowPosition) => void;
   updateSize: (id: WindowId, size: WindowSize) => void;
+  updateBounds: (id: WindowId, position: WindowPosition, size: WindowSize) => void;
   setDragging: (id: WindowId, isDragging: boolean) => void;
   setResizing: (id: WindowId, isResizing: boolean) => void;
 }
@@ -350,6 +351,19 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
         windows: {
           ...state.windows,
           [id]: { ...win, size },
+        },
+      };
+    });
+  },
+
+  updateBounds: (id, position, size) => {
+    set((state) => {
+      const win = state.windows[id];
+      if (!win) return state;
+      return {
+        windows: {
+          ...state.windows,
+          [id]: { ...win, position, size },
         },
       };
     });
