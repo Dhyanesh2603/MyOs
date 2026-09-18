@@ -7,8 +7,8 @@ export const WALLPAPERS: WallpaperDefinition[] = [
     name: 'Obsidian Carbon',
     type: 'abstract',
     style: {
-      backgroundColor: '#08090a',
-      backgroundImage: `radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 60%)`,
+      backgroundColor: 'rgb(var(--surface-canvas))',
+      backgroundImage: `radial-gradient(circle at 50% 0%, rgb(var(--content-primary) / 0.04) 0%, transparent 60%)`,
     },
   },
   {
@@ -16,7 +16,8 @@ export const WALLPAPERS: WallpaperDefinition[] = [
     name: 'Apple Pro Studio',
     type: 'gradient',
     style: {
-      background: 'linear-gradient(180deg, #0e1014 0%, #060709 100%)',
+      background:
+        'linear-gradient(180deg, rgb(var(--surface-overlay)) 0%, rgb(var(--surface-canvas)) 100%)',
     },
   },
   {
@@ -24,15 +25,16 @@ export const WALLPAPERS: WallpaperDefinition[] = [
     name: 'Warp Technical Slate',
     type: 'minimal',
     style: {
-      background: 'linear-gradient(135deg, #0c0e12 0%, #07080a 100%)',
+      background:
+        'linear-gradient(135deg, rgb(var(--surface-subtle) / 0.5) 0%, rgb(var(--surface-canvas)) 100%)',
     },
   },
   {
     id: 'monochrome-pitch',
-    name: 'Monochrome Pitch',
+    name: 'Monochrome Canvas',
     type: 'minimal',
     style: {
-      backgroundColor: '#050507',
+      backgroundColor: 'rgb(var(--surface-canvas))',
     },
   },
 ];

@@ -72,8 +72,12 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
     const root = document.documentElement;
     if (themeId === 'dark') {
       root.removeAttribute('data-theme');
+      root.classList.remove('light');
+      root.classList.add('dark');
     } else {
       root.setAttribute('data-theme', themeId);
+      root.classList.remove('dark');
+      root.classList.add(themeId);
     }
   },
 

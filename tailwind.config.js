@@ -24,8 +24,14 @@ export default {
           muted: 'rgb(var(--accent-muted) / <alpha-value>)',
         },
         border: {
-          subtle: 'rgb(var(--border-subtle) / <alpha-value>)',
-          strong: 'rgb(var(--border-strong) / <alpha-value>)',
+          subtle: ({ opacityValue }) =>
+            opacityValue !== undefined
+              ? `rgb(var(--border-subtle) / ${opacityValue})`
+              : `rgb(var(--border-subtle) / var(--border-subtle-alpha, 0.08))`,
+          strong: ({ opacityValue }) =>
+            opacityValue !== undefined
+              ? `rgb(var(--border-strong) / ${opacityValue})`
+              : `rgb(var(--border-strong) / var(--border-strong-alpha, 0.16))`,
         },
       },
       borderRadius: {
