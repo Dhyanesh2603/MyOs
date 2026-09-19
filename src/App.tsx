@@ -23,6 +23,7 @@ import { FancyZonesOverlay } from '@shell/window/FancyZonesOverlay';
 import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
 import { FocusModeOverlay } from '@shell/focus/FocusModeOverlay';
 import { ScratchpadDrawer } from '@shell/scratchpad/ScratchpadDrawer';
+import { SplitScreenDivider } from '@shell/window/SplitScreenDivider';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -34,6 +35,7 @@ import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useCaptureStore } from '@shell/capture/captureStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
 import { useScratchpadStore } from '@core/scratchpad/scratchpadStore';
+import { useSplitScreenStore } from '@core/window/splitScreenStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { soundEngine } from '@core/audio/soundEngine';
@@ -128,6 +130,13 @@ export const App: React.FC = () => {
         useScratchpadStore.getState().toggleOpen();
         return;
       }
+
+      // 2-Up Split Screen Tiling: Alt+T
+      if (e.altKey && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        useSplitScreenStore.getState().toggleSplitTopWindows();
+        return;
+      }
     };
     window.addEventListener('keydown', handleShortcuts);
 
@@ -163,6 +172,9 @@ export const App: React.FC = () => {
       {windowList.map((win) => (
         <WindowFrame key={win.id} windowState={win} />
       ))}
+
+      {/* Interactive 2-Up Split Screen Divider */}
+      <SplitScreenDivider />
 
       {/* Fluid Magnetic Dock */}
       <Dock />
