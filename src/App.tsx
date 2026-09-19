@@ -14,6 +14,7 @@ import { MissionControl } from '@shell/switcher/MissionControl';
 import { ClipboardHistoryModal } from '@shell/clipboard/ClipboardHistoryModal';
 import { ScreenCaptureOverlay } from '@shell/capture/ScreenCaptureOverlay';
 import { ScreenSaver } from '@shell/desktop/screensaver/ScreenSaver';
+import { CopilotDrawer } from '@shell/copilot/CopilotDrawer';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -22,6 +23,7 @@ import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useCaptureStore } from '@shell/capture/captureStore';
+import { useCopilotStore } from '@core/copilot/copilotStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -85,6 +87,13 @@ export const App: React.FC = () => {
       ) {
         e.preventDefault();
         useCaptureStore.getState().startCapture();
+        return;
+      }
+
+      // Copilot Assistant: Ctrl+J
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        useCopilotStore.getState().toggleCopilot();
         return;
       }
     };
@@ -153,6 +162,9 @@ export const App: React.FC = () => {
 
       {/* Ambient Nothing-style ScreenSaver */}
       <ScreenSaver />
+
+      {/* Raycast-style AI Copilot Sidecar Drawer */}
+      <CopilotDrawer />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

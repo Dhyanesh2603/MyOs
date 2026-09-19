@@ -16,7 +16,10 @@ import {
   CornerDownLeft,
   FileText,
   FileCode,
+  Calculator,
 } from 'lucide-react';
+import { soundEngine } from '@core/audio/soundEngine';
+import { useNotificationStore } from '@core/notifications/notificationStore';
 
 export const CommandPalette: React.FC = () => {
   const { isOpen, query, selectedIndex, close, toggle, setQuery, setSelectedIndex } =
@@ -170,17 +173,87 @@ export const CommandPalette: React.FC = () => {
     };
   }, [query, launchApp]);
 
+function tryEvaluateMath(raw: string): string | null {
+  const q = raw.trim();
+  if (!q) return null;
+
+  // Percentage pattern: "20% of 150"
+  const percentMatch = q.match(/^([\d\.]+)\s*%\s*of\s*([\d\.]+)$/i);
+  if (percentMatch && percentMatch[1] && percentMatch[2]) {
+    const p = parseFloat(percentMatch[1]);
+    const total = parseFloat(percentMatch[2]);
+    if (!isNaN(p) && !isNaN(total)) {
+      return String((p / 100) * total);
+    }
+  }
+
+  let expr = q.replace(/\^/g, '**');
+  expr = expr.replace(/sqrt\(/gi, 'Math.sqrt(');
+  expr = expr.replace(/sin\(/gi, 'Math.sin(');
+  expr = expr.replace(/cos\(/gi, 'Math.cos(');
+  expr = expr.replace(/tan\(/gi, 'Math.tan(');
+  expr = expr.replace(/log\(/gi, 'Math.log10(');
+  expr = expr.replace(/ln\(/gi, 'Math.log(');
+  expr = expr.replace(/pi\b/gi, 'Math.PI');
+  expr = expr.replace(/e\b/gi, 'Math.E');
+
+  if (!/^[\d\s\+\-\*\/\.\(\)\,\%]|Math\.(sqrt|sin|cos|tan|log10|log|PI|E)/.test(expr)) {
+    return null;
+  }
+  const sanitized = expr.replace(/Math\.(sqrt|sin|cos|tan|log10|log|PI|E)/g, '');
+  if (/[a-zA-Z_$]/.test(sanitized)) {
+    return null;
+  }
+  if (!/[\+\-\*\/\%]|Math\./.test(expr)) {
+    return null;
+  }
+
+  try {
+    // eslint-disable-next-line no-new-func
+    const val = Function(`"use strict"; return (${expr});`)();
+    if (typeof val === 'number' && !isNaN(val) && isFinite(val)) {
+      return Number.isInteger(val) ? String(val) : String(parseFloat(val.toFixed(6)));
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
   // Filter actions based on query and append deep full-text matches
   const filteredActions = useMemo(() => {
     if (!query.trim()) return actions;
     const cleanQuery = query.toLowerCase().trim();
+
+    const mathResult = tryEvaluateMath(query);
+    const mathActions: CommandAction[] = [];
+    if (mathResult !== null) {
+      mathActions.push({
+        id: 'math-calc-result',
+        title: `= ${mathResult}`,
+        subtitle: `Calculation: ${query} (Press Enter to copy result)`,
+        category: 'calc',
+        icon: Calculator,
+        shortcut: '↵ Copy',
+        handler: () => {
+          navigator.clipboard.writeText(mathResult);
+          soundEngine.playClick();
+          useNotificationStore.getState().notify({
+            title: 'Calculation Copied',
+            message: `${mathResult} copied to clipboard`,
+            type: 'info',
+          });
+        },
+      });
+    }
+
     const appAndWinMatches = actions.filter(
       (a) =>
         a.title.toLowerCase().includes(cleanQuery) ||
         (a.subtitle && a.subtitle.toLowerCase().includes(cleanQuery)) ||
         a.category.toLowerCase().includes(cleanQuery)
     );
-    return [...appAndWinMatches, ...fileActions];
+    return [...mathActions, ...appAndWinMatches, ...fileActions];
   }, [actions, query, fileActions]);
 
   // Handle keyboard navigation in result list

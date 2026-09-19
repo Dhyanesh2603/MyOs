@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 
-export type CommandCategory = 'apps' | 'windows' | 'system' | 'appearance' | 'files';
+export type CommandCategory = 'apps' | 'windows' | 'system' | 'appearance' | 'files' | 'calc';
 
 export interface CommandAction {
   readonly id: string;

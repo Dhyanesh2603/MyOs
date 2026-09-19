@@ -12,11 +12,13 @@ import {
   Calendar as CalendarIcon,
   ShieldCheck,
   SlidersHorizontal,
+  Sparkles,
 } from 'lucide-react';
 import { useThemeStore } from '@core/theme/themeStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
+import { useCopilotStore } from '@core/copilot/copilotStore';
 
 export const SystemTray: React.FC = () => {
   const { themeId, setTheme } = useThemeStore();
@@ -172,6 +174,18 @@ export const SystemTray: React.FC = () => {
         {unreadCount > 0 && (
           <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
         )}
+      </button>
+
+      {/* AI Copilot Trigger */}
+      <button
+        onClick={() => {
+          soundEngine.playClick();
+          useCopilotStore.getState().toggleCopilot();
+        }}
+        title="FlowOS Copilot (Ctrl+J)"
+        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-accent-primary transition-colors"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
       </button>
 
       {/* Control Center Trigger */}
