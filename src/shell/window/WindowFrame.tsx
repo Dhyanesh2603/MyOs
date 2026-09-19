@@ -82,9 +82,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
           willChange: isInteracting ? 'left, top, width, height' : 'auto',
           transition: 'opacity 0.2s ease, filter 0.2s ease',
         }}
-        className={`group flex flex-col overflow-hidden rounded-window border transition-colors duration-150 ${
+        className={`group flex flex-col overflow-hidden ${
+          windowState.isMaximized ? 'rounded-none border-0' : 'rounded-window border'
+        } transition-colors duration-150 ${
           isPeekTarget
             ? 'border-accent shadow-[0_0_30px_rgba(var(--accent-rgb),0.5)] ring-2 ring-accent'
+            : windowState.isMaximized
+            ? 'shadow-none'
             : windowState.isFocused
             ? 'border-border-strong shadow-window'
             : 'border-border-subtle shadow-lg opacity-[0.99]'

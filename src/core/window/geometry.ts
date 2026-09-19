@@ -20,7 +20,7 @@ export interface ViewportInsets {
 
 export const DEFAULT_INSETS: ViewportInsets = {
   top: 32, // Reserve space for top menu bar clearance
-  bottom: 84, // Reserve space for dock clearance
+  bottom: 0, // Dock auto-hides; allow windows to reach bottom of viewport
   left: 0,
   right: 0,
 };

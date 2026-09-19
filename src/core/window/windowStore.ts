@@ -70,8 +70,8 @@ const DEFAULT_CONSTRAINTS: WindowConstraints = {
 };
 
 const DEFAULT_SIZE: WindowSize = {
-  width: 680,
-  height: 480,
+  width: 960,
+  height: 640,
 };
 
 let windowSequence = 0;
@@ -135,20 +135,46 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
       options.initialPosition ??
       computeInitialPosition(initialSize, viewportSize, activeWin, insets);
 
+    // Standard application windows automatically open full-screen (taking over browser viewport)
+    // Small utility tools (e.g. calculator, retro games) with strict max constraints open floating
+    const isStrictCompactApp =
+      (mergedConstraints.maxWidth !== undefined && mergedConstraints.maxWidth < 650) ||
+      (mergedConstraints.maxHeight !== undefined && mergedConstraints.maxHeight < 600);
+
+    const shouldStartMaximized =
+      customState?.startMaximized !== false && !isStrictCompactApp;
+
+    const finalPosition = shouldStartMaximized
+      ? { x: insets.left, y: insets.top }
+      : initialPosition;
+
+    const finalSize = shouldStartMaximized
+      ? {
+          width: Math.max(320, viewportSize.width - insets.left - insets.right),
+          height: Math.max(240, viewportSize.height - insets.top - insets.bottom),
+        }
+      : initialSize;
+
     const newWindow: WindowState = {
       id: winId,
       processId,
       appId,
       title,
-      position: initialPosition,
-      size: initialSize,
+      position: finalPosition,
+      size: finalSize,
       constraints: mergedConstraints,
       zIndex: BASE_Z_INDEX + get().focusStack.length,
       isFocused: true,
       isMinimized: false,
-      isMaximized: false,
+      isMaximized: shouldStartMaximized,
       isDragging: false,
       isResizing: false,
+      preMaximizedState: shouldStartMaximized
+        ? {
+            position: initialPosition,
+            size: initialSize,
+          }
+        : undefined,
       workspaceId,
       customState,
     };

@@ -112,7 +112,7 @@ export const personalOsManifest: AppManifest = {
   description: 'Flow OS v2 engineering command hub answering "What should I work on next?" with missions, projects, and academics.',
   category: 'productivity',
   icon: Compass,
-  defaultSize: { width: 1060, height: 720 },
+  defaultSize: { width: 1180, height: 740 },
   constraints: { minWidth: 760, minHeight: 520, maxWidth: 1920, maxHeight: 1200 },
   allowMultipleInstances: false,
   permissions: ['notifications', 'audio'],
