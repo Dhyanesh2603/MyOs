@@ -13,7 +13,17 @@ export interface DockState {
 }
 
 export const useDockStore = create<DockState>((set) => ({
-  pinnedAppIds: ['file-explorer', 'notes', 'terminal', 'calculator', 'music', 'system-settings'],
+  pinnedAppIds: [
+    'browser',
+    'file-explorer',
+    'code-editor',
+    'notes',
+    'terminal',
+    'calculator',
+    'task-manager',
+    'music',
+    'system-settings',
+  ],
   dockSize: 'regular',
 
   pinApp: (appId) => {

@@ -5,6 +5,9 @@ import { terminalManifest } from '@apps/terminal';
 import { fileExplorerManifest } from '@apps/file-explorer';
 import { calculatorManifest } from '@apps/calculator';
 import { musicManifest } from '@apps/music';
+import { taskManagerManifest } from '@apps/task-manager';
+import { codeEditorManifest } from '@apps/code-editor';
+import { browserManifest } from '@apps/browser';
 
 let initialized = false;
 
@@ -21,6 +24,9 @@ export function initializeApplications(): void {
   appRegistry.register(fileExplorerManifest);
   appRegistry.register(calculatorManifest);
   appRegistry.register(musicManifest);
+  appRegistry.register(taskManagerManifest);
+  appRegistry.register(codeEditorManifest);
+  appRegistry.register(browserManifest);
 
   initialized = true;
 }

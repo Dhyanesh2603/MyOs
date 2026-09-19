@@ -11,6 +11,9 @@ import {
   File,
   Calculator,
   ExternalLink,
+  Globe,
+  Code2,
+  Activity,
 } from 'lucide-react';
 
 interface DesktopShortcut {
@@ -30,11 +33,25 @@ export const DesktopIcons: React.FC = () => {
   // Default system shortcuts + desktop files
   const shortcuts: DesktopShortcut[] = [
     {
+      id: 'sc-browser',
+      name: 'Browser',
+      type: 'app',
+      target: 'browser',
+      icon: Globe,
+    },
+    {
       id: 'sc-explorer',
       name: 'Files',
       type: 'app',
       target: 'file-explorer',
       icon: Folder,
+    },
+    {
+      id: 'sc-code',
+      name: 'Code',
+      type: 'app',
+      target: 'code-editor',
+      icon: Code2,
     },
     {
       id: 'sc-notes',
@@ -49,6 +66,13 @@ export const DesktopIcons: React.FC = () => {
       type: 'app',
       target: 'terminal',
       icon: Terminal,
+    },
+    {
+      id: 'sc-activity',
+      name: 'Activity',
+      type: 'app',
+      target: 'task-manager',
+      icon: Activity,
     },
     {
       id: 'sc-calculator',
