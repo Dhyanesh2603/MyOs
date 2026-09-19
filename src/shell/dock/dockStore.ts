@@ -20,6 +20,8 @@ export const useDockStore = create<DockState>((set) => ({
     'notes',
     'terminal',
     'calculator',
+    'paint',
+    'gallery',
     'task-manager',
     'music',
     'system-settings',

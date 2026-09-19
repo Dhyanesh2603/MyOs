@@ -8,6 +8,8 @@ import { musicManifest } from '@apps/music';
 import { taskManagerManifest } from '@apps/task-manager';
 import { codeEditorManifest } from '@apps/code-editor';
 import { browserManifest } from '@apps/browser';
+import { paintManifest } from '@apps/paint';
+import { galleryManifest } from '@apps/gallery';
 
 let initialized = false;
 
@@ -27,6 +29,8 @@ export function initializeApplications(): void {
   appRegistry.register(taskManagerManifest);
   appRegistry.register(codeEditorManifest);
   appRegistry.register(browserManifest);
+  appRegistry.register(paintManifest);
+  appRegistry.register(galleryManifest);
 
   initialized = true;
 }

@@ -16,6 +16,8 @@ import {
   Code2,
   Activity,
   Download,
+  Palette,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface DesktopShortcut {
@@ -82,6 +84,20 @@ export const DesktopIcons: React.FC = () => {
       type: 'app',
       target: 'calculator',
       icon: Calculator,
+    },
+    {
+      id: 'sc-paint',
+      name: 'Paint',
+      type: 'app',
+      target: 'paint',
+      icon: Palette,
+    },
+    {
+      id: 'sc-gallery',
+      name: 'Gallery',
+      type: 'app',
+      target: 'gallery',
+      icon: ImageIcon,
     },
     {
       id: 'sc-settings',

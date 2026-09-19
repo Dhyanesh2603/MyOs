@@ -29,6 +29,14 @@ export const FILE_EXTENSIONS_MAP: Record<string, string> = {
   mp3: 'music',
   wav: 'music',
   ogg: 'music',
+
+  // Image & Photos
+  png: 'gallery',
+  jpg: 'gallery',
+  jpeg: 'gallery',
+  svg: 'gallery',
+  webp: 'gallery',
+  gif: 'gallery',
 };
 
 /**
