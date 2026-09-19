@@ -11,6 +11,8 @@ import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
+import { LockScreen } from '@shell/session/LockScreen';
+import { useSessionStore } from '@core/session/sessionStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -26,7 +28,18 @@ export const App: React.FC = () => {
       });
     }, 600);
 
-    return () => clearTimeout(timer);
+    const handleLockShortcut = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        useSessionStore.getState().lock();
+      }
+    };
+    window.addEventListener('keydown', handleLockShortcut);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', handleLockShortcut);
+    };
   }, []);
 
   const windows = useWindowStore((state) => state.windows);
@@ -57,6 +70,9 @@ export const App: React.FC = () => {
 
       {/* Visual Alt+Tab Task Switcher */}
       <TaskSwitcher />
+
+      {/* Lock Screen & Session Auth Overlay */}
+      <LockScreen />
     </DesktopSurface>
   );
 };
