@@ -19,7 +19,7 @@ export interface ViewportInsets {
 }
 
 export const DEFAULT_INSETS: ViewportInsets = {
-  top: 0,
+  top: 32, // Reserve space for top menu bar clearance
   bottom: 84, // Reserve space for dock clearance
   left: 0,
   right: 0,

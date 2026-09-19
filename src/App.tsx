@@ -10,6 +10,7 @@ import { NotificationToaster } from '@shell/notifications/NotificationToaster';
 import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
+import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -33,6 +34,9 @@ export const App: React.FC = () => {
 
   return (
     <DesktopSurface>
+      {/* Unified Global Top Menu Bar */}
+      <TopMenuBar />
+
       {/* Interactive Rendered Windows */}
       {windowList.map((win) => (
         <WindowFrame key={win.id} windowState={win} />

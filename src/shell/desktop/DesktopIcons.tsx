@@ -164,7 +164,7 @@ export const DesktopIcons: React.FC = () => {
   return (
     <div
       aria-label="Desktop Grid"
-      className="absolute top-8 left-8 z-[20] flex max-h-[85vh] flex-col flex-wrap gap-4 select-none pointer-events-auto"
+      className="absolute top-12 left-8 z-[20] flex max-h-[85vh] flex-col flex-wrap gap-4 select-none pointer-events-auto"
     >
       {shortcuts.map((item) => {
         const IconComponent = item.icon;
