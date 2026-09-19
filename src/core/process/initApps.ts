@@ -16,6 +16,7 @@ import { flow2048Manifest } from '@apps/retro-2048';
 import { flowSweeperManifest } from '@apps/retro-sweeper';
 import { synthManifest } from '@apps/synth';
 import { flowcamManifest } from '@apps/flowcam';
+import { flowtapeManifest } from '@apps/flowtape';
 
 let initialized = false;
 
@@ -43,6 +44,7 @@ export function initializeApplications(): void {
   appRegistry.register(flowSweeperManifest);
   appRegistry.register(synthManifest);
   appRegistry.register(flowcamManifest);
+  appRegistry.register(flowtapeManifest);
 
   initialized = true;
 }

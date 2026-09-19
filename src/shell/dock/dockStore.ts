@@ -29,6 +29,7 @@ export const useDockStore = create<DockState>((set) => ({
     'retro-sweeper',
     'synth',
     'flowcam',
+    'flowtape',
   ],
   dockSize: 'regular',
 
