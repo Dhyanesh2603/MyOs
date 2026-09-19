@@ -1,5 +1,6 @@
 import { vfs, normalizePath } from '@core/vfs/vfsService';
 import { useProcessStore } from '@core/process/processStore';
+import { executeCode } from '@core/runtime/codeRunner';
 
 export interface ShellResult {
   output: string;
@@ -20,7 +21,7 @@ export async function executeCommand(
     case 'help':
       return {
         output: [
-          'FlowOS Shell v0.1.0',
+          'FlowOS Shell v0.2.0',
           'Available commands:',
           '  help               Show this help guide',
           '  pwd                Print current working directory',
@@ -31,6 +32,8 @@ export async function executeCommand(
           '  mkdir <dir>        Create a directory',
           '  rm <path>          Delete file or directory',
           '  echo <text>        Print text',
+          '  eval <code>        Evaluate JavaScript expression',
+          '  run <file>         Execute a JavaScript file from VFS',
           '  ps                 List active OS processes',
           '  kill <pid>         Terminate a process by ID',
           '  clear              Clear terminal screen',
@@ -149,6 +152,44 @@ export async function executeCommand(
 
     case 'echo': {
       return { output: args.join(' ') };
+    }
+
+    case 'eval': {
+      if (args.length === 0) return { output: 'eval: missing JavaScript expression' };
+      const code = args.join(' ');
+      const result = await executeCode(code);
+      const out: string[] = [];
+      result.logs.forEach((l) => out.push(`[${l.level}] ${l.message}`));
+      if (result.returnValue !== undefined && result.returnValue !== 'undefined') {
+        out.push(`=> ${result.returnValue}`);
+      }
+      if (result.error) {
+        out.push(`Error: ${result.error}`);
+      }
+      out.push(`(completed in ${result.durationMs}ms)`);
+      return { output: out.join('\n') };
+    }
+
+    case 'run':
+    case 'node': {
+      const target = args[0];
+      if (!target) return { output: 'run: missing script file operand' };
+      const targetPath = target.startsWith('/') ? target : normalizePath(`${cwd}/${target}`);
+      try {
+        const fileContent = await vfs.readFile(targetPath);
+        const result = await executeCode(fileContent);
+        const out: string[] = [];
+        result.logs.forEach((l) => out.push(l.message));
+        if (result.returnValue !== undefined && result.returnValue !== 'undefined') {
+          out.push(`=> ${result.returnValue}`);
+        }
+        if (result.error) {
+          out.push(`Runtime Error:\n${result.error}`);
+        }
+        return { output: out.join('\n') };
+      } catch (err: any) {
+        return { output: `run: cannot read script '${targetPath}': ${err.message || 'No such file'}` };
+      }
     }
 
     case 'ps': {
