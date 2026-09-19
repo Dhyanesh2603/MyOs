@@ -175,12 +175,24 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 - **Vector Doodle Pen:** Freehand drawing brush with customizable color swatches and stroke widths ($2\text{px}, 4\text{px}, 8\text{px}$).
 - **Instant VFS Snapshot Export:** Render the full board onto an offscreen canvas and export high-resolution PNG snapshots directly to `/home/user/Pictures/FlowBoard_*.png`.
 
+### 29. Flow OS v2 — Personal Operating System
+- **"What should I work on next?" Momentum Engine:** Intelligent algorithmic prioritization assessing imminent university deadlines, regulatory attendance compliance, active sprint focus, and review queue.
+- **Missions as Engineering Campaigns:** Long-term strategic missions (e.g. *Crack Product Placement*, *Architect Flow OS v2*, *Complete Semester VII*, *Master ML Transformers*) with milestones, dependencies, and resources.
+- **Deep Engineering Project Studio:** Architecture specifications, roadmap milestones, known bug log with severity tags, ideas scratchpad, Git commit activity, and release changelogs.
+- **Academic Workspace & Compliance Alerts:** Real-time course tracking with bold $\lt 75\%$ mandatory attendance warning banners, CAT-1/CAT-2/FAT exam schedules, and an interactive semester CGPA simulator.
+- **Learning Hub & Dedicated DSA Workspace:** Track engineering skills across Systems, Frontend, Backend, and AI. Dedicated DSA pattern categorizer (Sliding Window, Monotonic Stack, DP, Graphs) with difficulty spread, interview readiness score (82%), and mistake notebook.
+- **Career & Placement Command Dashboard:** Visual 6-stage Kanban recruitment pipeline (Wishlist $\to$ Offer), ATS 95+ resume versioning, interview rounds log, and portfolio readiness checklist.
+- **Daily Planner & Deep Work Stopwatch:** Morning intentional priorities checklist, Deep Work stopwatch timer with audio feedback, evening reflections (Wins & Mistakes), and focus telemetry.
+- **Interactive Vector Knowledge Graph:** High-performance relational vector canvas visualizer interconnecting Projects, Skills, Subjects, Goals, and Companies with an interactive node inspector.
+- **Distraction-Free Focus Mode:** One-click full-screen HUD muting all system distractions and focusing entirely on a singular task, countdown timer, and milestone deliverables.
+
 ---
 
 ## 📱 Built-in & Community Applications
 
 | Application | ID | Category | Description |
 | :--- | :--- | :--- | :--- |
+| **Personal OS** | `personal-os` | Productivity | Engineering control center answering "What should I work on next?" with missions, projects, and academics. |
 | **Browser** | `browser` | Productivity | Sandboxed in-OS web browser with multi-tabs, URL/search omnibox, and quick bookmarks (MDN, GitHub, HN, Wikipedia). |
 | **Files** | `file-explorer` | Utilities | Arc-style Workspace sidebar, breadcrumbs, high-density table/grid views, VFS file creation/deletion, and host export. |
 | **Code Editor** | `code-editor` | Development | Monospaced editor with line numbers gutter, syntax detection, `Ctrl+S` VFS save, and integrated WebWorker execution console. |
