@@ -17,12 +17,14 @@ import {
   Sparkles,
   Music as MusicIcon,
   Image as ImageIcon,
+  Download,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { openVFSFile } from '@core/vfs/fileAssociations';
+import { downloadVFSToPC, importHostFileToVFS } from '@core/vfs/hostBridge';
 import { normalizePath } from '@core/vfs/vfsService';
 
 const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
@@ -288,6 +290,17 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               <span>File</span>
             </button>
 
+            {selectedPath && nodes[selectedPath]?.type === 'file' && (
+              <button
+                onClick={() => downloadVFSToPC(selectedPath)}
+                title="Download to Physical PC"
+                className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+              >
+                <Download className="h-3 w-3 text-emerald-400" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+            )}
+
             {selectedPath && (
               <button
                 onClick={() => handleDelete(selectedPath)}
@@ -303,6 +316,19 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
         {/* Directory Items Viewport */}
         <div
           onClick={() => setSelectedPath(null)}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onDrop={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.dataTransfer.files?.length) {
+              for (const f of Array.from(e.dataTransfer.files)) {
+                await importHostFileToVFS(f, currentPath);
+              }
+            }
+          }}
           className="flex-1 overflow-y-auto p-4 select-none"
         >
           {currentNodes.length === 0 ? (

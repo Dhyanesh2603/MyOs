@@ -7,13 +7,15 @@ import { SelectionMarquee } from './SelectionMarquee';
 import { DesktopIcons } from './DesktopIcons';
 import { DesktopWidgets } from '../widgets/DesktopWidgets';
 import { SnapPreviewOverlay } from './SnapPreviewOverlay';
-import { FileText, Settings, Image, Minus, X } from 'lucide-react';
+import { importHostFileToVFS } from '@core/vfs/hostBridge';
+import { FileText, Settings, Image, Minus, X, UploadCloud } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
 }
 
 export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
+  const [isDragOver, setIsDragOver] = useState(false);
   const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
   const wallpaper = wallpapers.find((w) => w.id === currentWallpaperId) ?? wallpapers[0]!;
   const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
@@ -146,6 +148,26 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onContextMenu={handleContextMenu}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget === e.target) {
+          setIsDragOver(false);
+        }
+      }}
+      onDrop={async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+        if (e.dataTransfer.files?.length) {
+          for (const file of Array.from(e.dataTransfer.files)) {
+            await importHostFileToVFS(file, '/home/user/Desktop');
+          }
+        }
+      }}
       style={wallpaper.style}
       className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none"
     >
@@ -180,6 +202,21 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
 
       {/* Aero Snap Preview Overlay */}
       <SnapPreviewOverlay />
+
+      {/* Host Machine Drag-and-Drop Indicator */}
+      {isDragOver && (
+        <div className="pointer-events-none fixed inset-8 z-[8900] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-accent-primary bg-accent-primary/15 backdrop-blur-md shadow-2xl animate-in fade-in zoom-in-95 select-none">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-panel border border-accent-primary/40 text-accent-primary shadow-lg mb-3">
+            <UploadCloud className="h-8 w-8 animate-bounce" />
+          </div>
+          <h3 className="font-sans text-base font-semibold text-content-primary">
+            Drop Physical Files to Import
+          </h3>
+          <p className="mt-1 font-mono text-xs text-content-tertiary">
+            Will be written directly to /home/user/Desktop in FlowOS VFS
+          </p>
+        </div>
+      )}
 
       {/* Surface Children (Windows, Dock, HUD, Overlays) */}
       {children}

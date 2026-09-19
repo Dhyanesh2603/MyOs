@@ -3,6 +3,7 @@ import { useProcessStore } from '@core/process/processStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { openVFSFile } from '@core/vfs/fileAssociations';
+import { downloadVFSToPC } from '@core/vfs/hostBridge';
 import {
   Settings,
   FileText,
@@ -14,6 +15,7 @@ import {
   Globe,
   Code2,
   Activity,
+  Download,
 } from 'lucide-react';
 
 interface DesktopShortcut {
@@ -147,6 +149,19 @@ export const DesktopIcons: React.FC = () => {
             action: () => handleOpen(item),
           },
         },
+        ...(item.type === 'file'
+          ? [
+              {
+                type: 'item' as const,
+                item: {
+                  id: 'download-pc',
+                  label: 'Download to PC',
+                  icon: Download,
+                  action: () => downloadVFSToPC(item.target),
+                },
+              },
+            ]
+          : []),
         { type: 'separator', id: 'sep-1' },
         {
           type: 'item',
