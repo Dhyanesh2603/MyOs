@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
-import { useWindowStore } from '@core/window/windowStore';
+import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
 import { appRegistry } from '@core/process/registry';
 import { Minus, Square, Copy, X } from 'lucide-react';
 
@@ -17,6 +17,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     toggleMaximize,
     updatePosition,
     setDragging,
+    snapWindow,
+    setSnapPreview,
   } = useWindowStore();
 
   const isDraggingRef = useRef(false);
@@ -24,9 +26,36 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
   const startPosRef = useRef<WindowPosition>({ x: 0, y: 0 });
   const rafRef = useRef<number | null>(null);
   const pendingPosRef = useRef<WindowPosition | null>(null);
+  const activeSnapRef = useRef<SnapTarget>(null);
 
   const manifest = appRegistry.get(windowState.appId);
   const IconComponent = manifest?.icon;
+
+  // Global keyboard shortcuts for focused window (Aero Snap shortcuts)
+  useEffect(() => {
+    if (!windowState.isFocused) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.altKey && (e.key === '[' || e.key === 'ArrowLeft')) {
+        e.preventDefault();
+        snapWindow(windowState.id, 'left', { width: window.innerWidth, height: window.innerHeight });
+      } else if (e.altKey && (e.key === ']' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        snapWindow(windowState.id, 'right', { width: window.innerWidth, height: window.innerHeight });
+      } else if (e.altKey && (e.key === 'Enter' || e.key === 'ArrowUp')) {
+        e.preventDefault();
+        toggleMaximize(windowState.id, { width: window.innerWidth, height: window.innerHeight });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [windowState.id, windowState.isFocused, snapWindow, toggleMaximize]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Only primary button and when not maximized
@@ -45,6 +74,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     startPointerRef.current = { x: e.clientX, y: e.clientY };
     startPosRef.current = { ...windowState.position };
     pendingPosRef.current = null;
+    activeSnapRef.current = null;
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -72,6 +102,21 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
     pendingPosRef.current = clamped;
 
+    // Detect snap edge proximity
+    let detectedSnap: SnapTarget = null;
+    if (e.clientX <= 24) {
+      detectedSnap = 'left';
+    } else if (e.clientX >= window.innerWidth - 24) {
+      detectedSnap = 'right';
+    } else if (e.clientY <= 20) {
+      detectedSnap = 'maximize';
+    }
+
+    if (activeSnapRef.current !== detectedSnap) {
+      activeSnapRef.current = detectedSnap;
+      setSnapPreview(detectedSnap);
+    }
+
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(() => {
         if (pendingPosRef.current) {
@@ -89,13 +134,23 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     }
-    if (pendingPosRef.current) {
+
+    const snapTarget = activeSnapRef.current;
+    if (snapTarget) {
+      snapWindow(windowState.id, snapTarget, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      activeSnapRef.current = null;
+      setSnapPreview(null);
+    } else if (pendingPosRef.current) {
       updatePosition(windowState.id, pendingPosRef.current);
       pendingPosRef.current = null;
     }
 
     isDraggingRef.current = false;
     setDragging(windowState.id, false);
+    setSnapPreview(null);
 
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);

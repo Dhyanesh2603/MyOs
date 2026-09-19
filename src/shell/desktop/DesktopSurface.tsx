@@ -6,6 +6,7 @@ import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { SelectionMarquee } from './SelectionMarquee';
 import { DesktopIcons } from './DesktopIcons';
 import { DesktopWidgets } from '../widgets/DesktopWidgets';
+import { SnapPreviewOverlay } from './SnapPreviewOverlay';
 import { FileText, Settings, Image, Minus, X } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
@@ -176,6 +177,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
 
       {/* Persistent Desktop HUD Widgets */}
       <DesktopWidgets />
+
+      {/* Aero Snap Preview Overlay */}
+      <SnapPreviewOverlay />
 
       {/* Surface Children (Windows, Dock, HUD, Overlays) */}
       {children}

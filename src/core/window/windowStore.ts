@@ -41,12 +41,22 @@ export interface WindowStoreState {
     viewportSize: WindowSize,
     insets?: ViewportInsets
   ) => void;
+  snapPreview: SnapTarget;
+  setSnapPreview: (preview: SnapTarget) => void;
+  snapWindow: (
+    id: WindowId,
+    target: 'left' | 'right' | 'maximize',
+    viewportSize: WindowSize,
+    insets?: ViewportInsets
+  ) => void;
   updatePosition: (id: WindowId, position: WindowPosition) => void;
   updateSize: (id: WindowId, size: WindowSize) => void;
   updateBounds: (id: WindowId, position: WindowPosition, size: WindowSize) => void;
   setDragging: (id: WindowId, isDragging: boolean) => void;
   setResizing: (id: WindowId, isResizing: boolean) => void;
 }
+
+export type SnapTarget = 'left' | 'right' | 'maximize' | null;
 
 const DEFAULT_CONSTRAINTS: WindowConstraints = {
   minWidth: 320,
@@ -70,6 +80,8 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
   windows: {},
   focusStack: [],
   activeWindowId: null,
+  snapPreview: null,
+  setSnapPreview: (preview) => set({ snapPreview: preview }),
 
   getZIndex: (id: WindowId): number => {
     const { focusStack } = get();
@@ -327,6 +339,72 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
           },
         };
       }
+    });
+  },
+
+  snapWindow: (id, target, viewportSize, insets = DEFAULT_INSETS) => {
+    set((state) => {
+      const win = state.windows[id];
+      if (!win) return state;
+
+      const availWidth = Math.max(320, viewportSize.width - insets.left - insets.right);
+      const availHeight = Math.max(240, viewportSize.height - insets.top - insets.bottom);
+      const halfWidth = Math.floor(availWidth / 2);
+
+      const preState = win.preMaximizedState ?? {
+        position: { ...win.position },
+        size: { ...win.size },
+      };
+
+      if (target === 'maximize') {
+        return {
+          windows: {
+            ...state.windows,
+            [id]: {
+              ...win,
+              isMaximized: true,
+              preMaximizedState: preState,
+              position: { x: insets.left, y: insets.top },
+              size: { width: availWidth, height: availHeight },
+            },
+          },
+          snapPreview: null,
+        };
+      }
+
+      if (target === 'left') {
+        return {
+          windows: {
+            ...state.windows,
+            [id]: {
+              ...win,
+              isMaximized: false,
+              preMaximizedState: preState,
+              position: { x: insets.left, y: insets.top },
+              size: { width: halfWidth, height: availHeight },
+            },
+          },
+          snapPreview: null,
+        };
+      }
+
+      if (target === 'right') {
+        return {
+          windows: {
+            ...state.windows,
+            [id]: {
+              ...win,
+              isMaximized: false,
+              preMaximizedState: preState,
+              position: { x: insets.left + halfWidth, y: insets.top },
+              size: { width: availWidth - halfWidth, height: availHeight },
+            },
+          },
+          snapPreview: null,
+        };
+      }
+
+      return { ...state, snapPreview: null };
     });
   },
 
