@@ -7,6 +7,7 @@ import { SelectionMarquee } from './SelectionMarquee';
 import { DesktopIcons } from './DesktopIcons';
 import { DesktopWidgets } from '../widgets/DesktopWidgets';
 import { SnapPreviewOverlay } from './SnapPreviewOverlay';
+import { DynamicWallpaperHost } from './wallpapers/DynamicWallpaperHost';
 import { importHostFileToVFS } from '@core/vfs/hostBridge';
 import { useWidgetStore } from '@core/widgets/widgetStore';
 import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye } from 'lucide-react';
@@ -203,6 +204,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       style={wallpaper.style}
       className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none"
     >
+      {/* Live Dynamic Generative Canvas Wallpaper Layer */}
+      <DynamicWallpaperHost wallpaper={wallpaper} />
+
       {/* Architectural Sub-pixel Dot Matrix Grid (Linear / Dieter Rams) */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.08]"

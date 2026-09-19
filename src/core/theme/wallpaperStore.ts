@@ -37,6 +37,33 @@ export const WALLPAPERS: WallpaperDefinition[] = [
       backgroundColor: 'rgb(var(--surface-canvas))',
     },
   },
+  {
+    id: 'live-starfield',
+    name: 'Cosmic Starfield (Live)',
+    type: 'live',
+    dynamicType: 'starfield',
+    style: {
+      backgroundColor: '#05070a',
+    },
+  },
+  {
+    id: 'live-matrix',
+    name: 'Matrix Cyber Rain (Live)',
+    type: 'live',
+    dynamicType: 'matrix',
+    style: {
+      backgroundColor: '#05070a',
+    },
+  },
+  {
+    id: 'live-waves',
+    name: 'Harmonic Waves (Live)',
+    type: 'live',
+    dynamicType: 'waves',
+    style: {
+      backgroundColor: '#06080d',
+    },
+  },
 ];
 
 export interface WallpaperState {

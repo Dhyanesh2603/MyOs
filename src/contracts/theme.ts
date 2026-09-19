@@ -23,7 +23,8 @@ export interface AccentColorDefinition {
 export interface WallpaperDefinition {
   id: string;
   name: string;
-  type: 'gradient' | 'abstract' | 'minimal';
+  type: 'gradient' | 'abstract' | 'minimal' | 'live';
+  dynamicType?: 'starfield' | 'matrix' | 'waves';
   style: React.CSSProperties;
 }
 

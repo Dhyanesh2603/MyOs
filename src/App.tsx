@@ -13,6 +13,7 @@ import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import { MissionControl } from '@shell/switcher/MissionControl';
 import { ClipboardHistoryModal } from '@shell/clipboard/ClipboardHistoryModal';
 import { ScreenCaptureOverlay } from '@shell/capture/ScreenCaptureOverlay';
+import { ScreenSaver } from '@shell/desktop/screensaver/ScreenSaver';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -149,6 +150,9 @@ export const App: React.FC = () => {
 
       {/* FlowShot Screen Capture Marquee Overlay */}
       <ScreenCaptureOverlay />
+
+      {/* Ambient Nothing-style ScreenSaver */}
+      <ScreenSaver />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />
