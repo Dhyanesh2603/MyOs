@@ -19,6 +19,7 @@ import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
+import { PomodoroWidget } from './PomodoroWidget';
 
 export const SystemTray: React.FC = () => {
   const { themeId, setTheme } = useThemeStore();
@@ -163,6 +164,9 @@ export const SystemTray: React.FC = () => {
           <Moon className="h-3.5 w-3.5 text-indigo-400" />
         )}
       </button>
+
+      {/* Pomodoro Focus Timer Widget */}
+      <PomodoroWidget />
 
       {/* Notification Center Trigger */}
       <button

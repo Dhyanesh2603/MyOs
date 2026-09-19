@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Wifi,
@@ -15,10 +15,15 @@ import {
   Disc3,
   Flame,
   BatteryCharging,
+  CloudRain,
+  Radio,
+  Orbit,
+  Headphones,
 } from 'lucide-react';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 import { useMediaStore } from '@core/media/mediaStore';
+import { ambientSoundEngine, AmbientTrack } from '@core/audio/ambientSoundEngine';
 
 export const ControlCenterShade: React.FC = () => {
   const {
@@ -44,6 +49,8 @@ export const ControlCenterShade: React.FC = () => {
 
   const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
   const containerRef = useRef<HTMLDivElement>(null);
+  const [ambientTrack, setAmbientTrack] = useState<AmbientTrack>(ambientSoundEngine.getCurrentTrack());
+  const [ambientVol, setAmbientVol] = useState(ambientSoundEngine.getVolume());
 
   // Close on outside click
   useEffect(() => {
@@ -288,6 +295,79 @@ export const ControlCenterShade: React.FC = () => {
               {isMuted ? 'Unmute' : 'Mute'}
             </button>
           </div>
+        </div>
+
+        {/* Lo-Fi Ambient Soundscapes Card */}
+        <div className="mt-2 rounded-xl border border-border-subtle bg-surface-subtle/30 p-2.5">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-content-primary">
+              <Headphones className="h-3.5 w-3.5 text-accent-primary" />
+              <span>Lo-Fi Ambient Noise</span>
+            </div>
+            {ambientTrack !== 'none' && (
+              <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full border border-emerald-400/20 animate-pulse">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span>Playing</span>
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 mb-2">
+            {[
+              { id: 'rain', label: 'Rain', icon: CloudRain },
+              { id: 'campfire', label: 'Campfire', icon: Flame },
+              { id: 'white_noise', label: 'Noise', icon: Radio },
+              { id: 'deep_space', label: 'Space', icon: Orbit },
+            ].map((t) => {
+              const Icon = t.icon;
+              const isActive = ambientTrack === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    if (isActive) {
+                      ambientSoundEngine.stop();
+                      setAmbientTrack('none');
+                    } else {
+                      ambientSoundEngine.play(t.id as AmbientTrack);
+                      setAmbientTrack(t.id as AmbientTrack);
+                    }
+                  }}
+                  className={`flex flex-col items-center gap-1 rounded-lg border py-1.5 transition-all text-center ${
+                    isActive
+                      ? 'border-accent-primary bg-accent-primary/20 text-accent-primary font-semibold shadow-sm'
+                      : 'border-border-subtle bg-surface-card/60 text-content-secondary hover:bg-surface-subtle hover:text-content-primary'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="font-mono text-[9px]">{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {ambientTrack !== 'none' && (
+            <div className="flex items-center gap-2 pt-1 border-t border-border-subtle/40">
+              <span className="font-mono text-[9px] text-content-tertiary">Vol</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={ambientVol}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setAmbientVol(v);
+                  ambientSoundEngine.setVolume(v);
+                }}
+                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-surface-hover accent-accent-primary"
+              />
+              <span className="font-mono text-[9px] text-content-tertiary min-w-[28px] text-right">
+                {Math.round(ambientVol * 100)}%
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Now Playing Media Controller Card */}
