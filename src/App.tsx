@@ -11,12 +11,14 @@ import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import { MissionControl } from '@shell/switcher/MissionControl';
+import { ClipboardHistoryModal } from '@shell/clipboard/ClipboardHistoryModal';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { useSessionStore } from '@core/session/sessionStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
+import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -63,6 +65,13 @@ export const App: React.FC = () => {
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'ArrowLeft') {
         e.preventDefault();
         useWorkspaceStore.getState().prevWorkspace();
+        return;
+      }
+
+      // System Clipboard History: Ctrl+Shift+V
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        useClipboardStore.getState().toggleModal();
         return;
       }
     };
@@ -122,6 +131,9 @@ export const App: React.FC = () => {
 
       {/* Fullscreen Mission Control & Spaces Overview */}
       <MissionControl />
+
+      {/* System Clipboard History Manager Modal */}
+      <ClipboardHistoryModal />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />
