@@ -20,6 +20,7 @@ import { QuickLookModal } from '@shell/quicklook/QuickLookModal';
 import { StageManagerStrip } from '@shell/stage/StageManagerStrip';
 import { FlowDropModal } from '@shell/airdrop/FlowDropModal';
 import { FancyZonesOverlay } from '@shell/window/FancyZonesOverlay';
+import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -195,6 +196,9 @@ export const App: React.FC = () => {
 
       {/* Spatial FancyZones Snap Wireframe Overlay */}
       <FancyZonesOverlay />
+
+      {/* Smart Batch Renamer Studio Modal */}
+      <BatchRenamerModal />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

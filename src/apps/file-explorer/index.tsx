@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
   Download,
   Eye,
+  Tag,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
@@ -28,6 +29,7 @@ import { openVFSFile } from '@core/vfs/fileAssociations';
 import { downloadVFSToPC, importHostFileToVFS } from '@core/vfs/hostBridge';
 import { normalizePath } from '@core/vfs/vfsService';
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
+import { useBatchRenamerStore } from '@core/vfs/batchRenamerStore';
 
 const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const { nodes, mkdir, writeFile, deleteNode } = useVFSStore();
@@ -71,11 +73,19 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
       if (e.key === ' ' && selectedPath && nodes[selectedPath]?.type === 'file') {
         e.preventDefault();
         useQuickLookStore.getState().openQuickLook(selectedPath);
+        return;
+      }
+      if (e.key === 'F2') {
+        e.preventDefault();
+        const targets = selectedPath ? [selectedPath] : Object.values(nodes).filter((n) => n.parentPath === currentPath && n.path !== currentPath).map((n) => n.path);
+        if (targets.length > 0) {
+          useBatchRenamerStore.getState().openRenamer(targets);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedPath, nodes]);
+  }, [selectedPath, nodes, currentPath]);
 
   // Get nodes in current directory
   const currentNodes = Object.values(nodes).filter(
@@ -302,6 +312,20 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             >
               <FilePlus className="h-3 w-3 text-accent-primary" />
               <span>File</span>
+            </button>
+
+            <button
+              onClick={() => {
+                const targets = selectedPath ? [selectedPath] : currentNodes.map((n) => n.path);
+                if (targets.length > 0) {
+                  useBatchRenamerStore.getState().openRenamer(targets);
+                }
+              }}
+              title="Batch Rename Files (F2)"
+              className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            >
+              <Tag className="h-3 w-3 text-emerald-400" />
+              <span className="hidden sm:inline">Rename</span>
             </button>
 
             {selectedPath && nodes[selectedPath]?.type === 'file' && (
