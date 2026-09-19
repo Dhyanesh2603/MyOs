@@ -7,13 +7,18 @@ import {
   Star,
   Sparkles,
   Play,
+  Plus,
+  Globe,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { usePackageStore } from '@core/packages/packageStore';
 import { useProcessStore } from '@core/process/processStore';
+import { useCustomAppStore, WEB_APP_ICONS } from '@core/packages/customAppStore';
+import { soundEngine } from '@core/audio/soundEngine';
 
 export const AppStoreApp: React.FC<AppProps> = () => {
   const { packages, installPackage, uninstallPackage } = usePackageStore();
+  const { customApps, openCreateModal, deleteWebApp } = useCustomAppStore();
   const { launchApp } = useProcessStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,16 +60,28 @@ export const AppStoreApp: React.FC<AppProps> = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative flex items-center w-full sm:w-64">
-          <Search className="absolute left-3 h-3.5 w-3.5 text-content-tertiary" />
-          <input
-            type="text"
-            placeholder="Search applications..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-border-subtle bg-surface-subtle/60 py-1.5 pl-9 pr-3 text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-accent transition-all"
-          />
+        {/* Search Bar & Package Web App Button */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex items-center w-full sm:w-60">
+            <Search className="absolute left-3 h-3.5 w-3.5 text-content-tertiary" />
+            <input
+              type="text"
+              placeholder="Search applications..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-border-subtle bg-surface-subtle/60 py-1.5 pl-9 pr-3 text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-accent transition-all"
+            />
+          </div>
+          <button
+            onClick={() => {
+              soundEngine.playClick();
+              openCreateModal();
+            }}
+            className="flex items-center gap-1.5 rounded-xl bg-accent-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Package Web App</span>
+          </button>
         </div>
       </div>
 
@@ -132,6 +149,76 @@ export const AppStoreApp: React.FC<AppProps> = () => {
             </button>
           ))}
         </div>
+
+        {/* Custom Packaged Web Apps Section */}
+        {customApps.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-accent" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-content-secondary">
+                  Custom Web Apps ({customApps.length})
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {customApps.map((app) => {
+                const IconComp = WEB_APP_ICONS[app.iconName] ?? Globe;
+                return (
+                  <div
+                    key={app.id}
+                    className="flex flex-col justify-between rounded-2xl border border-border-subtle bg-surface-card p-4 shadow-sm hover:border-accent/40 transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm"
+                        style={{ backgroundColor: app.accentColor }}
+                      >
+                        <IconComp className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="truncate text-xs font-bold text-content-primary">
+                            {app.name}
+                          </h4>
+                          <span className="rounded bg-surface-subtle px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+                            {app.category}
+                          </span>
+                        </div>
+                        <p className="mt-1 line-clamp-1 font-mono text-[10px] text-content-tertiary">
+                          {app.url}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between border-t border-border-subtle/60 pt-2.5">
+                      <span className="font-mono text-[10px] text-emerald-400">
+                        ● Installed
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => launchApp(app.id)}
+                          className="flex items-center gap-1 rounded-lg bg-surface-panel border border-border-subtle px-2.5 py-1 text-xs font-semibold text-content-primary hover:bg-accent hover:text-accent-fg transition-all"
+                        >
+                          <Play className="h-3 w-3 fill-current" />
+                          <span>Open</span>
+                        </button>
+                        <button
+                          onClick={() => deleteWebApp(app.id)}
+                          title="Uninstall"
+                          className="rounded-lg p-1 text-content-tertiary hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Packages Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

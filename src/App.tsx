@@ -15,6 +15,7 @@ import { ClipboardHistoryModal } from '@shell/clipboard/ClipboardHistoryModal';
 import { ScreenCaptureOverlay } from '@shell/capture/ScreenCaptureOverlay';
 import { ScreenSaver } from '@shell/desktop/screensaver/ScreenSaver';
 import { CopilotDrawer } from '@shell/copilot/CopilotDrawer';
+import { CreateWebAppModal } from '@shell/dialogs/CreateWebAppModal';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -24,12 +25,14 @@ import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useCaptureStore } from '@shell/capture/captureStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
+import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
   useEffect(() => {
     initializeApplications();
     useVFSStore.getState().init();
+    useCustomAppStore.getState().init();
 
     const timer = setTimeout(() => {
       useNotificationStore.getState().notify({
@@ -165,6 +168,9 @@ export const App: React.FC = () => {
 
       {/* Raycast-style AI Copilot Sidecar Drawer */}
       <CopilotDrawer />
+
+      {/* 1-Click PWA Web App Creator Modal */}
+      <CreateWebAppModal />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

@@ -10,7 +10,8 @@ import { SnapPreviewOverlay } from './SnapPreviewOverlay';
 import { DynamicWallpaperHost } from './wallpapers/DynamicWallpaperHost';
 import { importHostFileToVFS } from '@core/vfs/hostBridge';
 import { useWidgetStore } from '@core/widgets/widgetStore';
-import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye } from 'lucide-react';
+import { useCustomAppStore } from '@core/packages/customAppStore';
+import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye, Globe } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
@@ -94,6 +95,15 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             icon: Eye,
             shortcut: 'Alt+W',
             action: () => useWidgetStore.getState().toggleWidgetsVisibility(),
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'package-web-app',
+            label: 'Package Web App (PWA)...',
+            icon: Globe,
+            action: () => useCustomAppStore.getState().openCreateModal(),
           },
         },
         { type: 'separator', id: 'sep-2' },
