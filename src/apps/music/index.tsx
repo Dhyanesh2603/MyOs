@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Music as MusicIcon,
   Play,
@@ -10,74 +10,39 @@ import {
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { audioEngine } from './audioEngine';
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  baseFreq: number;
-}
-
-const TRACKS: Track[] = [
-  {
-    id: 'track-1',
-    title: 'Kinetic Drift',
-    artist: 'FlowOS Soundscape Lab',
-    baseFreq: 110, // A2
-  },
-  {
-    id: 'track-2',
-    title: 'Obsidian Horizons',
-    artist: 'Synthetic Pulse Studio',
-    baseFreq: 130.81, // C3
-  },
-  {
-    id: 'track-3',
-    title: 'Subtle Aurora',
-    artist: 'Ambient Micro-Kernel',
-    baseFreq: 164.81, // E3
-  },
-];
+import { useMediaStore } from '@core/media/mediaStore';
 
 const MusicApp: React.FC<AppProps> = ({ windowId }) => {
-  const [currentTrackIdx, setCurrentTrackIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.8);
+  const {
+    tracks,
+    currentTrackIndex,
+    isPlaying,
+    volume,
+    togglePlay,
+    nextTrack,
+    prevTrack,
+    setVolume,
+  } = useMediaStore();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
 
-  const currentTrack = TRACKS[currentTrackIdx]!;
+  const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
 
   const handleTogglePlay = () => {
-    if (isPlaying) {
-      audioEngine.stop();
-      setIsPlaying(false);
-    } else {
-      audioEngine.startTrack(currentTrack.baseFreq);
-      setIsPlaying(true);
-    }
+    togglePlay();
   };
 
   const handleNext = () => {
-    const nextIdx = (currentTrackIdx + 1) % TRACKS.length;
-    setCurrentTrackIdx(nextIdx);
-    if (isPlaying) {
-      audioEngine.startTrack(TRACKS[nextIdx]!.baseFreq);
-    }
+    nextTrack();
   };
 
   const handlePrev = () => {
-    const prevIdx = (currentTrackIdx - 1 + TRACKS.length) % TRACKS.length;
-    setCurrentTrackIdx(prevIdx);
-    if (isPlaying) {
-      audioEngine.startTrack(TRACKS[prevIdx]!.baseFreq);
-    }
+    prevTrack();
   };
 
   const handleVolumeChange = (newVol: number) => {
     setVolume(newVol);
-    audioEngine.setVolume(newVol);
   };
 
   // Canvas visualizer render loop

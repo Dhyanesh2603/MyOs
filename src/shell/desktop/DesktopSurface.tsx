@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useProcessStore } from '@core/process/processStore';
@@ -8,7 +8,8 @@ import { DesktopIcons } from './DesktopIcons';
 import { DesktopWidgets } from '../widgets/DesktopWidgets';
 import { SnapPreviewOverlay } from './SnapPreviewOverlay';
 import { importHostFileToVFS } from '@core/vfs/hostBridge';
-import { FileText, Settings, Image, Minus, X, UploadCloud } from 'lucide-react';
+import { useWidgetStore } from '@core/widgets/widgetStore';
+import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
@@ -21,6 +22,17 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
   const { launchApp } = useProcessStore();
   const openMenu = useContextMenuStore((state) => state.openMenu);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        useWidgetStore.getState().toggleWidgetsVisibility();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
@@ -61,6 +73,26 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             action: () => {
               if (nextWallpaper) setWallpaper(nextWallpaper.id);
             },
+          },
+        },
+        { type: 'separator', id: 'sep-widgets' },
+        {
+          type: 'item',
+          item: {
+            id: 'add-widgets',
+            label: 'Add Widgets...',
+            icon: LayoutGrid,
+            action: () => useWidgetStore.getState().openDrawer(),
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'toggle-widgets',
+            label: useWidgetStore.getState().isWidgetsVisible ? 'Hide Widgets' : 'Show Widgets',
+            icon: Eye,
+            shortcut: 'Alt+W',
+            action: () => useWidgetStore.getState().toggleWidgetsVisibility(),
           },
         },
         { type: 'separator', id: 'sep-2' },
