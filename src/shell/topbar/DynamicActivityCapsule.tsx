@@ -11,10 +11,14 @@ import {
   Radio,
   Orbit,
   Sparkles,
+  Waves,
+  Server,
+  Zap,
 } from 'lucide-react';
 import { useMediaStore } from '@core/media/mediaStore';
 import { usePomodoroStore } from '@core/focus/pomodoroStore';
-import { ambientSoundEngine, AmbientTrack } from '@core/audio/ambientSoundEngine';
+import { useAmbientSoundStore } from '@core/audio/ambientSoundStore';
+import type { AmbientTrack } from '@core/audio/ambientSoundEngine';
 import { soundEngine } from '@core/audio/soundEngine';
 
 export const DynamicActivityCapsule: React.FC = () => {
@@ -23,17 +27,8 @@ export const DynamicActivityCapsule: React.FC = () => {
   const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [ambientTrack, setAmbientTrack] = useState<AmbientTrack>(ambientSoundEngine.getCurrentTrack());
+  const { currentTrack: ambientTrack, playTrack, stopTrack } = useAmbientSoundStore();
   const popoverRef = useRef<HTMLDivElement>(null);
-
-  // Poll ambient track status
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const cur = ambientSoundEngine.getCurrentTrack();
-      if (cur !== ambientTrack) setAmbientTrack(cur);
-    }, 500);
-    return () => clearInterval(interval);
-  }, [ambientTrack]);
 
   // Click outside to collapse
   useEffect(() => {
@@ -56,6 +51,12 @@ export const DynamicActivityCapsule: React.FC = () => {
 
   const getAmbientIcon = () => {
     switch (ambientTrack) {
+      case 'brown_noise':
+        return <Waves className="h-3 w-3 text-amber-400 animate-pulse" />;
+      case 'server_room':
+        return <Server className="h-3 w-3 text-emerald-400 animate-pulse" />;
+      case 'gamma_waves':
+        return <Zap className="h-3 w-3 text-indigo-400 animate-pulse" />;
       case 'rain':
         return <CloudRain className="h-3 w-3 text-cyan-400 animate-pulse" />;
       case 'campfire':
@@ -113,9 +114,15 @@ export const DynamicActivityCapsule: React.FC = () => {
 
         {/* Ambient Noise state */}
         {ambientTrack !== 'none' && !isPlaying && (
-          <div className="flex items-center gap-1 font-mono text-[10px] text-cyan-300">
+          <div className="flex items-center gap-1.5 font-mono text-[10px] text-cyan-300">
+            <div className="flex items-end gap-0.5 h-3">
+              <span className="w-0.5 bg-cyan-400 animate-[bounce_0.8s_infinite_50ms] h-2 rounded-full" />
+              <span className="w-0.5 bg-cyan-400 animate-[bounce_0.8s_infinite_200ms] h-3 rounded-full" />
+              <span className="w-0.5 bg-cyan-400 animate-[bounce_0.8s_infinite_350ms] h-1.5 rounded-full" />
+              <span className="w-0.5 bg-cyan-400 animate-[bounce_0.8s_infinite_100ms] h-2.5 rounded-full" />
+            </div>
             {getAmbientIcon()}
-            <span className="capitalize">{ambientTrack.replace('_', ' ')}</span>
+            <span className="capitalize hidden sm:inline">{ambientTrack.replace('_', ' ')}</span>
           </div>
         )}
       </motion.button>
@@ -128,7 +135,7 @@ export const DynamicActivityCapsule: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 4 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ type: 'spring', damping: 24, stiffness: 350 }}
-            className="absolute left-1/2 -translate-x-1/2 top-8 z-[9500] w-72 rounded-2xl border border-white/15 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-2xl"
+            className="absolute left-1/2 -translate-x-1/2 top-8 z-[9500] w-76 rounded-2xl border border-white/15 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-2xl"
           >
             {/* Now Playing section */}
             {isPlaying && (
@@ -138,22 +145,21 @@ export const DynamicActivityCapsule: React.FC = () => {
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-accent-primary">
                       <Disc3 className="h-4 w-4 animate-spin" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold">{currentTrack.title}</div>
-                      <div className="truncate text-[10px] text-white/60">{currentTrack.artist}</div>
+                    <div className="truncate">
+                      <div className="font-semibold text-xs truncate">{currentTrack.title}</div>
+                      <div className="text-[10px] text-white/50 truncate">{currentTrack.artist}</div>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-1">
                     <button
                       onClick={togglePlay}
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-primary text-white shadow-sm"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black hover:bg-white/90"
                     >
-                      <Pause className="h-3 w-3 fill-current" />
+                      <Pause className="h-3.5 w-3.5 fill-current" />
                     </button>
                     <button
                       onClick={nextTrack}
-                      className="rounded p-1 text-white/70 hover:text-white"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
                     >
                       <SkipForward className="h-3.5 w-3.5" />
                     </button>
@@ -164,19 +170,20 @@ export const DynamicActivityCapsule: React.FC = () => {
 
             {/* Pomodoro Timer section */}
             {isPomoRunning && (
-              <div className="mb-2 flex items-center justify-between border-b border-white/10 pb-2">
+              <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <Timer className="h-4 w-4 text-emerald-400" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+                    <Timer className="h-3.5 w-3.5" />
+                  </div>
                   <div>
                     <div className="font-mono text-sm font-bold text-emerald-400">{pomoFormatted}</div>
-                    <div className="text-[9px] uppercase tracking-wider text-white/50">{pomoMode} block</div>
+                    <div className="text-[9px] text-white/40 uppercase tracking-widest">{pomoMode} session</div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 font-mono text-[10px]">
                   <button
                     onClick={togglePomo}
-                    className="rounded-lg bg-white/10 px-2 py-1 font-mono text-[10px] hover:bg-white/20"
+                    className="rounded-lg border border-white/15 bg-white/10 px-2 py-1 text-white hover:bg-white/20"
                   >
                     Pause
                   </button>
@@ -190,26 +197,58 @@ export const DynamicActivityCapsule: React.FC = () => {
               </div>
             )}
 
-            {/* Ambient Sound section */}
-            {ambientTrack !== 'none' && (
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-2">
-                  {getAmbientIcon()}
-                  <span className="font-mono text-[11px] capitalize text-white/80">
-                    {ambientTrack.replace('_', ' ')} Soundscape
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    ambientSoundEngine.stop();
-                    setAmbientTrack('none');
-                  }}
-                  className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[9px] text-white/70 hover:bg-white/10 hover:text-white"
-                >
-                  Stop
-                </button>
+            {/* Ambient Soundscape Section */}
+            <div className="pt-1">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-[10px] text-white/50 uppercase tracking-wider">
+                  Ambient Focus Audio
+                </span>
+                {ambientTrack !== 'none' && (
+                  <button
+                    onClick={stopTrack}
+                    className="rounded border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[9px] text-white/70 hover:bg-white/10 hover:text-white"
+                  >
+                    Stop
+                  </button>
+                )}
               </div>
-            )}
+
+              <div className="grid grid-cols-4 gap-1.5 text-center font-mono text-[10px]">
+                {[
+                  { id: 'brown_noise', label: 'Brown', icon: Waves },
+                  { id: 'rain', label: 'Rain', icon: CloudRain },
+                  { id: 'server_room', label: 'Server', icon: Server },
+                  { id: 'gamma_waves', label: '40Hz', icon: Zap },
+                  { id: 'campfire', label: 'Fire', icon: Flame },
+                  { id: 'white_noise', label: 'White', icon: Radio },
+                  { id: 'deep_space', label: 'Space', icon: Orbit },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isSelected = ambientTrack === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        soundEngine.playClick();
+                        if (isSelected) {
+                          stopTrack();
+                        } else {
+                          playTrack(item.id as AmbientTrack);
+                        }
+                      }}
+                      className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-1.5 transition-all ${
+                        isSelected
+                          ? 'border-accent-primary bg-accent-primary/20 text-accent-primary font-medium'
+                          : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span className="truncate w-full text-[9px]">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between font-mono text-[9px] text-white/40">
               <div className="flex items-center gap-1">

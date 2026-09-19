@@ -4,12 +4,19 @@ import {
   CheckCircle2,
   Clock,
   Layers,
+  Waves,
+  CloudRain,
+  Server,
+  Zap,
 } from 'lucide-react';
 import { usePersonalOsStore } from '@core/personal-os/personalOsStore';
+import { useAmbientSoundStore } from '@core/audio/ambientSoundStore';
+import type { AmbientTrack } from '@core/audio/ambientSoundEngine';
 import { soundEngine } from '@core/audio/soundEngine';
 
 export const FocusModeOverlay: React.FC = () => {
   const { focusMode, stopFocusMode, tickFocusTimer } = usePersonalOsStore();
+  const { currentTrack: ambientTrack, toggleTrack, stopTrack } = useAmbientSoundStore();
 
   // Timer interval
   useEffect(() => {
@@ -102,6 +109,53 @@ export const FocusModeOverlay: React.FC = () => {
             <CheckCircle2 className="h-4 w-4" />
             <span>Complete Objective</span>
           </button>
+        </div>
+
+        {/* Ambient Focus Audio Bar */}
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+            Deep Focus Soundscape
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md">
+            {[
+              { id: 'brown_noise', label: 'Brown Noise', icon: Waves },
+              { id: 'rain', label: 'Rain', icon: CloudRain },
+              { id: 'server_room', label: 'Server Hum', icon: Server },
+              { id: 'gamma_waves', label: '40Hz Gamma', icon: Zap },
+            ].map((snd) => {
+              const Icon = snd.icon;
+              const isSelected = ambientTrack === snd.id;
+              return (
+                <button
+                  key={snd.id}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    toggleTrack(snd.id as AmbientTrack);
+                  }}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs transition-all ${
+                    isSelected
+                      ? 'bg-white text-black font-semibold shadow-sm'
+                      : 'text-neutral-400 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{snd.label}</span>
+                </button>
+              );
+            })}
+            {ambientTrack !== 'none' && (
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  stopTrack();
+                }}
+                className="rounded-lg px-2.5 py-1.5 font-mono text-xs text-rose-400 hover:bg-rose-500/10 transition-colors"
+                title="Mute Ambient Sound"
+              >
+                Mute
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

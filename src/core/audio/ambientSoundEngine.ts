@@ -1,5 +1,16 @@
 // Procedural Web Audio Ambient Soundscapes (Zero external assets)
-export type AmbientTrack = 'none' | 'rain' | 'white_noise' | 'campfire' | 'deep_space';
+export type AmbientTrack =
+  | 'none'
+  | 'brown_noise'
+  | 'rain'
+  | 'server_room'
+  | 'gamma_waves'
+  | 'white_noise'
+  | 'campfire'
+  | 'deep_space';
+
+type TrackChangeListener = (track: AmbientTrack) => void;
+type VolumeChangeListener = (vol: number) => void;
 
 class AmbientSoundEngine {
   private ctx: AudioContext | null = null;
@@ -7,10 +18,37 @@ class AmbientSoundEngine {
   private currentTrack: AmbientTrack = 'none';
   private activeNodes: { stop: () => void }[] = [];
   private volume: number = 0.5;
+  private trackListeners: Set<TrackChangeListener> = new Set();
+  private volumeListeners: Set<VolumeChangeListener> = new Set();
+
+  public subscribeTrack(fn: TrackChangeListener) {
+    this.trackListeners.add(fn);
+    return () => {
+      this.trackListeners.delete(fn);
+    };
+  }
+
+  public subscribeVolume(fn: VolumeChangeListener) {
+    this.volumeListeners.add(fn);
+    return () => {
+      this.volumeListeners.delete(fn);
+    };
+  }
+
+  private notifyTrack() {
+    this.trackListeners.forEach((fn) => fn(this.currentTrack));
+  }
+
+  private notifyVolume() {
+    this.volumeListeners.forEach((fn) => fn(this.volume));
+  }
 
   private initCtx() {
     if (!this.ctx) {
-      const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtxClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
       this.ctx = new AudioCtxClass();
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
@@ -26,6 +64,7 @@ class AmbientSoundEngine {
     if (this.ctx && this.masterGain) {
       this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
     }
+    this.notifyVolume();
   }
 
   public getVolume(): number {
@@ -44,6 +83,7 @@ class AmbientSoundEngine {
     });
     this.activeNodes = [];
     this.currentTrack = 'none';
+    this.notifyTrack();
   }
 
   public play(track: AmbientTrack) {
@@ -53,10 +93,20 @@ class AmbientSoundEngine {
     if (!this.ctx || !this.masterGain) return;
 
     this.currentTrack = track;
+    this.notifyTrack();
 
     switch (track) {
+      case 'brown_noise':
+        this.startBrownNoise();
+        break;
       case 'rain':
         this.startRain();
+        break;
+      case 'server_room':
+        this.startServerRoom();
+        break;
+      case 'gamma_waves':
+        this.startGammaWaves();
         break;
       case 'white_noise':
         this.startWhiteNoise();
@@ -80,6 +130,118 @@ class AmbientSoundEngine {
       data[i] = filler();
     }
     return buffer;
+  }
+
+  // Deep Work Brownian Noise
+  private startBrownNoise() {
+    if (!this.ctx || !this.masterGain) return;
+
+    let lastOut = 0.0;
+    const buffer = this.createNoiseBuffer(5, () => {
+      const white = Math.random() * 2 - 1;
+      lastOut = (lastOut + 0.025 * white) / 1.025;
+      return lastOut * 3.2;
+    });
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(480, this.ctx.currentTime);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.75, this.ctx.currentTime);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    source.start();
+
+    this.activeNodes.push({ stop: () => source.stop() });
+  }
+
+  // Server Room Datacenter Hum
+  private startServerRoom() {
+    if (!this.ctx || !this.masterGain) return;
+
+    // 60Hz & 120Hz Transformer Hum
+    const osc60 = this.ctx.createOscillator();
+    const osc120 = this.ctx.createOscillator();
+    const oscGain = this.ctx.createGain();
+    osc60.type = 'sine';
+    osc60.frequency.setValueAtTime(60, this.ctx.currentTime);
+    osc120.type = 'sine';
+    osc120.frequency.setValueAtTime(120, this.ctx.currentTime);
+    oscGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+
+    osc60.connect(oscGain);
+    osc120.connect(oscGain);
+    oscGain.connect(this.masterGain);
+    osc60.start();
+    osc120.start();
+
+    // High CFM Cooling Fan Airflow
+    const fanBuffer = this.createNoiseBuffer(4, () => (Math.random() * 2 - 1) * 0.35);
+    const fanSource = this.ctx.createBufferSource();
+    fanSource.buffer = fanBuffer;
+    fanSource.loop = true;
+
+    const fanFilter = this.ctx.createBiquadFilter();
+    fanFilter.type = 'bandpass';
+    fanFilter.frequency.setValueAtTime(420, this.ctx.currentTime);
+    fanFilter.Q.setValueAtTime(1.2, this.ctx.currentTime);
+
+    const fanGain = this.ctx.createGain();
+    fanGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+
+    fanSource.connect(fanFilter);
+    fanFilter.connect(fanGain);
+    fanGain.connect(this.masterGain);
+    fanSource.start();
+
+    this.activeNodes.push({
+      stop: () => {
+        osc60.stop();
+        osc120.stop();
+        fanSource.stop();
+      },
+    });
+  }
+
+  // 40Hz Cognitive Gamma Isochronic Waves
+  private startGammaWaves() {
+    if (!this.ctx || !this.masterGain) return;
+
+    const carrier = this.ctx.createOscillator();
+    carrier.type = 'sine';
+    carrier.frequency.setValueAtTime(196, this.ctx.currentTime); // G3 warm harmonic
+
+    // 40Hz Modulator LFO
+    const lfo = this.ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(40, this.ctx.currentTime);
+
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+
+    const modGain = this.ctx.createGain();
+    modGain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+
+    lfo.connect(modGain.gain);
+    carrier.connect(modGain);
+    modGain.connect(this.masterGain);
+
+    carrier.start();
+    lfo.start();
+
+    this.activeNodes.push({
+      stop: () => {
+        carrier.stop();
+        lfo.stop();
+      },
+    });
   }
 
   // Gentle Rain Soundscape
