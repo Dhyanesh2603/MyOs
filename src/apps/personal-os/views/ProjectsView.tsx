@@ -1,0 +1,393 @@
+import React, { useState } from 'react';
+import {
+  FolderGit2,
+  ExternalLink,
+  GitCommit,
+  Bug,
+  CheckCircle2,
+  Circle,
+  Layers,
+  Cpu,
+  Sparkles,
+  Plus,
+  Check,
+} from 'lucide-react';
+import { usePersonalOsStore } from '@core/personal-os/personalOsStore';
+import { soundEngine } from '@core/audio/soundEngine';
+
+export const ProjectsView: React.FC = () => {
+  const {
+    projects,
+    missions,
+    skills,
+    toggleProjectMilestone,
+    addProjectBug,
+    resolveProjectBug,
+    setActiveTab,
+  } = usePersonalOsStore();
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0]?.id || '');
+  const [newBugText, setNewBugText] = useState('');
+  const [newBugSeverity, setNewBugSeverity] = useState<'critical' | 'moderate' | 'minor'>('moderate');
+
+  const activeProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
+  const associatedMission = missions.find((m) => m.id === activeProject?.missionId);
+
+  const handleAddBug = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBugText.trim() || !activeProject) return;
+    soundEngine.playClick();
+    addProjectBug(activeProject.id, newBugText.trim(), newBugSeverity);
+    setNewBugText('');
+  };
+
+  return (
+    <div className="flex flex-col gap-6 p-6 font-sans text-neutral-200">
+      {/* 1. Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <div className="flex items-center gap-2">
+            <FolderGit2 className="h-5 w-5 text-neutral-300" />
+            <h2 className="text-xl font-medium tracking-tight text-white">
+              Engineering Project Studio
+            </h2>
+          </div>
+          <p className="text-xs text-neutral-400 mt-1">
+            Deep architectural specs, tech stacks, milestones, known bugs, and changelogs.
+          </p>
+        </div>
+
+        {/* Project Selector Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {projects.map((proj) => (
+            <button
+              key={proj.id}
+              onClick={() => {
+                soundEngine.playClick();
+                setSelectedProjectId(proj.id);
+              }}
+              className={`flex items-center gap-2 rounded-xl border px-3.5 py-1.5 text-xs font-mono transition-all ${
+                activeProject?.id === proj.id
+                  ? 'border-white/30 bg-white/15 text-white font-medium shadow-sm'
+                  : 'border-white/10 bg-white/[0.02] text-neutral-400 hover:border-white/20 hover:text-white'
+              }`}
+            >
+              <span>{proj.name}</span>
+              <span className="rounded bg-white/10 px-1.5 py-0.2 text-[10px] text-neutral-300">
+                {proj.progress}%
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activeProject && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Architecture & Tech Stack (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col gap-5">
+            {/* Overview Card */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-white/10">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-white tracking-tight">
+                      {activeProject.name}
+                    </h3>
+                    <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
+                      {activeProject.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-400 mt-1">{activeProject.tagline}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {activeProject.repoUrl && (
+                    <a
+                      href={activeProject.repoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs font-mono text-neutral-300 hover:bg-white/10 hover:text-white transition-colors"
+                    >
+                      <FolderGit2 className="h-3.5 w-3.5" />
+                      <span>Repo</span>
+                      <ExternalLink className="h-3 w-3 opacity-50" />
+                    </a>
+                  )}
+                  {activeProject.demoUrl && (
+                    <a
+                      href={activeProject.demoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-mono text-white hover:bg-white/20 transition-colors"
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3.5 text-xs leading-relaxed text-neutral-300">
+                {activeProject.description}
+              </div>
+
+              {/* Connected Mission & Skills linkage */}
+              <div className="mt-4 pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                {associatedMission && (
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] uppercase text-neutral-400">Mission:</span>
+                    <button
+                      onClick={() => {
+                        soundEngine.playClick();
+                        setActiveTab('missions');
+                      }}
+                      className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[11px] text-white hover:bg-white/10 transition-colors"
+                    >
+                      {associatedMission.title}
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[10px] uppercase text-neutral-400">Skills:</span>
+                  {activeProject.skillIds.map((sid) => {
+                    const skill = skills.find((s) => s.id === sid);
+                    return (
+                      <button
+                        key={sid}
+                        onClick={() => {
+                          soundEngine.playClick();
+                          setActiveTab('learning');
+                        }}
+                        className="rounded bg-white/5 px-2 py-0.5 font-mono text-[10px] text-neutral-300 hover:bg-white/10"
+                      >
+                        {skill?.name || sid}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Architecture Overview */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/10">
+                <Cpu className="h-4 w-4 text-neutral-300" />
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                  Architecture Specifications
+                </h4>
+              </div>
+              <div className="mt-3.5 rounded-xl border border-white/5 bg-neutral-950/60 p-3.5 font-mono text-xs leading-relaxed text-neutral-300">
+                {activeProject.architectureOverview}
+              </div>
+
+              {/* Tech Stack Chips */}
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <div className="text-[10px] font-mono uppercase text-neutral-400 mb-2">Tech Stack Matrix</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeProject.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-mono text-neutral-200"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Ideas & Future Roadmap */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/10">
+                <Sparkles className="h-4 w-4 text-amber-400" />
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                  Explorations & Future Plans
+                </h4>
+              </div>
+              <div className="mt-3.5 flex flex-col gap-2">
+                {activeProject.ideas.map((idea, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-neutral-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/60 mt-1.5 shrink-0" />
+                    <span>{idea}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Milestones, Known Bugs & Changelog (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col gap-5">
+            {/* Roadmap Milestones */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-neutral-300" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                    Milestones Roadmap
+                  </h4>
+                </div>
+                <span className="font-mono text-xs text-white">
+                  {activeProject.milestones.filter((m) => m.completed).length}/{activeProject.milestones.length}
+                </span>
+              </div>
+
+              <div className="mt-3.5 flex flex-col gap-2">
+                {activeProject.milestones.map((m) => (
+                  <div
+                    key={m.id}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      toggleProjectMilestone(activeProject.id, m.id);
+                    }}
+                    className={`flex items-start gap-2.5 rounded-xl border p-2.5 transition-all cursor-pointer ${
+                      m.completed
+                        ? 'border-white/5 bg-white/[0.01] text-neutral-500 line-through'
+                        : 'border-white/10 bg-white/[0.02] text-neutral-200 hover:border-white/20'
+                    }`}
+                  >
+                    {m.completed ? (
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-400 mt-0.5" />
+                    ) : (
+                      <Circle className="h-4 w-4 shrink-0 text-neutral-500 mt-0.5" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs">{m.title}</div>
+                      {m.dueDate && (
+                        <div className="text-[10px] font-mono text-neutral-400 mt-0.5">Due: {m.dueDate}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Known Bugs Tracker */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <Bug className="h-4 w-4 text-rose-400" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                    Known Issues & Bugs ({activeProject.knownBugs.filter((b) => b.status === 'open').length})
+                  </h4>
+                </div>
+              </div>
+
+              <div className="mt-3.5 flex flex-col gap-2">
+                {activeProject.knownBugs.length === 0 ? (
+                  <div className="text-xs text-neutral-500 py-2">No known issues reported. Clean pipeline.</div>
+                ) : (
+                  activeProject.knownBugs.map((bug) => (
+                    <div
+                      key={bug.id}
+                      className={`flex items-start justify-between gap-2 rounded-xl border p-2.5 text-xs ${
+                        bug.status === 'resolved'
+                          ? 'border-white/5 bg-white/[0.01] text-neutral-500 line-through'
+                          : 'border-white/10 bg-white/[0.02] text-neutral-200'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span
+                            className={`rounded px-1.5 py-0.2 font-mono text-[9px] uppercase tracking-wider ${
+                              bug.severity === 'critical'
+                                ? 'bg-rose-500/20 text-rose-300'
+                                : 'bg-white/10 text-neutral-400'
+                            }`}
+                          >
+                            {bug.severity}
+                          </span>
+                        </div>
+                        <div>{bug.description}</div>
+                      </div>
+
+                      {bug.status === 'open' && (
+                        <button
+                          onClick={() => {
+                            soundEngine.playClick();
+                            resolveProjectBug(activeProject.id, bug.id);
+                          }}
+                          className="flex items-center gap-1 rounded border border-white/15 bg-white/5 px-2 py-1 text-[10px] font-mono text-neutral-300 hover:bg-white/15 hover:text-white transition-colors"
+                          title="Mark Resolved"
+                        >
+                          <Check className="h-3 w-3" />
+                          <span>Fix</span>
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Add Bug Form */}
+              <form onSubmit={handleAddBug} className="mt-3 pt-3 border-t border-white/10 flex flex-col gap-2">
+                <input
+                  type="text"
+                  placeholder="Report an architectural or runtime edge case..."
+                  value={newBugText}
+                  onChange={(e) => setNewBugText(e.target.value)}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
+                />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    {(['minor', 'moderate', 'critical'] as const).map((sev) => (
+                      <button
+                        key={sev}
+                        type="button"
+                        onClick={() => setNewBugSeverity(sev)}
+                        className={`rounded px-2 py-0.5 text-[10px] font-mono uppercase ${
+                          newBugSeverity === sev ? 'bg-white/20 text-white font-bold' : 'text-neutral-500 hover:text-white'
+                        }`}
+                      >
+                        {sev}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="submit"
+                    className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-medium text-white hover:bg-white/20"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Log Issue</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Commits & Changelog */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <GitCommit className="h-4 w-4 text-neutral-300" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                    Recent Commits & Versions
+                  </h4>
+                </div>
+              </div>
+
+              <div className="mt-3.5 flex flex-col gap-2">
+                {activeProject.recentCommits.map((c) => (
+                  <div key={c.hash} className="flex items-center justify-between text-xs font-mono text-neutral-400">
+                    <span className="truncate max-w-[220px] text-neutral-300">{c.message}</span>
+                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">{c.hash}</span>
+                  </div>
+                ))}
+              </div>
+
+              {activeProject.changelog.length > 0 && (
+                <div className="mt-3.5 pt-3 border-t border-white/10">
+                  <div className="text-[10px] font-mono uppercase text-neutral-400 mb-1.5">Latest Changelog</div>
+                  {activeProject.changelog.map((entry) => (
+                    <div key={entry.version} className="text-xs font-mono text-neutral-300">
+                      <div className="text-white font-semibold">{entry.version} ({entry.date})</div>
+                      <div className="text-[11px] text-neutral-400 mt-0.5">{entry.notes.join(' • ')}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
