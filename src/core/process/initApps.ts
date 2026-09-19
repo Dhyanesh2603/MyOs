@@ -17,6 +17,7 @@ import { flowSweeperManifest } from '@apps/retro-sweeper';
 import { synthManifest } from '@apps/synth';
 import { flowcamManifest } from '@apps/flowcam';
 import { flowtapeManifest } from '@apps/flowtape';
+import { flowboardManifest } from '@apps/flowboard';
 
 let initialized = false;
 
@@ -45,6 +46,7 @@ export function initializeApplications(): void {
   appRegistry.register(synthManifest);
   appRegistry.register(flowcamManifest);
   appRegistry.register(flowtapeManifest);
+  appRegistry.register(flowboardManifest);
 
   initialized = true;
 }

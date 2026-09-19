@@ -30,6 +30,7 @@ export const useDockStore = create<DockState>((set) => ({
     'synth',
     'flowcam',
     'flowtape',
+    'flowboard',
   ],
   dockSize: 'regular',
 
