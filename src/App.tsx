@@ -33,6 +33,7 @@ import { useCaptureStore } from '@shell/capture/captureStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
+import { soundEngine } from '@core/audio/soundEngine';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -49,6 +50,11 @@ export const App: React.FC = () => {
     }, 600);
 
     const handleShortcuts = (e: KeyboardEvent) => {
+      // Acoustic Keyboard Soundscapes
+      if (!['Control', 'Shift', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
+        soundEngine.playKeypress(e.key);
+      }
+
       // Lock screen: Ctrl+Alt+L
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'l') {
         e.preventDefault();

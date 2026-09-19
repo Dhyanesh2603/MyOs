@@ -21,6 +21,7 @@ import {
   Headphones,
   LayoutGrid,
   Sparkles,
+  Keyboard,
 } from 'lucide-react';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
@@ -48,7 +49,7 @@ export const ControlCenterShade: React.FC = () => {
     toggleAirBridge,
   } = useControlCenterStore();
 
-  const { isMuted, setMuted } = useSoundStore();
+  const { isMuted, setMuted, audioTheme, setAudioTheme } = useSoundStore();
   const { tracks, currentTrackIndex, isPlaying, togglePlay, nextTrack, volume, setVolume } =
     useMediaStore();
 
@@ -360,6 +361,49 @@ export const ControlCenterShade: React.FC = () => {
             >
               {isMuted ? 'Unmute' : 'Mute'}
             </button>
+          </div>
+        </div>
+
+        {/* Acoustic Keyboard Soundscapes Selector */}
+        <div className="mt-2 rounded-xl border border-border-subtle bg-surface-subtle/40 p-2.5">
+          <div className="flex items-center justify-between text-xs font-medium text-content-secondary mb-2">
+            <div className="flex items-center gap-1.5">
+              <Keyboard className="h-3.5 w-3.5 text-accent" />
+              <span>Keyboard Acoustics</span>
+            </div>
+            <span className="font-mono text-[10px] capitalize text-accent">
+              {audioTheme}
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-1">
+            {(
+              [
+                { id: 'mechanical', label: 'Mechanical' },
+                { id: 'nothing', label: 'Nothing' },
+                { id: 'retro', label: 'Retro' },
+                { id: 'silent', label: 'Mute' },
+              ] as const
+            ).map((t) => {
+              const active = audioTheme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setAudioTheme(t.id);
+                    if (t.id !== 'silent') {
+                      setTimeout(() => soundEngine.playKeypress('a'), 20);
+                    }
+                  }}
+                  className={`rounded-lg py-1 px-1 text-center font-mono text-[10px] transition-all border ${
+                    active
+                      ? 'border-accent bg-accent/20 text-accent font-semibold shadow-sm'
+                      : 'border-border-subtle bg-surface-card/60 text-content-secondary hover:bg-surface-subtle hover:text-content-primary'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
