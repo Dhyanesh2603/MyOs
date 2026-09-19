@@ -2,6 +2,7 @@ import React from 'react';
 import { FlowMenu } from './FlowMenu';
 import { ActiveAppMenu } from './ActiveAppMenu';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
+import { DynamicActivityCapsule } from './DynamicActivityCapsule';
 import { SystemTray } from './SystemTray';
 
 export const TopMenuBar: React.FC = () => {
@@ -14,8 +15,11 @@ export const TopMenuBar: React.FC = () => {
         <ActiveAppMenu />
       </div>
 
-      {/* Center: Workspaces & Mission Control */}
-      <WorkspaceSwitcher />
+      {/* Center: Workspaces & Dynamic Island Activity Capsule */}
+      <div className="flex items-center gap-3">
+        <WorkspaceSwitcher />
+        <DynamicActivityCapsule />
+      </div>
 
       {/* Right side: System Tray (Battery, Wi-Fi, Volume, Clock & Calendar) */}
       <SystemTray />
