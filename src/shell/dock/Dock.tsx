@@ -77,7 +77,7 @@ export const Dock: React.FC<DockProps> = ({
             setIsDockRevealed(true);
             setIsHoveringBottom(false);
             hoverTimerRef.current = null;
-          }, 2000); // Strict 2-second hover intent
+          }, 1000); // 1-second hover intent
         }
       } else {
         // Pointer left bottom edge zone
@@ -173,7 +173,7 @@ export const Dock: React.FC<DockProps> = ({
                 setIsDockRevealed(true);
                 setIsHoveringBottom(false);
                 hoverTimerRef.current = null;
-              }, 2000);
+              }, 1000);
             }
           }}
           onMouseLeave={() => {
@@ -183,38 +183,44 @@ export const Dock: React.FC<DockProps> = ({
         />
       )}
 
-      {/* Minimalist Bottom Indicator Pill: expands and glows over 2s to indicate hover intent */}
+      {/* Minimalist Bottom Indicator Pill: expands and glows over 1s to indicate hover intent */}
       {isAutoHideActive && !isVisible && (
         <div
           data-dock-indicator="true"
           onClick={() => setIsDockRevealed(true)}
           className="fixed bottom-1 left-1/2 -translate-x-1/2 z-[495] flex items-center justify-center cursor-pointer select-none"
-          title="Hover at bottom edge for 2 seconds to reveal Dock"
+          title="Hover at bottom edge for 1 second to reveal Dock"
         >
           <div
-            className={`h-1 rounded-full transition-all ${
+            className={`h-1.5 rounded-full transition-all ${
               isHoveringBottom
                 ? 'w-24 bg-accent-primary shadow-[0_0_12px_rgba(var(--accent-primary),0.8)]'
                 : 'w-12 bg-white/20 hover:bg-white/40'
             }`}
             style={{
-              transitionDuration: isHoveringBottom ? '2000ms' : '200ms',
+              transitionDuration: isHoveringBottom ? '1000ms' : '200ms',
               transitionTimingFunction: isHoveringBottom ? 'linear' : 'ease-out',
             }}
           />
         </div>
       )}
 
-      {/* Fluid Magnetic Dock with Spring Physics Slide-up/down */}
+      {/* Fluid Magnetic Dock with Spring Physics Slide-up/down (Centered horizontally) */}
       <motion.nav
         ref={dockRef}
         aria-label="Application Dock"
-        initial={false}
+        initial={{
+          x: '-50%',
+        }}
         animate={{
+          x: '-50%',
           y: isVisible ? 0 : 80,
           opacity: isVisible ? 1 : 0,
           scale: isVisible ? 1 : 0.96,
           pointerEvents: isVisible ? 'auto' : 'none',
+        }}
+        style={{
+          left: '50%',
         }}
         transition={{
           type: 'spring',
@@ -227,7 +233,7 @@ export const Dock: React.FC<DockProps> = ({
           handleDockMouseLeave();
         }}
         onMouseEnter={handleDockMouseEnter}
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
+        className="fixed bottom-4 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
       >
         {/* Pinned Applications */}
         {pinnedAppIds.map((appId) => {
