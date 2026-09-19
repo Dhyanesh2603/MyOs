@@ -18,6 +18,7 @@ import { CopilotDrawer } from '@shell/copilot/CopilotDrawer';
 import { CreateWebAppModal } from '@shell/dialogs/CreateWebAppModal';
 import { QuickLookModal } from '@shell/quicklook/QuickLookModal';
 import { StageManagerStrip } from '@shell/stage/StageManagerStrip';
+import { FlowDropModal } from '@shell/airdrop/FlowDropModal';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -187,6 +188,9 @@ export const App: React.FC = () => {
 
       {/* Stage Manager Left Strip */}
       <StageManagerStrip />
+
+      {/* Spatial FlowDrop AirBridge Radar Modal */}
+      <FlowDropModal />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

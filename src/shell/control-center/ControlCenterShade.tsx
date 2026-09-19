@@ -28,6 +28,7 @@ import { useMediaStore } from '@core/media/mediaStore';
 import { ambientSoundEngine, AmbientTrack } from '@core/audio/ambientSoundEngine';
 import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
+import { useFlowDropStore } from '@core/airdrop/airdropStore';
 
 export const ControlCenterShade: React.FC = () => {
   const {
@@ -160,11 +161,13 @@ export const ControlCenterShade: React.FC = () => {
             </div>
           </button>
 
-          {/* AirBridge Host Bridge */}
+          {/* AirBridge Host Bridge / FlowDrop */}
           <button
             onClick={() => {
               soundEngine.playClick();
               toggleAirBridge();
+              useFlowDropStore.getState().openFlowDrop();
+              closeControlCenter();
             }}
             className={`flex items-center gap-2.5 rounded-xl border p-2.5 transition-all text-left ${
               isAirBridgeActive
