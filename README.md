@@ -117,6 +117,64 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 - **Host Drag-and-Drop:** Drag physical files, images, or code from Windows Explorer directly into the browser surface or File Explorer to import them into `/home/user/Desktop` in the virtual file system.
 - **Native Export to PC:** Right-click any file in File Explorer or Desktop $\to$ select **"Download to PC"** to save it directly to your physical Downloads folder.
 
+### 21. FlowCam Retro Photo Booth
+- **Real-Time Viewfinder & Live Shaders:** Zero-latency webcam capture with 6 instant retro canvas shaders:
+  - **Natural Crisp:** True-to-life balanced optical capture.
+  - **Cyberpunk Neon:** High-saturation chromatic neon glow with cyan-magenta bias.
+  - **Amber Phosphor CRT:** 1980s amber monitor scanlines with horizontal raster sweeps.
+  - **GameBoy LCD:** 4-shade olive green 8-bit matrix pixelation.
+  - **Vintage Noir (1970s):** High-contrast silver halide monochrome with analog film grain.
+  - **Vaporwave Glitch:** Chromatic aberration RGB split with retro aesthetic.
+- **Tactile Shutter & Photo Reel:** 3-second countdown timer, screen flash burst animation, mechanical shutter click, and bottom filmstrip carousel saving directly to `/home/user/Pictures`.
+
+### 22. FlowDrop Spatial AirBridge Radar
+- **Spatial Device Beacon:** AirDrop-inspired radial pulse radar modal scanning for nearby active devices across the local AirBridge network.
+- **Simulated P2P Discovery:** Automatically detects and displays simulated nearby devices (e.g. *MacBook Pro M3*, *iPhone 16 Pro*, *Nothing Phone (2)*, *Pixel 9 Pro*) with battery status and signal strength.
+- **Fluid Transmission Beam:** Beam files, photos, or documents to any target node with animated sending progress rings, transmission chimes, and system notifications.
+
+### 23. Flow Tape Cassette Voice Recorder
+- **Dieter Rams & Teenage Engineering Aesthetic:** Tactile cassette deck with rotating dual tape reels, matte textured shell, and orange accent buttons.
+- **Analog VU Needle Meter:** Responsive ballistic analog needle gauges displaying real-time microphone decibels with peak LEDs.
+- **Waveform Visualizer & Speed Controls:** 128-FFT audio time-domain display, variable playback pitch speeds ($0.5\times, 1.0\times, 1.5\times, 2.0\times$), and one-click WebM audio export to `/home/user/Audio`.
+
+### 24. FancyZones Spatial Window Snapping (`Shift + Drag`)
+- **PowerToys-Inspired Spatial Tiling:** Hold `Shift` while dragging any window header to summon an interactive spatial zone wireframe overlay.
+- **Adaptive 3-Column Layouts:** Dynamic left (28%), center (44%), and right (28%) docking regions with glowing accent boundaries.
+- **Magnetic Snapping & Tactile Audio:** Releasing over a highlighted zone instantly snaps and docks the window to the exact layout boundary with a tactile acoustic snap.
+
+### 25. System Typography & Dynamic UI Scale Engine
+- **Global Typography Switcher:** Switch between 5 high-grade typographic styles on the fly:
+  - **Geist:** Modern engineering elegance.
+  - **Inter:** Crisp Swiss utilitarian clarity.
+  - **JetBrains Mono:** Code-focused monospaced geometry.
+  - **Space Grotesk:** Quirky retro-futuristic proportions.
+  - **Nothing DotMatrix:** Teenage Engineering / Nothing OS matrix aesthetic.
+- **Global UI Density Scaler:** Smooth zoom scaling ($85\% \to 120\%$) across all windows, menus, widgets, and dock elements with dynamic CSS variable remounting.
+
+### 26. Smart Batch Renamer Studio (`F2`)
+- **Multi-File Batch Operations:** Select multiple files in File Explorer and press `F2` to summon the dedicated Batch Renamer Studio.
+- **Live Before-and-After Preview:** Real-time diff table previewing updated filenames prior to disk commit.
+- **Transform Engines:**
+  - **Find & Replace:** Instant substring replacement across all filenames.
+  - **Prefix & Suffix Insertion:** Prepend or append project tags or dates.
+  - **Sequential Counter:** Auto-number items with customizable start index and zero padding (`{n}`).
+  - **Case Conversion:** Lowercase, uppercase, title case, or kebab-case normalization.
+
+### 27. Acoustic Keyboard Soundscapes & Audio Profiles
+- **Physical Keypress Synthesis:** Web Audio procedural sound generation attached to every keystroke across the operating system.
+- **3 Curated Acoustic Themes:**
+  - **Mechanical Thock:** Rich bottom-out switch thud with subtle randomized charCode pitch variation and distinct Enter / Backspace acoustics.
+  - **Nothing Micro-Tick:** Ultra-precise 6ms high-frequency haptic tick inspired by Teenage Engineering hardware.
+  - **8-Bit Retro Arcade:** Nostalgic chiptune chirps and dual-tone coin sounds.
+- **Control Center Switching:** Switch sound profiles instantly via the macOS Control Center shade.
+
+### 28. FlowBoard Infinite Vector Whiteboard Canvas
+- **Infinite Dot-Matrix Surface:** Smooth canvas panning (drag or middle-click) and fluid zoom ($35\% \to 250\%$) with coordinate HUD.
+- **Tactile Sticky Notes:** Draggable cards with 6 vibrant color palettes (Canary, Cyan, Sakura, Mint, Lavender, Obsidian), editable titles, markdown bodies, and duplication controls.
+- **Shape Nodes & Connecting Arrows:** Add process rectangles, pills, and circles, and dynamically connect them with smart bezier vector arrows.
+- **Vector Doodle Pen:** Freehand drawing brush with customizable color swatches and stroke widths ($2\text{px}, 4\text{px}, 8\text{px}$).
+- **Instant VFS Snapshot Export:** Render the full board onto an offscreen canvas and export high-resolution PNG snapshots directly to `/home/user/Pictures/FlowBoard_*.png`.
+
 ---
 
 ## 📱 Built-in & Community Applications
@@ -138,6 +196,9 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 | **Calculator** | `calculator` | Utilities | Tactile keypad with expression history tape, chained calculations, percentage, floating-point precision, and isolated keyboard handling. |
 | **Music Player** | `music` | Media | Procedural Web Audio synthesizer tracks and real-time 60 FPS FFT frequency visualizer. |
 | **Pocket Synth** | `synth` | Media | Teenage Engineering OP-1 aesthetic synthesizer, 2-octave keyboard, 16-step beat sequencer, and CRT oscilloscope. |
+| **FlowCam** | `flowcam` | Media | Retro photo booth with 6 live shaders (Cyberpunk, Amber CRT, GameBoy, Noir 1970s, Vaporwave), 3s shutter countdown, and photo reel. |
+| **Flow Tape** | `flowtape` | Media | Dieter Rams / Teenage Engineering cassette voice recorder with analog ballistic VU meters, rotating reels, and audio export. |
+| **FlowBoard** | `flowboard` | Productivity | Infinite vector whiteboard canvas with tactile sticky cards, geometric shape nodes, connecting arrows, and doodle pen. |
 | **Settings** | `system-settings` | System | Linear Personalization Studio with live accent color swatches, window radius slider ($8\text{px} \to 28\text{px}$), dynamic canvas wallpapers, and screensaver configuration. |
 | **Matrix Rain** *(Community)* | `matrix-rain` | Utilities | Cyberpunk phosphor code waterfall visualizer with interactive stream density controls. |
 | **Markdown Reader** *(Community)* | `markdown-viewer` | Productivity | Fast documentation and markdown reader with sidebar heading outline. |
@@ -150,6 +211,8 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 | Shortcut | Scope | Action |
 | :--- | :--- | :--- |
 | `Spacebar` | File Explorer / Desktop | Open macOS-style Quick Look File Previewer Modal |
+| `F2` | File Explorer | Open Smart Batch Renamer Studio for selected files |
+| `Shift + Drag` | Window Header | Summon FancyZones spatial window snapping wireframe overlay |
 | `Alt + S` | Global | Toggle Stage Manager Spatial Window Clusters & Left Strip |
 | `Ctrl + K` / `Cmd + K` | Global | Open Raycast Spotlight Command Palette (App search, VFS Full-Text Search, and Inline Math Calculations) |
 | `Ctrl + J` / `Cmd + J` | Global | Toggle Raycast AI Copilot Intelligence Sidecar Drawer |
