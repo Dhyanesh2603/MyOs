@@ -21,10 +21,14 @@ import {
   Zap,
   Network,
   GraduationCap,
+  Binary,
+  Wrench,
+  Sparkles,
 } from 'lucide-react';
 import { soundEngine } from '@core/audio/soundEngine';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { usePersonalOsStore, PersonalOsTab } from '@core/personal-os/personalOsStore';
+import { evaluateSpotlightQuery } from '@core/spotlight/evaluator';
 
 export const CommandPalette: React.FC = () => {
   const { isOpen, query, selectedIndex, close, toggle, setQuery, setSelectedIndex } =
@@ -318,14 +322,39 @@ function tryEvaluateMath(raw: string): string | null {
       });
     }
 
+    const devResults = evaluateSpotlightQuery(query);
+    const devActions: CommandAction[] = devResults.map((dev) => ({
+      id: dev.id,
+      title: dev.title,
+      subtitle: dev.subtitle,
+      category: dev.category,
+      icon: dev.category === 'slash' ? Sparkles : dev.category === 'dev' ? Binary : Wrench,
+      shortcut: dev.actionLabel || '↵ Copy',
+      handler: () => {
+        if (dev.onExecute) {
+          dev.onExecute();
+          close();
+        } else if (dev.copyValue) {
+          navigator.clipboard.writeText(dev.copyValue);
+          soundEngine.playClick();
+          useNotificationStore.getState().notify({
+            title: 'Copied to Clipboard',
+            message: `${dev.copyValue} copied.`,
+            type: 'info',
+          });
+          close();
+        }
+      },
+    }));
+
     const appAndWinMatches = actions.filter(
       (a) =>
         a.title.toLowerCase().includes(cleanQuery) ||
         (a.subtitle && a.subtitle.toLowerCase().includes(cleanQuery)) ||
         a.category.toLowerCase().includes(cleanQuery)
     );
-    return [...mathActions, ...appAndWinMatches, ...fileActions];
-  }, [actions, query, fileActions]);
+    return [...devActions, ...mathActions, ...appAndWinMatches, ...fileActions];
+  }, [actions, query, fileActions, close]);
 
   // Handle keyboard navigation in result list
   const handleKeyDown = (e: React.KeyboardEvent) => {
