@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlowMenu } from './FlowMenu';
 import { ActiveAppMenu } from './ActiveAppMenu';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { SystemTray } from './SystemTray';
 
 export const TopMenuBar: React.FC = () => {
@@ -12,6 +13,9 @@ export const TopMenuBar: React.FC = () => {
         <div className="h-3.5 w-px bg-border-subtle/80" />
         <ActiveAppMenu />
       </div>
+
+      {/* Center: Workspaces & Mission Control */}
+      <WorkspaceSwitcher />
 
       {/* Right side: System Tray (Battery, Wi-Fi, Volume, Clock & Calendar) */}
       <SystemTray />

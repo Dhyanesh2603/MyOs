@@ -14,11 +14,14 @@ import {
   computeInitialPosition,
   type ViewportInsets,
 } from './geometry';
+import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 
 export interface WindowStoreState {
   windows: Record<WindowId, WindowState>;
   focusStack: WindowId[];
   activeWindowId: WindowId | null;
+  peekWindowId: WindowId | null;
+  snapPreview: SnapTarget;
 
   // Selectors / Helpers
   getZIndex: (id: WindowId) => number;
@@ -41,8 +44,9 @@ export interface WindowStoreState {
     viewportSize: WindowSize,
     insets?: ViewportInsets
   ) => void;
-  snapPreview: SnapTarget;
   setSnapPreview: (preview: SnapTarget) => void;
+  setPeekWindowId: (id: WindowId | null) => void;
+  setWindowWorkspace: (id: WindowId, workspaceId: number) => void;
   snapWindow: (
     id: WindowId,
     target: 'left' | 'right' | 'maximize',
@@ -80,8 +84,21 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
   windows: {},
   focusStack: [],
   activeWindowId: null,
+  peekWindowId: null,
   snapPreview: null,
   setSnapPreview: (preview) => set({ snapPreview: preview }),
+  setPeekWindowId: (id) => set({ peekWindowId: id }),
+
+  setWindowWorkspace: (id: WindowId, workspaceId: number) => {
+    const win = get().windows[id];
+    if (!win) return;
+    set((state) => ({
+      windows: {
+        ...state.windows,
+        [id]: { ...win, workspaceId },
+      },
+    }));
+  },
 
   getZIndex: (id: WindowId): number => {
     const { focusStack } = get();
@@ -101,6 +118,7 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
       initialSize = DEFAULT_SIZE,
       constraints = {},
       customState = {},
+      workspaceId = useWorkspaceStore.getState().activeWorkspaceId ?? 1,
       viewportSize = { width: window.innerWidth || 1280, height: window.innerHeight || 800 },
       insets = DEFAULT_INSETS,
     } = options;
@@ -131,6 +149,7 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
       isMaximized: false,
       isDragging: false,
       isResizing: false,
+      workspaceId,
       customState,
     };
 

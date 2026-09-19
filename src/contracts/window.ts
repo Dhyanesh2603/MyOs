@@ -52,6 +52,7 @@ export interface WindowState {
   isDragging: boolean;
   isResizing: boolean;
   preMaximizedState?: WindowPreMaximizedSnapshot;
+  workspaceId?: number;
   customState?: Record<string, unknown>;
 }
 
@@ -61,5 +62,6 @@ export interface WindowCreateOptions {
   initialPosition?: WindowPosition;
   initialSize?: WindowSize;
   constraints?: Partial<WindowConstraints>;
+  workspaceId?: number;
   customState?: Record<string, unknown>;
 }

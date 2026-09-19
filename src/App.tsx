@@ -10,11 +10,13 @@ import { NotificationToaster } from '@shell/notifications/NotificationToaster';
 import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
+import { MissionControl } from '@shell/switcher/MissionControl';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { useSessionStore } from '@core/session/sessionStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
+import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -30,17 +32,45 @@ export const App: React.FC = () => {
       });
     }, 600);
 
-    const handleLockShortcut = (e: KeyboardEvent) => {
+    const handleShortcuts = (e: KeyboardEvent) => {
+      // Lock screen: Ctrl+Alt+L
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         useSessionStore.getState().lock();
+        return;
+      }
+
+      // Mission Control: Ctrl+Up
+      if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') {
+        e.preventDefault();
+        useWorkspaceStore.getState().toggleMissionControl();
+        return;
+      }
+
+      // Workspace switching: Ctrl+1..4
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && ['1', '2', '3', '4'].includes(e.key)) {
+        e.preventDefault();
+        useWorkspaceStore.getState().setActiveWorkspace(parseInt(e.key, 10));
+        return;
+      }
+
+      // Workspace cycling: Ctrl+Alt+Left / Right
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'ArrowRight') {
+        e.preventDefault();
+        useWorkspaceStore.getState().nextWorkspace();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        useWorkspaceStore.getState().prevWorkspace();
+        return;
       }
     };
-    window.addEventListener('keydown', handleLockShortcut);
+    window.addEventListener('keydown', handleShortcuts);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('keydown', handleLockShortcut);
+      window.removeEventListener('keydown', handleShortcuts);
     };
   }, []);
 
@@ -89,6 +119,9 @@ export const App: React.FC = () => {
 
       {/* Visual Alt+Tab Task Switcher */}
       <TaskSwitcher />
+
+      {/* Fullscreen Mission Control & Spaces Overview */}
+      <MissionControl />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />
