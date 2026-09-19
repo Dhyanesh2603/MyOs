@@ -17,9 +17,14 @@ import {
   FileText,
   FileCode,
   Calculator,
+  Compass,
+  Zap,
+  Network,
+  GraduationCap,
 } from 'lucide-react';
 import { soundEngine } from '@core/audio/soundEngine';
 import { useNotificationStore } from '@core/notifications/notificationStore';
+import { usePersonalOsStore, PersonalOsTab } from '@core/personal-os/personalOsStore';
 
 export const CommandPalette: React.FC = () => {
   const { isOpen, query, selectedIndex, close, toggle, setQuery, setSelectedIndex } =
@@ -83,6 +88,72 @@ export const CommandPalette: React.FC = () => {
         shortcut: '↵',
         handler: () => focusWindow(win.id),
       });
+    });
+
+    // Flow Personal OS Quick Navigation
+    const openPersonalOsTab = (tab: PersonalOsTab) => {
+      usePersonalOsStore.getState().setActiveTab(tab);
+      launchApp('personal-os');
+    };
+
+    list.push({
+      id: 'pos-momentum',
+      title: 'Personal OS: What should I work on next?',
+      subtitle: 'Momentum intelligence engine recommendation',
+      category: 'apps',
+      icon: Compass,
+      shortcut: '↵',
+      handler: () => openPersonalOsTab('home'),
+    });
+
+    list.push({
+      id: 'pos-missions',
+      title: 'Personal OS: Engineering Missions',
+      subtitle: 'Long-term strategic campaigns and objectives',
+      category: 'apps',
+      icon: Compass,
+      shortcut: '↵',
+      handler: () => openPersonalOsTab('missions'),
+    });
+
+    list.push({
+      id: 'pos-dsa',
+      title: 'Personal OS: DSA Workspace',
+      subtitle: 'LeetCode patterns, difficulty spread, and mistake notebook',
+      category: 'apps',
+      icon: Zap,
+      shortcut: '↵',
+      handler: () => openPersonalOsTab('learning'),
+    });
+
+    list.push({
+      id: 'pos-academics',
+      title: 'Personal OS: Academic & Attendance Health',
+      subtitle: 'Coursework, CAT/FAT prep, and >=75% compliance',
+      category: 'apps',
+      icon: GraduationCap,
+      shortcut: '↵',
+      handler: () => openPersonalOsTab('academics'),
+    });
+
+    list.push({
+      id: 'pos-graph',
+      title: 'Personal OS: Relational Knowledge Graph',
+      subtitle: 'Visual brain connecting projects, skills, and coursework',
+      category: 'apps',
+      icon: Network,
+      shortcut: '↵',
+      handler: () => openPersonalOsTab('graph'),
+    });
+
+    list.push({
+      id: 'pos-focus',
+      title: 'Personal OS: Start 25m Deep Focus Block',
+      subtitle: 'Distraction-free fullscreen HUD with timer',
+      category: 'system',
+      icon: Zap,
+      shortcut: '↵',
+      handler: () => usePersonalOsStore.getState().startFocusMode('Deep Engineering Focus Block', 25),
     });
 
     // System Utilities

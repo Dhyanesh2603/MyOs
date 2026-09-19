@@ -14,6 +14,7 @@ export interface DockState {
 
 export const useDockStore = create<DockState>((set) => ({
   pinnedAppIds: [
+    'personal-os',
     'browser',
     'file-explorer',
     'code-editor',

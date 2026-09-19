@@ -21,6 +21,7 @@ import { StageManagerStrip } from '@shell/stage/StageManagerStrip';
 import { FlowDropModal } from '@shell/airdrop/FlowDropModal';
 import { FancyZonesOverlay } from '@shell/window/FancyZonesOverlay';
 import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
+import { FocusModeOverlay } from '@shell/focus/FocusModeOverlay';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -205,6 +206,9 @@ export const App: React.FC = () => {
 
       {/* Smart Batch Renamer Studio Modal */}
       <BatchRenamerModal />
+
+      {/* Global Distraction-Free Focus Mode Overlay */}
+      <FocusModeOverlay />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

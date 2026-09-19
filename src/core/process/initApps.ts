@@ -18,6 +18,7 @@ import { synthManifest } from '@apps/synth';
 import { flowcamManifest } from '@apps/flowcam';
 import { flowtapeManifest } from '@apps/flowtape';
 import { flowboardManifest } from '@apps/flowboard';
+import { personalOsManifest } from '@apps/personal-os';
 
 let initialized = false;
 
@@ -28,6 +29,7 @@ let initialized = false;
 export function initializeApplications(): void {
   if (initialized) return;
 
+  appRegistry.register(personalOsManifest);
   appRegistry.register(settingsManifest);
   appRegistry.register(notesManifest);
   appRegistry.register(terminalManifest);
