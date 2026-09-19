@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useCommandStore } from '@core/command/commandStore';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
+import { searchVFSContent } from '@core/vfs/searchIndexer';
 import type { CommandAction } from '@contracts/command';
 import {
   Search,
@@ -13,6 +14,8 @@ import {
   X,
   Play,
   CornerDownLeft,
+  FileText,
+  FileCode,
 } from 'lucide-react';
 
 export const CommandPalette: React.FC = () => {
@@ -122,17 +125,63 @@ export const CommandPalette: React.FC = () => {
     return list;
   }, [launchApp, windows, focusWindow, minimizeWindow, closeWindow, wallpapers, currentWallpaperId, setWallpaper]);
 
-  // Filter actions based on query
+  const [fileActions, setFileActions] = useState<CommandAction[]>([]);
+
+  // Deep VFS full-text search indexer query
+  useEffect(() => {
+    if (!query.trim()) {
+      setFileActions([]);
+      return;
+    }
+
+    let isMounted = true;
+    searchVFSContent(query).then((matches) => {
+      if (!isMounted) return;
+      const acts: CommandAction[] = matches.map((m) => {
+        const ext = m.name.split('.').pop()?.toLowerCase() || '';
+        let icon = FileText;
+        let appId = 'notes';
+
+        if (['js', 'ts', 'jsx', 'tsx', 'json', 'css', 'html', 'sh'].includes(ext)) {
+          icon = FileCode;
+          appId = 'code-editor';
+        } else if (['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext)) {
+          icon = Image;
+          appId = 'gallery';
+        }
+
+        return {
+          id: `file-${m.path}`,
+          title: m.isNameMatch ? m.name : `${m.name} (Line ${m.lineNumber})`,
+          subtitle: m.snippet ? `“${m.snippet}”` : m.path,
+          category: 'files',
+          icon,
+          shortcut: '↵',
+          handler: () => {
+            launchApp(appId, { filePath: m.path });
+          },
+        };
+      });
+      setFileActions(acts);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [query, launchApp]);
+
+  // Filter actions based on query and append deep full-text matches
   const filteredActions = useMemo(() => {
     if (!query.trim()) return actions;
     const cleanQuery = query.toLowerCase().trim();
-    return actions.filter(
+    const appAndWinMatches = actions.filter(
       (a) =>
         a.title.toLowerCase().includes(cleanQuery) ||
         (a.subtitle && a.subtitle.toLowerCase().includes(cleanQuery)) ||
         a.category.toLowerCase().includes(cleanQuery)
     );
-  }, [actions, query]);
+    return [...appAndWinMatches, ...fileActions];
+  }, [actions, query, fileActions]);
 
   // Handle keyboard navigation in result list
   const handleKeyDown = (e: React.KeyboardEvent) => {
