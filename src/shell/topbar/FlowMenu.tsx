@@ -7,11 +7,17 @@ import {
   RotateCw,
   Activity,
   Info,
+  DownloadCloud,
+  UploadCloud,
+  Monitor,
 } from 'lucide-react';
+import { exportSystemImage, restoreSystemImage } from '@core/system/backupEngine';
+import { useScreenSaverStore } from '@shell/desktop/screensaver/screenSaverStore';
 
 export const FlowMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { launchApp } = useProcessStore();
   const { notify } = useNotificationStore();
 
@@ -87,6 +93,44 @@ export const FlowMenu: React.FC = () => {
 
           <div className="my-1 border-t border-border-subtle/60" />
 
+          {/* Screensaver */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              useScreenSaverStore.getState().activate();
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
+          >
+            <Monitor className="h-3.5 w-3.5" />
+            <span>Start Screensaver</span>
+          </button>
+
+          {/* Export System Image */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              exportSystemImage();
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
+          >
+            <DownloadCloud className="h-3.5 w-3.5" />
+            <span>Export System Image (.flowos)</span>
+          </button>
+
+          {/* Restore System Image */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              fileInputRef.current?.click();
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
+          >
+            <UploadCloud className="h-3.5 w-3.5" />
+            <span>Restore System Image...</span>
+          </button>
+
+          <div className="my-1 border-t border-border-subtle/60" />
+
           <button
             onClick={() => {
               setIsOpen(false);
@@ -113,6 +157,21 @@ export const FlowMenu: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Hidden File Input for .flowos Restore */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".flowos,.json"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            restoreSystemImage(file);
+          }
+          e.target.value = '';
+        }}
+      />
     </div>
   );
 };
