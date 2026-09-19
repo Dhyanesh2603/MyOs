@@ -11,23 +11,29 @@ import {
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { useVFSStore } from '@core/vfs/vfsStore';
+import { useWindowStore } from '@core/window/windowStore';
 
 const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
-  const filePath = `/home/user/scratchpad-${processId.slice(-4)}.md`;
-  const [content, setContent] = useState(
-    `# FlowOS Notes\n\n> "Knowledge is a network, not a hierarchy." — Obsidian Philosophy\n\n### System Overview\nThis document is tied to **Process ID: ${processId}** and is persistently stored within the **Virtual File System** in browser IndexedDB.\n\n- [x] Hardware-accelerated shell\n- [x] Zero-rerender physics\n- [ ] Local knowledge graph integration\n\n\`\`\`ts\n// FlowOS POSIX Node\nconst note = await vfs.readFile("${filePath}");\n\`\`\`\n\n#architecture #flowos #vfs`
+  const customState = useWindowStore(
+    (state) => state.windows[windowId]?.customState as { initialData?: { filePath?: string } } | undefined
   );
+  const filePath = customState?.initialData?.filePath || `/home/user/scratchpad-${processId.slice(-4)}.md`;
+  const [content, setContent] = useState('');
   const [isSaved, setIsSaved] = useState(true);
   const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit');
 
   const { writeFile, readFile, nodes } = useVFSStore();
 
-  // Load existing file if present
+  // Load existing file if present, or set default template
   useEffect(() => {
     if (nodes[filePath]) {
       readFile(filePath)
         .then((text) => setContent(text))
         .catch(() => {});
+    } else {
+      setContent(
+        `# FlowOS Notes\n\n> "Knowledge is a network, not a hierarchy." — Obsidian Philosophy\n\n### Document: ${filePath.split('/').pop()}\nPersistently stored in the **Virtual File System** in browser IndexedDB.\n\n- [x] Hardware-accelerated shell\n- [x] Universal file associations\n- [ ] Deep knowledge linking\n\n#notes #flowos #vfs`
+      );
     }
   }, [filePath, nodes, readFile]);
 

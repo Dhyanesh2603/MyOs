@@ -21,15 +21,17 @@ import {
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
 import { useVFSStore } from '@core/vfs/vfsStore';
-import { useProcessStore } from '@core/process/processStore';
+import { useWindowStore } from '@core/window/windowStore';
+import { openVFSFile } from '@core/vfs/fileAssociations';
 import { normalizePath } from '@core/vfs/vfsService';
 
 const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const { nodes, mkdir, writeFile, deleteNode } = useVFSStore();
-  const { launchApp } = useProcessStore();
+  const customState = useWindowStore((state) => state.windows[windowId]?.customState as { initialData?: { initialPath?: string } } | undefined);
+  const startPath = customState?.initialData?.initialPath || '/home/user';
 
-  const [currentPath, setCurrentPath] = useState<string>('/home/user');
-  const [history, setHistory] = useState<string[]>(['/home/user']);
+  const [currentPath, setCurrentPath] = useState<string>(startPath);
+  const [history, setHistory] = useState<string[]>([startPath]);
   const [historyIdx, setHistoryIdx] = useState<number>(0);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -68,7 +70,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
     if (node.type === 'directory') {
       navigateTo(node.path);
     } else {
-      launchApp('notes');
+      openVFSFile(node.path);
     }
   };
 

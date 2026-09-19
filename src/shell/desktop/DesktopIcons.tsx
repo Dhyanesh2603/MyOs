@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useProcessStore } from '@core/process/processStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
+import { openVFSFile } from '@core/vfs/fileAssociations';
 import {
   Settings,
   FileText,
@@ -98,11 +99,9 @@ export const DesktopIcons: React.FC = () => {
     if (item.type === 'app') {
       launchApp(item.target);
     } else if (item.type === 'file') {
-      // Launch Notes to view/edit the file
-      launchApp('notes');
+      openVFSFile(item.target);
     } else if (item.type === 'folder') {
-      // Launch File Explorer navigated to the folder
-      launchApp('file-explorer');
+      launchApp('file-explorer', { initialPath: item.target });
     }
   };
 
