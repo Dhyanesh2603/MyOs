@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
 import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
+import { useFancyZonesStore } from '@core/window/fancyZonesStore';
 import { appRegistry } from '@core/process/registry';
 import { soundEngine } from '@core/audio/soundEngine';
 import { Minus, Square, Copy, X } from 'lucide-react';
@@ -106,6 +107,11 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
     pendingPosRef.current = clamped;
 
+    // FancyZones Shift-drag trigger
+    if (e.shiftKey) {
+      useFancyZonesStore.getState().showOverlay(windowState.id);
+    }
+
     // Detect snap edge proximity
     let detectedSnap: SnapTarget = null;
     if (e.clientX <= 24) {
@@ -139,18 +145,26 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       rafRef.current = null;
     }
 
-    const snapTarget = activeSnapRef.current;
-    if (snapTarget) {
-      soundEngine.playSnap();
-      snapWindow(windowState.id, snapTarget, {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+    const activeZone = useFancyZonesStore.getState().activeZoneId;
+    if (activeZone) {
+      useFancyZonesStore.getState().snapWindowToZone(windowState.id, activeZone);
       activeSnapRef.current = null;
       setSnapPreview(null);
-    } else if (pendingPosRef.current) {
-      updatePosition(windowState.id, pendingPosRef.current);
-      pendingPosRef.current = null;
+    } else {
+      useFancyZonesStore.getState().hideOverlay();
+      const snapTarget = activeSnapRef.current;
+      if (snapTarget) {
+        soundEngine.playSnap();
+        snapWindow(windowState.id, snapTarget, {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+        activeSnapRef.current = null;
+        setSnapPreview(null);
+      } else if (pendingPosRef.current) {
+        updatePosition(windowState.id, pendingPosRef.current);
+        pendingPosRef.current = null;
+      }
     }
 
     isDraggingRef.current = false;
