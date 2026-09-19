@@ -3,6 +3,7 @@ import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
 import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
 import { appRegistry } from '@core/process/registry';
+import { soundEngine } from '@core/audio/soundEngine';
 import { Minus, Square, Copy, X } from 'lucide-react';
 
 export interface WindowHeaderProps {
@@ -43,12 +44,15 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
       if (e.altKey && (e.key === '[' || e.key === 'ArrowLeft')) {
         e.preventDefault();
+        soundEngine.playSnap();
         snapWindow(windowState.id, 'left', { width: window.innerWidth, height: window.innerHeight });
       } else if (e.altKey && (e.key === ']' || e.key === 'ArrowRight')) {
         e.preventDefault();
+        soundEngine.playSnap();
         snapWindow(windowState.id, 'right', { width: window.innerWidth, height: window.innerHeight });
       } else if (e.altKey && (e.key === 'Enter' || e.key === 'ArrowUp')) {
         e.preventDefault();
+        soundEngine.playSnap();
         toggleMaximize(windowState.id, { width: window.innerWidth, height: window.innerHeight });
       }
     };
@@ -137,6 +141,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
     const snapTarget = activeSnapRef.current;
     if (snapTarget) {
+      soundEngine.playSnap();
       snapWindow(windowState.id, snapTarget, {
         width: window.innerWidth,
         height: window.innerHeight,

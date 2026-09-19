@@ -14,10 +14,12 @@ import {
 } from 'lucide-react';
 import { useThemeStore } from '@core/theme/themeStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
+import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 
 export const SystemTray: React.FC = () => {
   const { themeId, setTheme } = useThemeStore();
   const { toggleCenter, notifications } = useNotificationStore();
+  const { isMuted, setMuted } = useSoundStore();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const [timeStr, setTimeStr] = useState('');
@@ -25,7 +27,6 @@ export const SystemTray: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const [isCharging, setIsCharging] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -104,7 +105,11 @@ export const SystemTray: React.FC = () => {
     <div className="flex items-center gap-2 select-none">
       {/* Sound Volume Control */}
       <button
-        onClick={() => setIsMuted(!isMuted)}
+        onClick={() => {
+          const nextMuted = !isMuted;
+          setMuted(nextMuted);
+          if (!nextMuted) soundEngine.playClick();
+        }}
         title={isMuted ? 'Unmute System' : 'Mute System'}
         className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
       >
