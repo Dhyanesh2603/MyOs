@@ -78,38 +78,22 @@ export interface WidgetStoreState {
 
 const STORAGE_KEY = 'flowos_desktop_widgets_v1';
 
-const DEFAULT_WIDGETS: WidgetInstance[] = [
-  {
-    id: 'widget-default-clock',
-    type: 'clock',
-    title: 'Flow Clock',
-    position: { x: 32, y: 56 },
-  },
-  {
-    id: 'widget-default-telemetry',
-    type: 'telemetry',
-    title: 'Kernel Telemetry',
-    position: { x: 32, y: 210 },
-  },
-  {
-    id: 'widget-default-sticky',
-    type: 'sticky',
-    title: 'Quick Scratchpad',
-    position: { x: 32, y: 390 },
-    config: {
-      content: '⚡ Welcome to FlowOS!\n• Press Ctrl+K for Spotlight\n• Drag widgets anywhere on desktop\n• Right click desktop for more',
-      color: 'amber',
-    },
-  },
-];
+const DEFAULT_WIDGETS: WidgetInstance[] = [];
 
 function loadSavedWidgets(): WidgetInstance[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+      if (Array.isArray(parsed)) {
+        // Filter out legacy default widgets that overlapped desktop icons
+        return parsed.filter(
+          (w: any) =>
+            w &&
+            w.id !== 'widget-default-clock' &&
+            w.id !== 'widget-default-telemetry' &&
+            w.id !== 'widget-default-sticky'
+        );
       }
     }
   } catch (e) {
@@ -128,7 +112,7 @@ function persistWidgets(widgets: WidgetInstance[]) {
 
 export const useWidgetStore = create<WidgetStoreState>((set, get) => ({
   widgets: loadSavedWidgets(),
-  isWidgetsVisible: true,
+  isWidgetsVisible: false,
   isDrawerOpen: false,
 
   toggleWidgetsVisibility: () => {
@@ -163,7 +147,7 @@ export const useWidgetStore = create<WidgetStoreState>((set, get) => ({
     };
 
     const nextWidgets = [...existing, newWidget];
-    set({ widgets: nextWidgets });
+    set({ widgets: nextWidgets, isWidgetsVisible: true });
     persistWidgets(nextWidgets);
   },
 
