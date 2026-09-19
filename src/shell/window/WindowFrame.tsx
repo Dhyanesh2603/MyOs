@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import type { ResizeDirection, WindowState } from '@contracts/window';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
+import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { appRegistry } from '@core/process/registry';
 import { WindowHeader } from './WindowHeader';
 import { ResizeHandle } from './ResizeHandle';
@@ -23,9 +24,10 @@ const RESIZE_DIRECTIONS: ResizeDirection[] = [
 ];
 
 export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState }) => {
-  const { focusWindow, getZIndex, peekWindowId } = useWindowStore();
+  const { focusWindow, getZIndex, peekWindowId, activeWindowId } = useWindowStore();
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
   const isMissionControlOpen = useWorkspaceStore((state) => state.isMissionControlOpen);
+  const isStageManagerEnabled = useStageManagerStore((s) => s.isEnabled);
 
   const zIndex = getZIndex(windowState.id);
   const manifest = appRegistry.get(windowState.appId);
@@ -34,6 +36,16 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
   // Workspace visibility filter: hide if not in active workspace unless Mission Control is open
   const isCurrentWorkspace = (windowState.workspaceId ?? 1) === activeWorkspaceId;
   if (!isCurrentWorkspace && !isMissionControlOpen) {
+    return null;
+  }
+
+  // Stage Manager: tuck non-active windows into left stage strip
+  if (
+    isStageManagerEnabled &&
+    activeWindowId &&
+    windowState.id !== activeWindowId &&
+    !isMissionControlOpen
+  ) {
     return null;
   }
 

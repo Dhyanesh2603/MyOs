@@ -17,12 +17,14 @@ import { ScreenSaver } from '@shell/desktop/screensaver/ScreenSaver';
 import { CopilotDrawer } from '@shell/copilot/CopilotDrawer';
 import { CreateWebAppModal } from '@shell/dialogs/CreateWebAppModal';
 import { QuickLookModal } from '@shell/quicklook/QuickLookModal';
+import { StageManagerStrip } from '@shell/stage/StageManagerStrip';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { useSessionStore } from '@core/session/sessionStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
+import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useCaptureStore } from '@shell/capture/captureStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
@@ -100,6 +102,13 @@ export const App: React.FC = () => {
         useCopilotStore.getState().toggleCopilot();
         return;
       }
+
+      // Stage Manager: Alt+S
+      if (e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        useStageManagerStore.getState().toggleStageManager();
+        return;
+      }
     };
     window.addEventListener('keydown', handleShortcuts);
 
@@ -175,6 +184,9 @@ export const App: React.FC = () => {
 
       {/* macOS-style Spacebar Quick Look Modal */}
       <QuickLookModal />
+
+      {/* Stage Manager Left Strip */}
+      <StageManagerStrip />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

@@ -19,11 +19,15 @@ import {
   Radio,
   Orbit,
   Headphones,
+  LayoutGrid,
+  Sparkles,
 } from 'lucide-react';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 import { useMediaStore } from '@core/media/mediaStore';
 import { ambientSoundEngine, AmbientTrack } from '@core/audio/ambientSoundEngine';
+import { useStageManagerStore } from '@core/stage/stageManagerStore';
+import { useCopilotStore } from '@core/copilot/copilotStore';
 
 export const ControlCenterShade: React.FC = () => {
   const {
@@ -46,6 +50,11 @@ export const ControlCenterShade: React.FC = () => {
   const { isMuted, setMuted } = useSoundStore();
   const { tracks, currentTrackIndex, isPlaying, togglePlay, nextTrack, volume, setVolume } =
     useMediaStore();
+
+  const isStageManagerEnabled = useStageManagerStore((s) => s.isEnabled);
+  const toggleStageManager = useStageManagerStore((s) => s.toggleStageManager);
+  const isCopilotOpen = useCopilotStore((s) => s.isOpen);
+  const toggleCopilot = useCopilotStore((s) => s.toggleCopilot);
 
   const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -203,6 +212,60 @@ export const ControlCenterShade: React.FC = () => {
               <div className="text-xs font-semibold">Focus</div>
               <div className="truncate text-[10px] opacity-75">
                 {isFocusMode ? 'Do Not Disturb' : 'Off'}
+              </div>
+            </div>
+          </button>
+
+          {/* Stage Manager */}
+          <button
+            onClick={() => {
+              soundEngine.playClick();
+              toggleStageManager();
+            }}
+            className={`flex items-center gap-2.5 rounded-xl border p-2.5 transition-all text-left ${
+              isStageManagerEnabled
+                ? 'border-accent-primary/40 bg-accent-primary/15 text-content-primary'
+                : 'border-border-subtle bg-surface-subtle/40 text-content-tertiary'
+            }`}
+          >
+            <div
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                isStageManagerEnabled ? 'bg-accent-primary text-white' : 'bg-surface-hover text-content-tertiary'
+              }`}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1 leading-tight">
+              <div className="text-xs font-semibold">Stage Mgr</div>
+              <div className="truncate text-[10px] opacity-75">
+                {isStageManagerEnabled ? 'Active (Alt+S)' : 'Off'}
+              </div>
+            </div>
+          </button>
+
+          {/* AI Copilot */}
+          <button
+            onClick={() => {
+              soundEngine.playClick();
+              toggleCopilot();
+            }}
+            className={`flex items-center gap-2.5 rounded-xl border p-2.5 transition-all text-left ${
+              isCopilotOpen
+                ? 'border-purple-500/40 bg-purple-500/15 text-content-primary'
+                : 'border-border-subtle bg-surface-subtle/40 text-content-tertiary'
+            }`}
+          >
+            <div
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                isCopilotOpen ? 'bg-purple-500 text-white' : 'bg-surface-hover text-content-tertiary'
+              }`}
+            >
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1 leading-tight">
+              <div className="text-xs font-semibold">AI Copilot</div>
+              <div className="truncate text-[10px] opacity-75">
+                {isCopilotOpen ? 'Active (Alt+C)' : 'Ready'}
               </div>
             </div>
           </button>
