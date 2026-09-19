@@ -11,6 +11,7 @@ import { browserManifest } from '@apps/browser';
 import { paintManifest } from '@apps/paint';
 import { galleryManifest } from '@apps/gallery';
 import { flowshotManifest } from '@apps/flowshot';
+import { appStoreManifest } from '@apps/app-store';
 
 let initialized = false;
 
@@ -33,6 +34,7 @@ export function initializeApplications(): void {
   appRegistry.register(paintManifest);
   appRegistry.register(galleryManifest);
   appRegistry.register(flowshotManifest);
+  appRegistry.register(appStoreManifest);
 
   initialized = true;
 }

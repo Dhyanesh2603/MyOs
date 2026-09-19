@@ -1,6 +1,7 @@
 import { vfs, normalizePath } from '@core/vfs/vfsService';
 import { useProcessStore } from '@core/process/processStore';
 import { executeCode } from '@core/runtime/codeRunner';
+import { usePackageStore } from '@core/packages/packageStore';
 
 export interface ShellResult {
   output: string;
@@ -34,6 +35,7 @@ export async function executeCommand(
           '  echo <text>        Print text',
           '  eval <code>        Evaluate JavaScript expression',
           '  run <file>         Execute a JavaScript file from VFS',
+          '  pkg [cmd]          Package manager (list, install, remove, search)',
           '  ps                 List active OS processes',
           '  kill <pid>         Terminate a process by ID',
           '  clear              Clear terminal screen',
@@ -213,6 +215,59 @@ export async function executeCommand(
 
       useProcessStore.getState().terminateProcess(targetPid);
       return { output: `Process ${targetPid} terminated.` };
+    }
+
+    case 'pkg': {
+      const sub = args[0]?.toLowerCase();
+      const pkgStore = usePackageStore.getState();
+
+      if (!sub || sub === 'list') {
+        const header = 'PACKAGE ID          VERSION  STATUS      NAME';
+        const lines = pkgStore.packages.map(
+          (p) =>
+            `${p.id.padEnd(19)} ${p.version.padEnd(8)} ${(p.installed ? '[INSTALLED]' : '[AVAILABLE]').padEnd(11)} ${p.name}`
+        );
+        return { output: [header, ...lines].join('\n') };
+      }
+
+      if (sub === 'install') {
+        const target = args[1];
+        if (!target) return { output: 'pkg install: missing package name' };
+        const ok = pkgStore.installPackage(target);
+        return {
+          output: ok
+            ? `Successfully installed ${target}. Shortcut pinned to Dock.`
+            : `pkg: failed to install '${target}'. Package not found or already installed.`,
+        };
+      }
+
+      if (sub === 'remove' || sub === 'uninstall') {
+        const target = args[1];
+        if (!target) return { output: 'pkg remove: missing package name' };
+        const ok = pkgStore.uninstallPackage(target);
+        return {
+          output: ok
+            ? `Successfully uninstalled ${target}.`
+            : `pkg: package '${target}' is not installed.`,
+        };
+      }
+
+      if (sub === 'search') {
+        const q = args.slice(1).join(' ').toLowerCase();
+        const matches = pkgStore.packages.filter(
+          (p) => p.id.includes(q) || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+        );
+        if (matches.length === 0) return { output: `No packages matching '${q}'.` };
+        return {
+          output: matches
+            .map((m) => `${m.id} (${m.name}) - ${m.description} [${m.installed ? 'Installed' : 'Available'}]`)
+            .join('\n'),
+        };
+      }
+
+      return {
+        output: 'Usage: pkg [list | install <name> | remove <name> | search <query>]',
+      };
     }
 
     default:
