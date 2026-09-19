@@ -12,6 +12,7 @@ import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import { MissionControl } from '@shell/switcher/MissionControl';
 import { ClipboardHistoryModal } from '@shell/clipboard/ClipboardHistoryModal';
+import { ScreenCaptureOverlay } from '@shell/capture/ScreenCaptureOverlay';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -19,6 +20,7 @@ import { useSessionStore } from '@core/session/sessionStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useClipboardStore } from '@core/clipboard/clipboardStore';
+import { useCaptureStore } from '@shell/capture/captureStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -72,6 +74,16 @@ export const App: React.FC = () => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'v') {
         e.preventDefault();
         useClipboardStore.getState().toggleModal();
+        return;
+      }
+
+      // FlowShot Screen Capture: Ctrl+Shift+S or PrintScreen
+      if (
+        e.key === 'PrintScreen' ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's')
+      ) {
+        e.preventDefault();
+        useCaptureStore.getState().startCapture();
         return;
       }
     };
@@ -134,6 +146,9 @@ export const App: React.FC = () => {
 
       {/* System Clipboard History Manager Modal */}
       <ClipboardHistoryModal />
+
+      {/* FlowShot Screen Capture Marquee Overlay */}
+      <ScreenCaptureOverlay />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

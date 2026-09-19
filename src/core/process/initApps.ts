@@ -10,6 +10,7 @@ import { codeEditorManifest } from '@apps/code-editor';
 import { browserManifest } from '@apps/browser';
 import { paintManifest } from '@apps/paint';
 import { galleryManifest } from '@apps/gallery';
+import { flowshotManifest } from '@apps/flowshot';
 
 let initialized = false;
 
@@ -31,6 +32,7 @@ export function initializeApplications(): void {
   appRegistry.register(browserManifest);
   appRegistry.register(paintManifest);
   appRegistry.register(galleryManifest);
+  appRegistry.register(flowshotManifest);
 
   initialized = true;
 }
