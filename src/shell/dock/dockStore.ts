@@ -25,6 +25,8 @@ export const useDockStore = create<DockState>((set) => ({
     'task-manager',
     'music',
     'system-settings',
+    'retro-2048',
+    'retro-sweeper',
   ],
   dockSize: 'regular',
 
