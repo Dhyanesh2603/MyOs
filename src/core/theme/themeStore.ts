@@ -4,6 +4,7 @@ import type {
   AccentColorId,
   ThemeId,
   ThemePreferences,
+  FontFamilyId,
 } from '@contracts/theme';
 
 export const ACCENT_COLORS: Record<AccentColorId, AccentColorDefinition> = {
@@ -52,11 +53,15 @@ export const ACCENT_COLORS: Record<AccentColorId, AccentColorDefinition> = {
 };
 
 export interface ThemeStoreState extends ThemePreferences {
+  fontFamily: FontFamilyId;
+  uiScale: number;
   setTheme: (themeId: ThemeId) => void;
   setAccentColor: (accentColor: AccentColorId) => void;
   setWindowRadius: (radius: number) => void;
   setBlurAmount: (blur: number) => void;
   setReducedMotion: (reduced: boolean) => void;
+  setFontFamily: (font: FontFamilyId) => void;
+  setUiScale: (scale: number) => void;
 }
 
 export const useThemeStore = create<ThemeStoreState>((set) => ({
@@ -66,6 +71,8 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
   reducedMotion: false,
   windowRadius: 16,
   wallpaperId: 'obsidian-flow',
+  fontFamily: 'inter',
+  uiScale: 1.0,
 
   setTheme: (themeId) => {
     set({ themeId });
@@ -114,5 +121,16 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
 
   setReducedMotion: (reducedMotion) => {
     set({ reducedMotion });
+  },
+
+  setFontFamily: (fontFamily) => {
+    set({ fontFamily });
+    document.documentElement.setAttribute('data-font', fontFamily);
+  },
+
+  setUiScale: (uiScale) => {
+    set({ uiScale });
+    document.documentElement.style.setProperty('--ui-scale', `${uiScale}`);
+    document.documentElement.style.fontSize = `${uiScale * 16}px`;
   },
 }));

@@ -31,6 +31,10 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
     setWindowRadius,
     setBlurAmount,
     setReducedMotion,
+    fontFamily,
+    setFontFamily,
+    uiScale,
+    setUiScale,
   } = useThemeStore();
 
   const { wallpapers, currentWallpaperId, setWallpaper } = useWallpaperStore();
@@ -189,6 +193,61 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     </span>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* System Typography Selector */}
+            <div className="border-t border-border-subtle pt-4">
+              <h3 className="text-xs font-semibold tracking-tight text-content-primary">System Typography Engine</h3>
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Switch operating system font hierarchy on the fly.
+              </p>
+              <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {[
+                  { id: 'inter', label: 'Apple Inter', desc: 'Crisp & Clean' },
+                  { id: 'ndot', label: 'Nothing NDOT', desc: 'Space Grotesk' },
+                  { id: 'jetbrains', label: 'JetBrains Mono', desc: 'Hacker Terminal' },
+                  { id: 'serif', label: 'Editorial Serif', desc: 'Classic Reading' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFontFamily(f.id as any)}
+                    className={`flex flex-col rounded-lg border p-2.5 text-left transition-all ${
+                      fontFamily === f.id
+                        ? 'border-accent-primary bg-accent-primary/10 ring-1 ring-accent-primary text-content-primary'
+                        : 'border-border-subtle bg-surface-subtle/40 text-content-secondary hover:bg-surface-subtle'
+                    }`}
+                  >
+                    <span className="font-semibold text-xs text-content-primary">{f.label}</span>
+                    <span className="font-mono text-[9px] text-content-tertiary mt-0.5">{f.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Global UI Density Scale */}
+            <div className="border-t border-border-subtle pt-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-semibold tracking-tight text-content-primary">Global UI Density Scale</h3>
+                <span className="font-mono text-[11px] text-accent-primary">
+                  {Math.round(uiScale * 100)}%
+                </span>
+              </div>
+              <p className="text-[11px] text-content-secondary mt-0.5">
+                Scale interface elements, dock icons, and typography proportionally.
+              </p>
+              <div className="mt-2.5 flex items-center gap-3">
+                <span className="font-mono text-[10px] text-content-tertiary">85% Compact</span>
+                <input
+                  type="range"
+                  min="0.85"
+                  max="1.15"
+                  step="0.05"
+                  value={uiScale}
+                  onChange={(e) => setUiScale(parseFloat(e.target.value))}
+                  className="w-full accent-accent-primary cursor-pointer"
+                />
+                <span className="font-mono text-[10px] text-content-tertiary">115% Large</span>
               </div>
             </div>
           </div>

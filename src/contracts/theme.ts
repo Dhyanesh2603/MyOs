@@ -28,6 +28,8 @@ export interface WallpaperDefinition {
   style: React.CSSProperties;
 }
 
+export type FontFamilyId = 'inter' | 'ndot' | 'jetbrains' | 'serif';
+
 export interface ThemePreferences {
   themeId: ThemeId;
   accentColor: AccentColorId;
@@ -35,4 +37,6 @@ export interface ThemePreferences {
   reducedMotion: boolean;
   windowRadius: number;
   wallpaperId: string;
+  fontFamily?: FontFamilyId;
+  uiScale?: number;
 }
