@@ -6,6 +6,8 @@ import {
   type MotionValue,
 } from 'motion/react';
 import type { AppManifest } from '@contracts/app';
+import { useWindowStore } from '@core/window/windowStore';
+import { DockHoverPreview } from './DockHoverPreview';
 
 export interface DockItemProps {
   manifest: AppManifest;
@@ -27,7 +29,13 @@ export const DockItem: React.FC<DockItemProps> = ({
   onClick,
 }) => {
   const itemRef = useRef<HTMLButtonElement>(null);
+  const hoverTimerRef = useRef<number | null>(null);
+
   const [isHovered, setIsHovered] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const { windows, focusWindow, closeWindow, restoreWindow, setPeekWindowId } = useWindowStore();
+  const appWindows = Object.values(windows).filter((w) => w.appId === manifest.id);
 
   // Compute horizontal distance from mouse cursor to center of this dock item
   const distance = useTransform(mouseX, (val: number) => {
@@ -52,27 +60,69 @@ export const DockItem: React.FC<DockItemProps> = ({
 
   const IconComponent = manifest.icon;
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (appWindows.length > 0) {
+      hoverTimerRef.current = window.setTimeout(() => {
+        setShowPreview(true);
+      }, 220);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    setShowPreview(false);
+    setPeekWindowId(null);
+  };
+
+  const handleFocusWindow = (winId: string) => {
+    const target = windows[winId];
+    if (target?.isMinimized) {
+      restoreWindow(winId);
+    }
+    focusWindow(winId);
+    setShowPreview(false);
+    setPeekWindowId(null);
+  };
+
   return (
-    <div className="relative flex flex-col items-center">
-      {/* Sleek Linear Floated Tooltip */}
-      <div
-        role="tooltip"
-        className={`pointer-events-none absolute -top-9 z-50 rounded border border-border-subtle bg-surface-panel/95 px-2 py-0.5 text-[10px] font-mono tracking-tight text-content-primary shadow-lg backdrop-blur-md transition-all duration-150 ${
-          isHovered
-            ? 'opacity-100 -translate-y-1 scale-100'
-            : 'opacity-0 translate-y-1 scale-95'
-        }`}
-      >
-        {manifest.name}
-      </div>
+    <div
+      className="relative flex flex-col items-center"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Live Miniature Hover Preview or Simple Tooltip */}
+      {appWindows.length > 0 ? (
+        <DockHoverPreview
+          manifest={manifest}
+          windows={appWindows}
+          isOpen={showPreview}
+          onFocusWindow={handleFocusWindow}
+          onCloseWindow={(id) => closeWindow(id)}
+          onPeekWindow={(id) => setPeekWindowId(id)}
+        />
+      ) : (
+        <div
+          role="tooltip"
+          className={`pointer-events-none absolute -top-9 z-50 rounded border border-border-subtle bg-surface-panel/95 px-2 py-0.5 text-[10px] font-mono tracking-tight text-content-primary shadow-lg backdrop-blur-md transition-all duration-150 ${
+            isHovered
+              ? 'opacity-100 -translate-y-1 scale-100'
+              : 'opacity-0 translate-y-1 scale-95'
+          }`}
+        >
+          {manifest.name}
+        </div>
+      )}
 
       {/* Kinetic Magnetic Icon Button */}
       <motion.button
         ref={itemRef}
         style={{ width: size, height: size }}
         onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         onFocus={() => setIsHovered(true)}
         onBlur={() => setIsHovered(false)}
         whileTap={{ scale: 0.9 }}
