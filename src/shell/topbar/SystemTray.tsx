@@ -13,12 +13,14 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  PenLine,
 } from 'lucide-react';
 import { useThemeStore } from '@core/theme/themeStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
+import { useScratchpadStore } from '@core/scratchpad/scratchpadStore';
 import { PomodoroWidget } from './PomodoroWidget';
 
 export const SystemTray: React.FC = () => {
@@ -190,6 +192,18 @@ export const SystemTray: React.FC = () => {
         className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-accent-primary transition-colors"
       >
         <Sparkles className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Quick Scratchpad Trigger */}
+      <button
+        onClick={() => {
+          soundEngine.playClick();
+          useScratchpadStore.getState().toggleOpen();
+        }}
+        title="Quick Scratchpad (Ctrl+\)"
+        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+      >
+        <PenLine className="h-3.5 w-3.5" />
       </button>
 
       {/* Control Center Trigger */}

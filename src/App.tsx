@@ -22,6 +22,7 @@ import { FlowDropModal } from '@shell/airdrop/FlowDropModal';
 import { FancyZonesOverlay } from '@shell/window/FancyZonesOverlay';
 import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
 import { FocusModeOverlay } from '@shell/focus/FocusModeOverlay';
+import { ScratchpadDrawer } from '@shell/scratchpad/ScratchpadDrawer';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -32,6 +33,7 @@ import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useCaptureStore } from '@shell/capture/captureStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
+import { useScratchpadStore } from '@core/scratchpad/scratchpadStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { soundEngine } from '@core/audio/soundEngine';
@@ -117,6 +119,13 @@ export const App: React.FC = () => {
       if (e.altKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         useStageManagerStore.getState().toggleStageManager();
+        return;
+      }
+
+      // Quick Scratchpad Drawer: Ctrl+\
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
+        e.preventDefault();
+        useScratchpadStore.getState().toggleOpen();
         return;
       }
     };
@@ -209,6 +218,9 @@ export const App: React.FC = () => {
 
       {/* Global Distraction-Free Focus Mode Overlay */}
       <FocusModeOverlay />
+
+      {/* Raycast-style Quick Scratchpad Drawer */}
+      <ScratchpadDrawer />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />

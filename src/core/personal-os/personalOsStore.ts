@@ -74,10 +74,12 @@ export interface PersonalOsState {
   // Missions
   toggleMissionObjective: (missionId: string, objectiveId: string) => void;
   updateMissionStatus: (missionId: string, status: MissionStatus) => void;
+  addMission: (title: string, tagline?: string) => void;
 
   // Projects
   toggleProjectMilestone: (projectId: string, milestoneId: string) => void;
   addProjectBug: (projectId: string, description: string, severity: 'critical' | 'moderate' | 'minor') => void;
+  addProjectIssue: (projectId: string, title: string) => void;
   resolveProjectBug: (projectId: string, bugId: string) => void;
 
   // Academics
@@ -89,6 +91,7 @@ export interface PersonalOsState {
   toggleDsaStatus: (questionId: string) => void;
   toggleDsaFavorite: (questionId: string) => void;
   updateDsaMistake: (questionId: string, takeaways: string) => void;
+  addDsaMistakeNote: (title: string, mistake: string) => void;
 
   // Career
   updateCompanyStage: (companyId: string, stage: CareerStage) => void;
@@ -197,6 +200,33 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     });
   },
 
+  addMission: (title, tagline) => {
+    set((state) => {
+      const newMission: Mission = {
+        id: `mission-${Date.now()}`,
+        title,
+        tagline: tagline || 'Captured via Quick Scratchpad',
+        category: 'engineering',
+        status: 'active',
+        priority: 'high',
+        progress: 0,
+        deadline: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0] || '2026-09-30',
+        estimatedCompletion: '1-2 weeks',
+        objectives: [
+          { id: `obj-${Date.now()}-1`, text: 'Initial technical specification & architecture', completed: false },
+          { id: `obj-${Date.now()}-2`, text: 'Core implementation and verification', completed: false },
+        ],
+        projectIds: [],
+        skillIds: [],
+        dependencies: [],
+        resources: [],
+      };
+      const missions = [newMission, ...state.missions];
+      saveState({ ...state, missions });
+      return { missions };
+    });
+  },
+
   // Projects
   toggleProjectMilestone: (projectId, milestoneId) => {
     set((state) => {
@@ -208,6 +238,25 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
         const completedCount = milestones.filter((m) => m.completed).length;
         const progress = Math.round((completedCount / (milestones.length || 1)) * 100);
         return { ...p, milestones, progress };
+      });
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
+  addProjectIssue: (projectId, title) => {
+    set((state) => {
+      const targetProjectId = projectId || state.projects[0]?.id;
+      if (!targetProjectId) return state;
+      const projects = state.projects.map((p) => {
+        if (p.id !== targetProjectId) return p;
+        return {
+          ...p,
+          knownBugs: [
+            ...p.knownBugs,
+            { id: `kb-${Date.now()}`, description: title, severity: 'moderate' as const, status: 'open' as const },
+          ],
+        };
       });
       saveState({ ...state, projects });
       return { projects };
@@ -326,6 +375,25 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
       const dsaQuestions = state.dsaQuestions.map((q) =>
         q.id === questionId ? { ...q, mistakeTakeaways: takeaways } : q
       );
+      saveState({ ...state, dsaQuestions });
+      return { dsaQuestions };
+    });
+  },
+
+  addDsaMistakeNote: (title, mistake) => {
+    set((state) => {
+      const newQuestion: DsaQuestion = {
+        id: `dsa-note-${Date.now()}`,
+        title,
+        difficulty: 'Medium',
+        pattern: 'Sliding Window',
+        platform: 'LeetCode',
+        status: 'review_needed',
+        notes: 'Captured via Quick Scratchpad',
+        mistakeTakeaways: mistake,
+        isFavorite: true,
+      };
+      const dsaQuestions = [newQuestion, ...state.dsaQuestions];
       saveState({ ...state, dsaQuestions });
       return { dsaQuestions };
     });
