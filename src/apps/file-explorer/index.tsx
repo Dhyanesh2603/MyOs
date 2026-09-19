@@ -18,6 +18,7 @@ import {
   Music as MusicIcon,
   Image as ImageIcon,
   Download,
+  Eye,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
@@ -26,6 +27,7 @@ import { useWindowStore } from '@core/window/windowStore';
 import { openVFSFile } from '@core/vfs/fileAssociations';
 import { downloadVFSToPC, importHostFileToVFS } from '@core/vfs/hostBridge';
 import { normalizePath } from '@core/vfs/vfsService';
+import { useQuickLookStore } from '@core/quicklook/quickLookStore';
 
 const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const { nodes, mkdir, writeFile, deleteNode } = useVFSStore();
@@ -62,6 +64,18 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
       setSelectedPath(null);
     }
   };
+
+  // Keyboard shortcut: Spacebar opens Quick Look
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ' && selectedPath && nodes[selectedPath]?.type === 'file') {
+        e.preventDefault();
+        useQuickLookStore.getState().openQuickLook(selectedPath);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPath, nodes]);
 
   // Get nodes in current directory
   const currentNodes = Object.values(nodes).filter(
@@ -291,14 +305,24 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             </button>
 
             {selectedPath && nodes[selectedPath]?.type === 'file' && (
-              <button
-                onClick={() => downloadVFSToPC(selectedPath)}
-                title="Download to Physical PC"
-                className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
-              >
-                <Download className="h-3 w-3 text-emerald-400" />
-                <span className="hidden sm:inline">Export</span>
-              </button>
+              <>
+                <button
+                  onClick={() => useQuickLookStore.getState().openQuickLook(selectedPath)}
+                  title="Quick Look Preview (Space)"
+                  className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+                >
+                  <Eye className="h-3 w-3 text-cyan-400" />
+                  <span className="hidden sm:inline">Preview</span>
+                </button>
+                <button
+                  onClick={() => downloadVFSToPC(selectedPath)}
+                  title="Download to Physical PC"
+                  className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] font-mono text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+                >
+                  <Download className="h-3 w-3 text-emerald-400" />
+                  <span className="hidden sm:inline">Export</span>
+                </button>
+              </>
             )}
 
             {selectedPath && (

@@ -18,7 +18,9 @@ import {
   Download,
   Palette,
   Image as ImageIcon,
+  Eye,
 } from 'lucide-react';
+import { useQuickLookStore } from '@core/quicklook/quickLookStore';
 
 interface DesktopShortcut {
   id: string;
@@ -170,6 +172,16 @@ export const DesktopIcons: React.FC = () => {
               {
                 type: 'item' as const,
                 item: {
+                  id: 'quick-look',
+                  label: 'Quick Look Preview',
+                  icon: Eye,
+                  shortcut: 'Space',
+                  action: () => useQuickLookStore.getState().openQuickLook(item.target),
+                },
+              },
+              {
+                type: 'item' as const,
+                item: {
                   id: 'download-pc',
                   label: 'Download to PC',
                   icon: Download,
@@ -216,6 +228,9 @@ export const DesktopIcons: React.FC = () => {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleOpen(item);
+              } else if (e.key === ' ' && item.type === 'file') {
+                e.preventDefault();
+                useQuickLookStore.getState().openQuickLook(item.target);
               }
             }}
             onContextMenu={(e) => handleContextMenu(e, item)}

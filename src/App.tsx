@@ -16,6 +16,7 @@ import { ScreenCaptureOverlay } from '@shell/capture/ScreenCaptureOverlay';
 import { ScreenSaver } from '@shell/desktop/screensaver/ScreenSaver';
 import { CopilotDrawer } from '@shell/copilot/CopilotDrawer';
 import { CreateWebAppModal } from '@shell/dialogs/CreateWebAppModal';
+import { QuickLookModal } from '@shell/quicklook/QuickLookModal';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
@@ -171,6 +172,9 @@ export const App: React.FC = () => {
 
       {/* 1-Click PWA Web App Creator Modal */}
       <CreateWebAppModal />
+
+      {/* macOS-style Spacebar Quick Look Modal */}
+      <QuickLookModal />
 
       {/* Lock Screen & Session Auth Overlay */}
       <LockScreen />
