@@ -11,8 +11,10 @@ import { NotificationCenter } from '@shell/notifications/NotificationCenter';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { TaskSwitcher } from '@shell/switcher/TaskSwitcher';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
+import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { useSessionStore } from '@core/session/sessionStore';
+import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 
 export const App: React.FC = () => {
@@ -44,9 +46,23 @@ export const App: React.FC = () => {
 
   const windows = useWindowStore((state) => state.windows);
   const windowList = Object.values(windows);
+  const { brightness, isNightShift } = useControlCenterStore();
 
   return (
     <DesktopSurface>
+      {/* Screen Brightness & Night Shift Hardware Filter Overlay */}
+      {(brightness < 1 || isNightShift) && (
+        <div
+          className="pointer-events-none fixed inset-0 z-[8900] transition-colors duration-200"
+          style={{
+            backgroundColor: isNightShift
+              ? `rgba(255, 140, 0, ${0.12 + (1 - brightness) * 0.25})`
+              : `rgba(0, 0, 0, ${1 - brightness})`,
+            mixBlendMode: isNightShift ? 'multiply' : 'normal',
+          }}
+        />
+      )}
+
       {/* Unified Global Top Menu Bar */}
       <TopMenuBar />
 
@@ -67,6 +83,9 @@ export const App: React.FC = () => {
       {/* Notifications & System Shade */}
       <NotificationToaster />
       <NotificationCenter />
+
+      {/* Control Center Glass Shade */}
+      <ControlCenterShade />
 
       {/* Visual Alt+Tab Task Switcher */}
       <TaskSwitcher />

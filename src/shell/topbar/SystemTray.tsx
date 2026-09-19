@@ -11,10 +11,12 @@ import {
   VolumeX,
   Calendar as CalendarIcon,
   ShieldCheck,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useThemeStore } from '@core/theme/themeStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
+import { useControlCenterStore } from '@core/system/controlCenterStore';
 
 export const SystemTray: React.FC = () => {
   const { themeId, setTheme } = useThemeStore();
@@ -170,6 +172,19 @@ export const SystemTray: React.FC = () => {
         {unreadCount > 0 && (
           <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
         )}
+      </button>
+
+      {/* Control Center Trigger */}
+      <button
+        data-control-center-trigger
+        onClick={() => {
+          soundEngine.playClick();
+          useControlCenterStore.getState().toggleControlCenter();
+        }}
+        title="Control Center"
+        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+      >
+        <SlidersHorizontal className="h-3.5 w-3.5" />
       </button>
 
       {/* Live Date & Clock with Popover Calendar */}
