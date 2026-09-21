@@ -58,10 +58,28 @@ export interface ChangelogEntry {
   notes: string[];
 }
 
+export interface DiffLine {
+  type: 'add' | 'delete' | 'context';
+  oldLine?: number;
+  newLine?: number;
+  content: string;
+}
+
+export interface FileDiff {
+  filename: string;
+  additions: number;
+  deletions: number;
+  status: 'modified' | 'added' | 'deleted';
+  lines: DiffLine[];
+}
+
 export interface GitCommitRecord {
   hash: string;
   message: string;
   date: string;
+  branch?: string;
+  author?: string;
+  diffs?: FileDiff[];
 }
 
 export interface Project {

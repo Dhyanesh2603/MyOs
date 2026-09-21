@@ -3,6 +3,7 @@ import {
   FolderGit2,
   ExternalLink,
   GitCommit,
+  GitBranch,
   Bug,
   CheckCircle2,
   Circle,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { usePersonalOsStore } from '@core/personal-os/personalOsStore';
 import { soundEngine } from '@core/audio/soundEngine';
+import { GitVisualizerModal } from '../components/GitVisualizerModal';
 
 export const ProjectsView: React.FC = () => {
   const {
@@ -29,6 +31,8 @@ export const ProjectsView: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0]?.id || '');
   const [newBugText, setNewBugText] = useState('');
   const [newBugSeverity, setNewBugSeverity] = useState<'critical' | 'moderate' | 'minor'>('moderate');
+  const [isGitModalOpen, setIsGitModalOpen] = useState(false);
+  const [selectedCommitHash, setSelectedCommitHash] = useState<string | undefined>(undefined);
 
   const activeProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
   const associatedMission = missions.find((m) => m.id === activeProject?.missionId);
@@ -362,13 +366,36 @@ export const ProjectsView: React.FC = () => {
                     Recent Commits & Versions
                   </h4>
                 </div>
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setSelectedCommitHash(undefined);
+                    setIsGitModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-mono text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all shadow-sm"
+                >
+                  <GitBranch className="h-3 w-3" />
+                  <span>Git Tree & Diff</span>
+                </button>
               </div>
 
-              <div className="mt-3.5 flex flex-col gap-2">
+              <div className="mt-3.5 flex flex-col gap-1.5">
                 {activeProject.recentCommits.map((c) => (
-                  <div key={c.hash} className="flex items-center justify-between text-xs font-mono text-neutral-400">
-                    <span className="truncate max-w-[220px] text-neutral-300">{c.message}</span>
-                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px]">{c.hash}</span>
+                  <div
+                    key={c.hash}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      setSelectedCommitHash(c.hash);
+                      setIsGitModalOpen(true);
+                    }}
+                    className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.01] p-2 text-xs font-mono text-neutral-400 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04] transition-all cursor-pointer"
+                  >
+                    <span className="truncate max-w-[220px] text-neutral-300 group-hover:text-emerald-300 transition-colors">
+                      {c.message}
+                    </span>
+                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-neutral-300 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors">
+                      {c.hash}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -387,6 +414,15 @@ export const ProjectsView: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Git Branch Visualizer & Code Diff Modal */}
+      {isGitModalOpen && activeProject && (
+        <GitVisualizerModal
+          project={activeProject}
+          initialCommitHash={selectedCommitHash}
+          onClose={() => setIsGitModalOpen(false)}
+        />
       )}
     </div>
   );
