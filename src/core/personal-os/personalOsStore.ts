@@ -92,6 +92,14 @@ export interface PersonalOsState {
   toggleDsaFavorite: (questionId: string) => void;
   updateDsaMistake: (questionId: string, takeaways: string) => void;
   addDsaMistakeNote: (title: string, mistake: string) => void;
+  addDsaQuestion: (question: Omit<DsaQuestion, 'id'>) => void;
+  updateDsaQuestion: (questionId: string, updates: Partial<DsaQuestion>) => void;
+  deleteDsaQuestion: (questionId: string) => void;
+
+  // Skills
+  addSkill: (skill: Omit<SkillItem, 'id'>) => void;
+  updateSkill: (skillId: string, updates: Partial<SkillItem>) => void;
+  deleteSkill: (skillId: string) => void;
 
   // Career
   updateCompanyStage: (companyId: string, stage: CareerStage) => void;
@@ -396,6 +404,66 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
       const dsaQuestions = [newQuestion, ...state.dsaQuestions];
       saveState({ ...state, dsaQuestions });
       return { dsaQuestions };
+    });
+  },
+
+  addDsaQuestion: (question) => {
+    set((state) => {
+      const newQuestion: DsaQuestion = {
+        ...question,
+        id: `dsa-q-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      };
+      const dsaQuestions = [newQuestion, ...state.dsaQuestions];
+      saveState({ ...state, dsaQuestions });
+      return { dsaQuestions };
+    });
+  },
+
+  updateDsaQuestion: (questionId, updates) => {
+    set((state) => {
+      const dsaQuestions = state.dsaQuestions.map((q) =>
+        q.id === questionId ? { ...q, ...updates } : q
+      );
+      saveState({ ...state, dsaQuestions });
+      return { dsaQuestions };
+    });
+  },
+
+  deleteDsaQuestion: (questionId) => {
+    set((state) => {
+      const dsaQuestions = state.dsaQuestions.filter((q) => q.id !== questionId);
+      saveState({ ...state, dsaQuestions });
+      return { dsaQuestions };
+    });
+  },
+
+  addSkill: (skill) => {
+    set((state) => {
+      const newSkill: SkillItem = {
+        ...skill,
+        id: `sk-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      };
+      const skills = [newSkill, ...state.skills];
+      saveState({ ...state, skills });
+      return { skills };
+    });
+  },
+
+  updateSkill: (skillId, updates) => {
+    set((state) => {
+      const skills = state.skills.map((s) =>
+        s.id === skillId ? { ...s, ...updates } : s
+      );
+      saveState({ ...state, skills });
+      return { skills };
+    });
+  },
+
+  deleteSkill: (skillId) => {
+    set((state) => {
+      const skills = state.skills.filter((s) => s.id !== skillId);
+      saveState({ ...state, skills });
+      return { skills };
     });
   },
 
