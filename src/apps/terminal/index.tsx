@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { executeCommand } from './shell';
+import { vfs } from '@core/vfs/vfsService';
 
 interface TerminalBlock {
   id: string;
@@ -19,6 +20,12 @@ interface TerminalBlock {
   timestamp: string;
   durationMs: number;
 }
+
+const COMMAND_SUGGESTIONS = [
+  'help', 'pwd', 'ls', 'cd', 'cat', 'touch', 'mkdir', 'rm',
+  'echo', 'tree', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq',
+  'tr', 'eval', 'run', 'node', 'ps', 'kill', 'pkg', 'clear',
+];
 
 const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
   const [cwd, setCwd] = useState('/home/user');
@@ -99,6 +106,55 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       } else {
         setHistoryIdx(nextIdx);
         setInputVal(commandHistory[nextIdx] ?? '');
+      }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const current = inputVal;
+      if (!current) return;
+      const parts = current.split(' ');
+      if (parts.length === 1) {
+        const prefix = (parts[0] ?? '').toLowerCase();
+        const matches = COMMAND_SUGGESTIONS.filter((cmd) => cmd.startsWith(prefix));
+        if (matches.length === 1 && matches[0]) {
+          setInputVal(matches[0] + ' ');
+        } else if (matches.length > 1) {
+          let common = prefix;
+          let idx = prefix.length;
+          while (true) {
+            const nextChar = matches[0]?.[idx];
+            if (!nextChar) break;
+            if (matches.every((m) => m[idx] === nextChar)) {
+              common += nextChar;
+              idx++;
+            } else {
+              break;
+            }
+          }
+          setInputVal(common);
+        }
+      } else {
+        const lastPart = parts[parts.length - 1] ?? '';
+        try {
+          const isSlash = lastPart.includes('/');
+          let dirToSearch = cwd;
+          let filePrefix = lastPart;
+          if (isSlash) {
+            const lastSlash = lastPart.lastIndexOf('/');
+            const dirPart = lastPart.slice(0, lastSlash);
+            filePrefix = lastPart.slice(lastSlash + 1);
+            dirToSearch = dirPart.startsWith('/') ? dirPart : `${cwd}/${dirPart}`;
+          }
+          const nodes = await vfs.readDir(dirToSearch);
+          const matches = nodes.filter((n) => n.name.toLowerCase().startsWith(filePrefix.toLowerCase()));
+          if (matches.length === 1 && matches[0]) {
+            const completed = matches[0].name + (matches[0].type === 'directory' ? '/' : ' ');
+            const prefixPath = isSlash ? lastPart.slice(0, lastPart.lastIndexOf('/') + 1) : '';
+            parts[parts.length - 1] = prefixPath + completed;
+            setInputVal(parts.join(' '));
+          }
+        } catch {
+          // ignore autocomplete errors
+        }
       }
     }
   };
