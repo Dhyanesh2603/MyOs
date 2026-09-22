@@ -56,9 +56,9 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
   - **Campfire Crackle** — randomized impulse crackle chain
   - **White Noise** — flat-spectrum broadband noise
   - **Deep Space Drone** — slow beating sub-oscillators
-  - **Brown Noise** — Brownian motion synthesis
-  - **Server Room Hum** — 60 Hz / 120 Hz data center ambience
-  - **40 Hz Gamma Waves** — isochronic carrier for deep focus
+  - **Brown Noise** — Brownian motion synthesis ($1/f^2$ slope)
+  - **Server Room Hum** — 60 Hz / 120 Hz data center ambience with fan noise
+  - **40 Hz Gamma Waves** — isochronic carrier for cognitive deep focus
 - **Reactive Store Sync:** `ambientSoundStore` (Zustand) reflects engine state in real time via pub-sub — zero polling.
 - **Focus Mode Integration:** Ambient soundscape selector rail with Mute control appears inside the full-screen Focus Mode overlay.
 - **Control Center Integration:** Integrated soundscape selector with live volume adjustment.
@@ -130,9 +130,10 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 
 ### 19. Enhanced VFS Terminal Shell — Unix Pipeline Edition
 - **Unix-Style Pipe Engine:** Chain commands with `|` — e.g. `cat notes.txt | grep TODO | wc -l`.
-- **New Pipeline-Compatible Commands:** `grep <pattern>`, `wc [-l|-w|-c]`, `head [n]`, `tail [n]`, `sort`, `uniq`, `tr <from> <to>`.
+- **Pipeline-Compatible Filter Commands:** `grep <pattern>`, `wc [-l|-w|-c]`, `head [n]`, `tail [n]`, `sort`, `uniq`, `tr <from> <to>`.
 - **Visual Directory Tree (`tree`):** Renders the full VFS directory tree with ASCII art connectors (`├──`, `└──`, `│`) up to 5 levels deep.
-- **Existing Commands:** `ls`, `cd`, `cat`, `touch`, `mkdir`, `rm`, `echo`, `eval`, `run`, `ps`, `kill`, `pkg`, `clear`.
+- **Smart Tab Autocomplete:** Interactive Tab key completion for shell commands and relative/absolute VFS file paths with common prefix resolution.
+- **Command History:** Arrow Up and Arrow Down keys traverse recent command history buffer.
 
 ### 20. Universal Full-Text Search & VFS Content Indexer
 - **Deep File Inspection in Spotlight (`Ctrl + K`):** Indexes and searches the contents of all documents, code files, notes, and configs across the IndexedDB virtual file system.
@@ -213,11 +214,34 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 - **Missions as Engineering Campaigns:** Long-term strategic missions with milestones, dependencies, and resources.
 - **Deep Engineering Project Studio:** Architecture specs, roadmap milestones, bug log with severity tags, ideas scratchpad, Git commit activity, and release changelogs.
 - **Academic Workspace & Compliance Alerts:** Real-time course tracking with bold $\lt 75\%$ mandatory attendance warning banners and interactive CGPA simulator.
-- **Learning Hub & Dedicated DSA Workspace:** Track engineering skills across Systems, Frontend, Backend, and AI with a dedicated DSA pattern categorizer and mistake notebook.
 - **Career & Placement Command Dashboard:** Visual 6-stage Kanban recruitment pipeline, ATS resume versioning, interview rounds log, and portfolio readiness checklist.
 - **Daily Planner & Deep Work Stopwatch:** Morning priorities checklist, Deep Work stopwatch, evening reflections, and focus telemetry.
 - **Interactive Vector Knowledge Graph:** High-performance relational vector canvas visualizer interconnecting Projects, Skills, Subjects, Goals, and Companies.
 - **Distraction-Free Focus Mode:** One-click full-screen HUD with ambient soundscape selector, countdown timer, and milestone deliverables.
+
+### 34. Project Studio Git Visualizer & Code Diff Viewer
+- **Interactive Git Branch & Commit Graph:** Filter across all active branches (`main`, `feat/split-screen`, `feat/terminal-pipes`, `feat/ambient-audio`, `feat/spotlight-dev`) with visual SVG/node timeline connectors (`●───●───●`) and author metadata.
+- **Side-by-Side & Unified Diff Modes:** Toggle between **Unified** and **Split** (side-by-side) diff perspectives with dual line numbers.
+- **Syntax Highlighting & Patch Colors:** Additions (`+`) rendered in emerald green tint, deletions (`-`) in rose red tint, with context lines in neutral gray.
+- **Multi-File Tab Bar:** Fast switching between modified files with live addition (`+48`) and deletion (`-9`) counters.
+- **1-Click Copy Patch:** Copy formatted patch contents directly to clipboard with acoustic feedback.
+- **Project Studio Integration:** Click the "Git Tree & Diff" button or any individual commit pill in Project Studio to launch the full inspector modal.
+
+### 35. Fully Dynamic & Editable DSA Problem Tracker & Skill Matrix
+- **Complete DSA Problem CRUD:**
+  - **`+ Add Problem` Modal:** Add questions with Problem Title, Difficulty (*Easy*, *Medium*, *Hard*), Algorithmic Pattern (*Two Pointers*, *Sliding Window*, *Monotonic Stack*, *DP*, *Graphs*, *Trees*, etc.), Platform (*LeetCode*, *Codeforces*, *GFG*), Status (*Solved*, *Review Needed*, *Unsolved*), Time & Space Complexities, and Cognitive Traps / Takeaways.
+  - **In-Place Problem Editing (`Pencil`):** Edit any problem's metadata with pre-populated form values.
+  - **Problem Deletion (`Trash2`):** Delete entries with immediate reactive state update.
+  - **Favorites & Review Queue:** Toggle star favorites and flip status between Solved and Review Flagged.
+  - **Inline Architectural Takeaway Drawer:** Expandable mistake notes drawer per question with direct inline editing.
+- **Zero Hardcoded Metrics — Fully Dynamic Telemetry:**
+  - **Live Interview Readiness %:** Algorithmic calculation based on solved ratio $\min(100, \text{round}((\text{solved} / \text{total}) \times 100))$ with dynamic status assessment.
+  - **Dynamic Difficulty Breakdown Bar:** Real-time proportional bar showing Easy, Medium, and Hard counts as questions are added or modified.
+  - **Instant Search Bar:** Filter questions in real time by title, pattern, or notes.
+- **Skill Matrix Management:**
+  - **`+ Add Skill` Modal:** Add engineering skills with Name, Category (*systems*, *frontend*, *backend*, *ai_ml*, *dsa*, *devops*, *architecture*), Proficiency (*beginner* to *mastered*), interactive $0\% \to 100\%$ mastery slider, practice reps, and mastered topic tags.
+  - **Skill Editing & Deletion:** In-place edit and delete buttons on every skill card.
+  - **Full Persistence:** All additions, edits, and deletions persist across sessions via IndexedDB / `localStorage`.
 
 ---
 
@@ -225,12 +249,12 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 
 | Application | ID | Category | Description |
 | :--- | :--- | :--- | :--- |
-| **Personal OS** | `personal-os` | Productivity | Engineering control center answering "What should I work on next?" with missions, projects, and academics. |
+| **Personal OS** | `personal-os` | Productivity | Engineering control center with missions, project studio, git diff viewer, editable DSA tracker, and academics. |
 | **Browser** | `browser` | Productivity | Sandboxed in-OS web browser with multi-tabs, URL/search omnibox, and quick bookmarks. |
 | **Files** | `file-explorer` | Utilities | Arc-style Workspace sidebar, breadcrumbs, high-density table/grid views, VFS file creation/deletion, and host export. |
 | **Code Editor** | `code-editor` | Development | Monospaced editor with line numbers gutter, syntax detection, `Ctrl+S` VFS save, and integrated WebWorker execution console. |
 | **Notes** | `notes` | Productivity | Obsidian-inspired markdown notes with `#tags`, word count, reading time, edit vs reading view, and VFS file loading. |
-| **Terminal** | `terminal` | Development | `flowsh` Unix Pipeline Edition — pipes, `grep`, `wc`, `head`, `tail`, `sort`, `tree`, `eval`, `run`, `pkg`. |
+| **Terminal** | `terminal` | Development | `flowsh` Unix Pipeline Edition — pipes, `grep`, `wc`, `head`, `tail`, `sort`, `tree`, Tab autocomplete, `eval`, `run`, `pkg`. |
 | **FlowShot** | `flowshot` | Productivity | Screen capture and tactile markup studio with arrows, boxes, text, highlighters, blur tool, and direct export. |
 | **Flow 2048** | `retro-2048` | Utilities | Tactile 4x4 sliding tile numerical puzzle with procedural Web Audio feedback and score tracking. |
 | **FlowSweeper** | `retro-sweeper` | Utilities | Minimalist tactile Minesweeper with classic logic, safe first clicks, and clean geometry. |
@@ -273,6 +297,7 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 | `Alt + ]` / `Alt + →` | Active Window | Snap window to right 50% split screen |
 | `Alt + Enter` / `Alt + ↑` | Active Window | Toggle window maximize / restore |
 | `Ctrl + S` / `Cmd + S` | Code / Notes | Save active file directly to VFS |
+| `Tab` | Terminal | Autocomplete command names and VFS file/directory paths |
 | `Esc` | Modals | Close Command Palette, Menus, FlowShot, Copilot, Quick Look, or Calendar |
 
 ---
