@@ -18,6 +18,8 @@ import {
   FolderOpen,
   AlertCircle,
   Laptop,
+  Play,
+  Info,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { useVFSStore } from '@core/vfs/vfsStore';
@@ -43,11 +45,60 @@ interface BrowserTab {
 const DEFAULT_BOOKMARKS = [
   { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system', mode: 'embed' as BrowserMode },
   { name: 'Hacker News', url: 'https://news.ycombinator.com', mode: 'embed' as BrowserMode },
+  { name: 'YouTube', url: 'flow://youtube', mode: 'embed' as BrowserMode },
   { name: 'MDN Web Docs', url: 'https://developer.mozilla.org/en-US/', mode: 'reader' as BrowserMode },
   { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/', mode: 'embed' as BrowserMode },
   { name: 'Localhost:3000', url: 'http://localhost:3000', mode: 'embed' as BrowserMode },
   { name: 'Localhost:5173', url: 'http://localhost:5173', mode: 'embed' as BrowserMode },
 ];
+
+/**
+ * Parses and extracts a YouTube video ID from various URL formats.
+ */
+function extractYouTubeVideoId(input: string): string | null {
+  try {
+    const raw = input.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) {
+      return raw;
+    }
+    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
+    if (url.hostname.includes('youtube.com')) {
+      const v = url.searchParams.get('v');
+      if (v && v.length === 11) return v;
+      if (url.pathname.startsWith('/embed/')) {
+        return url.pathname.split('/')[2]?.slice(0, 11) || null;
+      }
+      if (url.pathname.startsWith('/shorts/')) {
+        return url.pathname.split('/')[2]?.slice(0, 11) || null;
+      }
+      if (url.pathname.startsWith('/v/')) {
+        return url.pathname.split('/')[2]?.slice(0, 11) || null;
+      }
+    } else if (url.hostname.includes('youtu.be')) {
+      const id = url.pathname.replace(/^\//, '').slice(0, 11);
+      if (id.length === 11) return id;
+    }
+  } catch {
+    // Ignore invalid URL
+  }
+  return null;
+}
+
+/**
+ * Checks if a URL represents the YouTube root home page.
+ */
+function isYouTubeHome(input: string): boolean {
+  try {
+    const raw = input.trim();
+    if (raw.toLowerCase() === 'youtube' || raw.toLowerCase() === 'yt') return true;
+    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
+    const host = url.hostname.replace(/^www\./, '').toLowerCase();
+    const isRoot = url.pathname === '/' || url.pathname === '';
+    return (host === 'youtube.com' || host === 'm.youtube.com') && isRoot && !url.searchParams.has('v');
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Escapes raw strings for safe inclusion in generated HTML.
@@ -108,7 +159,6 @@ function buildReaderHtml(title: string, rawContent: string, sourceUrl: string): 
     } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       htmlParts.push(`<li>${escapeHtml(trimmed.slice(2))}</li>`);
     } else if (trimmed.startsWith('![')) {
-      // Basic image matcher: ![alt](url)
       const match = trimmed.match(/^!\[(.*?)\]\((.*?)\)/);
       if (match && match[2]) {
         htmlParts.push(`<img src="${escapeHtml(match[2])}" alt="${escapeHtml(match[1] || '')}" loading="lazy" />`);
@@ -116,11 +166,8 @@ function buildReaderHtml(title: string, rawContent: string, sourceUrl: string): 
         htmlParts.push(`<p>${escapeHtml(trimmed)}</p>`);
       }
     } else {
-      // Inline formatting: links [text](url) and `code`
       let formatted = escapeHtml(trimmed);
-      // Inline code
       formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-      // Simple links
       formatted = formatted.replace(
         /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
@@ -293,6 +340,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
   const [inputUrl, setInputUrl] = useState<string>('flow://start');
 
+  // Dedicated YouTube Hub state
+  const [ytVideoId, setYtVideoId] = useState<string>('jfKfPfyJRdk');
+  const [ytInputUrl, setYtInputUrl] = useState<string>('');
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // VFS & Device Storage stores
@@ -327,7 +378,20 @@ export const BrowserApp: React.FC<AppProps> = () => {
         title = 'Start Page';
         mode = 'embed';
       }
-      // 2. VFS / Device file: starts with /device/, /home/, file:///, or vfs:///
+      // 2. YouTube Portal or Root YouTube Home (bypasses X-Frame-Options SAMEORIGIN block)
+      else if (finalUrl === 'flow://youtube' || isYouTubeHome(finalUrl)) {
+        finalUrl = 'flow://youtube';
+        title = 'YouTube';
+        mode = 'embed';
+      }
+      // 3. YouTube Video (watch?v=, youtu.be/, shorts/, embed/)
+      else if (extractYouTubeVideoId(finalUrl)) {
+        const videoId = extractYouTubeVideoId(finalUrl)!;
+        finalUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+        title = 'YouTube Player';
+        mode = 'embed';
+      }
+      // 4. VFS / Device file: starts with /device/, /home/, file:///, or vfs:///
       else if (
         finalUrl.startsWith('/device/') ||
         finalUrl.startsWith('/home/') ||
@@ -358,7 +422,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
           srcDoc = `<!DOCTYPE html><html><body style="background:#0f141c;color:#f87171;font-family:sans-serif;padding:30px;"><h3>File Not Found</h3><p>Could not load ${escapeHtml(cleanPath)} from VFS.</p></body></html>`;
         }
       }
-      // 3. Web URL or Search
+      // 5. Standard Web URL or Search
       else {
         if (finalUrl.startsWith('http://') || finalUrl.startsWith('https://')) {
           // Valid URL
@@ -463,7 +527,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
    * Toggle between Direct Embed and Reader mode for web URLs
    */
   const handleToggleReader = () => {
-    if (activeTab.url === 'flow://start') return;
+    if (activeTab.url === 'flow://start' || activeTab.url === 'flow://youtube') return;
     const targetMode: BrowserMode = activeTab.mode === 'reader' ? 'embed' : 'reader';
     handleNavigate(activeTab.url, targetMode, false);
   };
@@ -608,6 +672,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
       <div className="flex h-9 items-center border-b border-border-subtle bg-surface-overlay/90 px-2 gap-1 overflow-x-auto">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
+          const isYouTubeTab = tab.url === 'flow://youtube' || tab.url.includes('youtube-nocookie.com');
           return (
             <div
               key={tab.id}
@@ -619,7 +684,9 @@ export const BrowserApp: React.FC<AppProps> = () => {
               }`}
             >
               <div className="flex items-center gap-1.5 truncate">
-                {tab.mode === 'reader' ? (
+                {isYouTubeTab ? (
+                  <Play className="h-3 w-3 shrink-0 text-red-500 fill-red-500" />
+                ) : tab.mode === 'reader' ? (
                   <Zap className="h-3 w-3 shrink-0 text-amber-400" />
                 ) : tab.mode === 'vfs' || tab.mode === 'local' ? (
                   <Laptop className="h-3 w-3 shrink-0 text-emerald-400" />
@@ -704,6 +771,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
           <div className="flex items-center gap-1.5 text-content-tertiary mr-1.5">
             {inputUrl.startsWith('https://') ? (
               <Lock className="h-3 w-3 text-emerald-400" />
+            ) : inputUrl.startsWith('flow://youtube') || inputUrl.includes('youtube') ? (
+              <Play className="h-3 w-3 text-red-500 fill-red-500" />
             ) : inputUrl.startsWith('flow://') ? (
               <ShieldCheck className="h-3 w-3 text-accent-primary" />
             ) : inputUrl.startsWith('file:///') || inputUrl.startsWith('/device/') ? (
@@ -716,30 +785,32 @@ export const BrowserApp: React.FC<AppProps> = () => {
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            placeholder="Enter web address, search query, or file path (/device/...)..."
+            placeholder="Enter web address, YouTube URL, search query, or file path (/device/...)..."
             className="w-full bg-transparent font-mono text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
           />
 
           {/* Mode Switcher inside Omnibox */}
-          {activeTab.url !== 'flow://start' && !activeTab.url.startsWith('file:///') && (
-            <button
-              type="button"
-              onClick={handleToggleReader}
-              title={
-                activeTab.mode === 'reader'
-                  ? 'Switch to Direct Iframe Embed'
-                  : 'Switch to Reader Engine (Bypasses iframe blockers)'
-              }
-              className={`ml-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                activeTab.mode === 'reader'
-                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                  : 'bg-surface-subtle text-content-secondary hover:text-content-primary hover:bg-surface-subtle/80'
-              }`}
-            >
-              <Zap className="h-2.5 w-2.5" />
-              <span>{activeTab.mode === 'reader' ? 'Reader Active' : 'Reader'}</span>
-            </button>
-          )}
+          {activeTab.url !== 'flow://start' &&
+            activeTab.url !== 'flow://youtube' &&
+            !activeTab.url.startsWith('file:///') && (
+              <button
+                type="button"
+                onClick={handleToggleReader}
+                title={
+                  activeTab.mode === 'reader'
+                    ? 'Switch to Direct Iframe Embed'
+                    : 'Switch to Reader Engine (Bypasses iframe blockers)'
+                }
+                className={`ml-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                  activeTab.mode === 'reader'
+                    ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                    : 'bg-surface-subtle text-content-secondary hover:text-content-primary hover:bg-surface-subtle/80'
+                }`}
+              >
+                <Zap className="h-2.5 w-2.5" />
+                <span>{activeTab.mode === 'reader' ? 'Reader Active' : 'Reader'}</span>
+              </button>
+            )}
         </form>
 
         {/* Quick Action: Open Host Device File */}
@@ -773,9 +844,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
           <button
             key={bm.name}
             onClick={() => handleNavigate(bm.url, bm.mode)}
-            className="rounded px-2 py-0.5 hover:bg-surface-subtle hover:text-content-primary transition-colors font-medium whitespace-nowrap"
+            className="flex items-center gap-1 rounded px-2 py-0.5 hover:bg-surface-subtle hover:text-content-primary transition-colors font-medium whitespace-nowrap"
           >
-            {bm.name}
+            {bm.name === 'YouTube' ? (
+              <Play className="h-2.5 w-2.5 fill-red-500 text-red-500" />
+            ) : null}
+            <span>{bm.name}</span>
           </button>
         ))}
 
@@ -803,7 +877,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                 FlowOS Web & Device Browser
               </h2>
               <p className="mt-1 text-xs text-content-tertiary">
-                Direct Iframe Web Embed, Bypass Reader Engine, and Real Host File Access.
+                Direct Iframe Web Embed, Bypass Reader Engine, YouTube Player, and Real Host File Access.
               </p>
 
               {/* Start Page Search Omnibox */}
@@ -837,11 +911,19 @@ export const BrowserApp: React.FC<AppProps> = () => {
                       className="flex items-center gap-2.5 rounded-lg border border-border-subtle bg-surface-subtle/30 p-2.5 hover:border-accent-primary/40 hover:bg-surface-subtle transition-all text-left group"
                     >
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-surface-panel border border-border-subtle text-accent-primary group-hover:scale-105 transition-transform">
-                        {bm.mode === 'reader' ? <Zap className="h-3.5 w-3.5 text-amber-400" /> : <Globe className="h-3.5 w-3.5" />}
+                        {bm.name === 'YouTube' ? (
+                          <Play className="h-3.5 w-3.5 fill-red-500 text-red-500" />
+                        ) : bm.mode === 'reader' ? (
+                          <Zap className="h-3.5 w-3.5 text-amber-400" />
+                        ) : (
+                          <Globe className="h-3.5 w-3.5" />
+                        )}
                       </div>
                       <div className="truncate">
                         <div className="font-medium text-xs text-content-primary truncate">{bm.name}</div>
-                        <div className="text-[10px] text-content-tertiary truncate">{bm.url.replace(/^https?:\/\//, '')}</div>
+                        <div className="text-[10px] text-content-tertiary truncate">
+                          {bm.url === 'flow://youtube' ? 'Video Player Hub' : bm.url.replace(/^https?:\/\//, '')}
+                        </div>
                       </div>
                     </button>
                   ))}
@@ -915,12 +997,153 @@ export const BrowserApp: React.FC<AppProps> = () => {
                   <span>Full Iframe Sandbox</span>
                 </div>
                 <div className="flex items-center gap-1">
+                  <Play className="h-3.5 w-3.5 text-red-500 fill-red-500" />
+                  <span>YouTube Embed API</span>
+                </div>
+                <div className="flex items-center gap-1">
                   <Zap className="h-3.5 w-3.5 text-amber-400" />
                   <span>Jina Reader Engine</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Laptop className="h-3.5 w-3.5 text-emerald-400" />
                   <span>W3C File System Access</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : activeTab.url === 'flow://youtube' ? (
+          /* FlowOS YouTube Portal */
+          <div className="flex h-full w-full flex-col bg-surface-panel p-4 overflow-y-auto">
+            <div className="max-w-4xl w-full mx-auto flex flex-col gap-4">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm">
+                    <Play className="h-4 w-4 fill-white ml-0.5" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-sm text-content-primary">FlowOS YouTube Player</h2>
+                    <p className="text-[11px] text-content-tertiary">
+                      Official Embed API Player for Sandboxed OS
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href="https://www.youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-subtle px-3 py-1.5 text-[11px] font-medium text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-colors"
+                >
+                  <span>Open Full YouTube.com</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+
+              {/* URL / Search input */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const parsed = extractYouTubeVideoId(ytInputUrl);
+                  if (parsed) {
+                    setYtVideoId(parsed);
+                    setYtInputUrl('');
+                  } else if (ytInputUrl.trim()) {
+                    handleNavigate(
+                      `https://html.duckduckgo.com/html/?q=${encodeURIComponent(ytInputUrl + ' site:youtube.com')}`
+                    );
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <div className="flex flex-1 items-center rounded-lg border border-border-subtle bg-surface-subtle/50 px-3 py-1.5 focus-within:border-red-500">
+                  <Search className="h-3.5 w-3.5 text-content-tertiary mr-2" />
+                  <input
+                    type="text"
+                    value={ytInputUrl}
+                    onChange={(e) => setYtInputUrl(e.target.value)}
+                    placeholder="Paste any YouTube URL (e.g. https://www.youtube.com/watch?v=... or youtu.be/...)..."
+                    className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-1.5 text-xs font-medium text-white transition-colors shadow-sm cursor-pointer"
+                >
+                  <Play className="h-3.5 w-3.5 fill-white" />
+                  <span>Play Video</span>
+                </button>
+              </form>
+
+              {/* Active Player */}
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border-subtle bg-black shadow-lg">
+                <iframe
+                  key={ytVideoId}
+                  src={`https://www.youtube-nocookie.com/embed/${ytVideoId}?autoplay=1&enablejsapi=1`}
+                  title="YouTube Video Player"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full border-none"
+                />
+              </div>
+
+              {/* Curated Channels / Quick Play */}
+              <div>
+                <div className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider mb-2">
+                  Featured & Instant Streams
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {[
+                    { title: 'Lofi Girl - Relax / Study Beats', id: 'jfKfPfyJRdk', tag: 'Lo-Fi Radio' },
+                    { title: 'Fireship - Linux in 100 Seconds', id: 'rrB13utjYV4', tag: 'Dev / Tech' },
+                    { title: 'Synthwave Radio - Chill Synth Vibes', id: '4xDzrJKXOOY', tag: 'Music Stream' },
+                    { title: 'Chillhop Music - Jazzy Beats', id: '5yx6BWlEVcY', tag: 'Chillhop' },
+                    { title: 'Veritasium - Illusion of Speed', id: 'A5w-dEgEx10', tag: 'Science' },
+                    { title: 'The History of Linux OS', id: '2j_g2W9h9-E', tag: 'Documentary' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setYtVideoId(item.id)}
+                      className={`flex flex-col rounded-lg border p-2.5 text-left transition-all group ${
+                        ytVideoId === item.id
+                          ? 'border-red-500/50 bg-red-500/10'
+                          : 'border-border-subtle bg-surface-subtle/30 hover:border-border-strong hover:bg-surface-subtle'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="rounded bg-surface-panel px-1.5 py-0.5 text-[9px] font-mono text-content-tertiary border border-border-subtle">
+                          {item.tag}
+                        </span>
+                        <Play
+                          className={`h-3 w-3 ${
+                            ytVideoId === item.id
+                              ? 'text-red-500 fill-red-500'
+                              : 'text-content-tertiary group-hover:text-red-400'
+                          }`}
+                        />
+                      </div>
+                      <span className="font-medium text-xs text-content-primary line-clamp-1">
+                        {item.title}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Educational Notice: Why does YouTube block standard iframes? */}
+              <div className="rounded-xl border border-border-subtle bg-surface-subtle/30 p-3.5 text-xs text-content-secondary flex gap-3">
+                <Info className="h-4 w-4 text-accent-primary shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="font-medium text-content-primary">
+                    Why can't the standard youtube.com homepage be embedded directly?
+                  </div>
+                  <p className="text-[11px] text-content-tertiary leading-relaxed">
+                    Google serves <code>X-Frame-Options: SAMEORIGIN</code> and <code>frame-ancestors 'self'</code> headers on the root <code>youtube.com</code> domain. Web browsers strictly refuse to embed the main site inside an iframe to prevent clickjacking attacks (protecting logged-in Google accounts).
+                  </p>
+                  <p className="text-[11px] text-content-tertiary leading-relaxed">
+                    However, YouTube officially provides its <strong>Embed API</strong> (<code>youtube.com/embed/...</code>), which FlowOS seamlessly uses here. You can paste any video URL or ID above to watch it inside FlowOS without restrictions!
+                  </p>
                 </div>
               </div>
             </div>
@@ -938,7 +1161,9 @@ export const BrowserApp: React.FC<AppProps> = () => {
               {activeTab.url}
             </div>
           </div>
-        ) : activeTab.mode === 'reader' || (activeTab.mode === 'vfs' && activeTab.srcDoc) || (activeTab.mode === 'local' && activeTab.srcDoc) ? (
+        ) : activeTab.mode === 'reader' ||
+          (activeTab.mode === 'vfs' && activeTab.srcDoc) ||
+          (activeTab.mode === 'local' && activeTab.srcDoc) ? (
           /* Rendered via srcDoc (Reader mode or Local HTML / Markdown / Code) */
           <div className="relative h-full w-full">
             <iframe
@@ -973,8 +1198,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
               src={activeTab.url}
               title={activeTab.title}
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
-              className="h-full w-full border-none bg-white"
+              className="h-full w-full border-none bg-black"
             />
 
             {/* Smart Banner: Provides 1-click Reader Mode fallback if site blocks iframes */}
@@ -1012,7 +1239,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 export const browserManifest: AppManifest = {
   id: 'browser',
   name: 'Browser',
-  description: 'Multi-mode web browser with direct embed, reader mode bypass, and host device file support.',
+  description: 'Multi-mode web browser with direct embed, YouTube player, reader mode bypass, and host device file support.',
   category: 'productivity',
   icon: Globe,
   defaultSize: { width: 840, height: 580 },
