@@ -84,17 +84,33 @@ function flowOsBrowserProxyPlugin(): Plugin {
         if (req.url.startsWith('/api/proxy')) {
           try {
             const urlObj = new URL(req.url, 'http://localhost:3000');
-            const targetUrl = urlObj.searchParams.get('url');
+            let targetUrl = urlObj.searchParams.get('url');
             if (!targetUrl) {
               res.writeHead(400, { 'Content-Type': 'text/plain' });
               res.end('Missing url parameter');
               return;
             }
 
-            const proxyResp = await fetch(targetUrl, {
+            // If the request is for Google Search (which returns 429 to server-side fetch),
+            // proxy the query through Bing or DuckDuckGo so search results always load
+            let effectiveUrl = targetUrl;
+            try {
+              const parsedTarget = new URL(targetUrl);
+              if (
+                parsedTarget.hostname.includes('google.') &&
+                (parsedTarget.pathname === '/search' || parsedTarget.pathname.startsWith('/search'))
+              ) {
+                const query = parsedTarget.searchParams.get('q') || '';
+                effectiveUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+              }
+            } catch {
+              // Ignore parse error
+            }
+
+            const proxyResp = await fetch(effectiveUrl, {
               headers: {
                 'User-Agent':
-                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
                 Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                 'Accept-Language': 'en-US,en;q=0.9',
               },
@@ -113,13 +129,112 @@ function flowOsBrowserProxyPlugin(): Plugin {
 
             if (contentType === 'text/html' || rawContentType.includes('text/html')) {
               let html = await proxyResp.text();
-              const baseTag = `<base href="${proxyResp.url || targetUrl}">`;
+              const baseHref = proxyResp.url || effectiveUrl;
+              const baseTag = `<base href="${baseHref}">`;
+
+              // Client-side interceptor: ensures link clicks and form submissions route back through /api/proxy
+              const interceptorScript = `
+<script data-flowos-interceptor="true">
+(function() {
+  if (window.__flowos_proxy_active) return;
+  window.__flowos_proxy_active = true;
+
+  var currentBase = "${baseHref}";
+
+  function toProxy(raw) {
+    try {
+      if (!raw) return raw;
+      var str = String(raw).trim();
+      if (str.startsWith('javascript:') || str.startsWith('data:') || str.startsWith('blob:') || str.startsWith('#')) {
+        return raw;
+      }
+      var targetObj = new URL(str, currentBase);
+      if (targetObj.origin === window.location.origin && targetObj.pathname.startsWith('/api/proxy')) {
+        return targetObj.href;
+      }
+      // Rewriting Google search form submissions to Bing query
+      if (targetObj.hostname.includes('google.') && (targetObj.pathname === '/search' || targetObj.pathname.startsWith('/search'))) {
+        var q = targetObj.searchParams.get('q') || '';
+        return '/api/proxy?url=' + encodeURIComponent('https://www.bing.com/search?q=' + encodeURIComponent(q));
+      }
+      // Rewriting YouTube video links
+      if (targetObj.hostname.includes('youtube.com') && targetObj.searchParams.has('v')) {
+        var v = targetObj.searchParams.get('v');
+        return 'https://www.youtube.com/embed/' + v + '?autoplay=1&enablejsapi=1&rel=0';
+      }
+      return '/api/proxy?url=' + encodeURIComponent(targetObj.href);
+    } catch (e) {
+      return raw;
+    }
+  }
+
+  // Intercept all link clicks in capture phase
+  document.addEventListener('click', function(e) {
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+    var proxied = toProxy(href);
+    if (proxied && proxied !== href) {
+      if (a.getAttribute('target') === '_blank') {
+        a.href = proxied;
+        return;
+      }
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      try {
+        var resolved = new URL(href, currentBase).href;
+        window.parent.postMessage({ type: 'flowos:browser:navigate', url: resolved }, '*');
+      } catch (err) {}
+      window.location.href = proxied;
+    }
+  }, true);
+
+  // Intercept all form submissions (e.g. Google Search, DuckDuckGo search) in capture phase
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form) return;
+    var rawAction = form.getAttribute('action') || '';
+    var method = (form.method || 'GET').toUpperCase();
+
+    if (method === 'GET') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      var formData = new FormData(form);
+      var params = new URLSearchParams();
+      formData.forEach(function(val, key) {
+        params.append(key, String(val));
+      });
+
+      var actionObj = new URL(rawAction || currentBase, currentBase);
+      actionObj.search = params.toString();
+      var finalUrl = actionObj.href;
+
+      if (actionObj.hostname.includes('google.') && (actionObj.pathname === '/search' || actionObj.pathname.startsWith('/search') || rawAction.includes('search'))) {
+        var q = params.get('q') || '';
+        finalUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(q);
+      }
+
+      try {
+        window.parent.postMessage({ type: 'flowos:browser:navigate', url: finalUrl }, '*');
+      } catch (err) {}
+
+      window.location.href = toProxy(finalUrl);
+    } else {
+      form.action = toProxy(rawAction);
+    }
+  }, true);
+})();
+</script>`;
+
               if (html.includes('<head>')) {
-                html = html.replace('<head>', `<head>${baseTag}`);
+                html = html.replace('<head>', `<head>${baseTag}${interceptorScript}`);
               } else if (html.includes('<head ')) {
-                html = html.replace(/<head[^>]*>/, `$&${baseTag}`);
+                html = html.replace(/<head[^>]*>/, `$&${baseTag}${interceptorScript}`);
               } else {
-                html = `${baseTag}${html}`;
+                html = `${baseTag}${interceptorScript}${html}`;
               }
 
               // Strip frame busters

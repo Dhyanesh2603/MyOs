@@ -50,13 +50,13 @@ export interface YouTubeVideoItem {
 }
 
 const DEFAULT_BOOKMARKS = [
+  { name: 'Google', url: 'https://www.google.com', mode: 'embed' as BrowserMode },
+  { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/', mode: 'embed' as BrowserMode },
   { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system', mode: 'embed' as BrowserMode },
   { name: 'Hacker News', url: 'https://news.ycombinator.com', mode: 'embed' as BrowserMode },
   { name: 'YouTube', url: 'flow://youtube', mode: 'embed' as BrowserMode },
   { name: 'MDN Web Docs', url: 'https://developer.mozilla.org/en-US/', mode: 'reader' as BrowserMode },
-  { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/', mode: 'embed' as BrowserMode },
   { name: 'Localhost:3000', url: 'http://localhost:3000', mode: 'embed' as BrowserMode },
-  { name: 'Localhost:5173', url: 'http://localhost:5173', mode: 'embed' as BrowserMode },
 ];
 
 const YOUTUBE_CATEGORIES = [
@@ -792,6 +792,27 @@ export const BrowserApp: React.FC<AppProps> = () => {
   useEffect(() => {
     setInputUrl(activeTab.displayUrl);
   }, [activeTab.displayUrl, activeTabId]);
+
+  // Listen for navigation messages from proxied iframes
+  useEffect(() => {
+    const handleFrameMessage = (event: MessageEvent) => {
+      if (
+        event.data &&
+        event.data.type === 'flowos:browser:navigate' &&
+        typeof event.data.url === 'string'
+      ) {
+        const navigatedUrl = event.data.url;
+        setInputUrl(navigatedUrl);
+        updateTab(activeTabId, {
+          url: navigatedUrl,
+          displayUrl: navigatedUrl,
+          title: navigatedUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web',
+        });
+      }
+    };
+    window.addEventListener('message', handleFrameMessage);
+    return () => window.removeEventListener('message', handleFrameMessage);
+  }, [activeTabId, updateTab]);
 
   // Find mounted device files in VFS to show in quick access
   const deviceFiles = Object.values(vfsNodes).filter(
