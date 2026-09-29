@@ -243,6 +243,24 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
   - **Skill Editing & Deletion:** In-place edit and delete buttons on every skill card.
   - **Full Persistence:** All additions, edits, and deletions persist across sessions via IndexedDB / `localStorage`.
 
+### 36. Device Storage & Host Machine File Mounting (W3C File System Access API)
+- **Direct PC Folder Mounting:** Mount any real physical folder from your host computer directly into FlowOS via the W3C File System Access API (`window.showDirectoryPicker()`) with cross-browser directory input fallback.
+- **Unified `/device` VFS Namespace:** Mounted directories and their recursive subtrees are mirrored directly into the VFS under `/device/{folderName}`.
+- **Dedicated File Explorer Storage Section:**
+  - Sidebar category with live green pulsing connection beacon.
+  - One-click **"Mount Local Folder"** and **"Import PC Files"** actions.
+  - Active list of mounted host folders with instant unmount buttons.
+  - Main viewport header banner with green path indicators and quick empty-state connection prompts.
+- **Cross-App Host File Interoperability:** Files in mounted device directories can be inspected in Quick Look (`Spacebar`), edited and saved in Code Editor, formatted in Notes, and previewed in the FlowOS Browser app.
+
+### 37. Multi-Mode Web & Device Browser (Direct Embed + Reader Bypass)
+- **Functional In-OS Iframe Browser:** High-performance sandboxed browser engine with multi-tabs, address & search omnibox, and full history traversal (Back, Forward, Reload, Home).
+- **Three Specialized Render Modes:**
+  - 🌐 **Direct Iframe Embed:** Sandboxed rendering with comprehensive permissions (`allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation`) for iframe-compatible web destinations, docs, and local servers (`localhost:3000`, `localhost:5173`).
+  - ⚡ **Jina Reader Engine Bypass:** Seamlessly overcomes `X-Frame-Options` and CSP `frame-ancestors` iframe blocking on sites like GitHub, Wikipedia, blogs, and news via dynamic proxy rendering in `srcDoc` with typography stylesheets.
+  - 💻 **Host Device & VFS File Viewer:** Direct access to mounted PC folders (`/device/...`) and individual local files via native file picker, rendering HTML, SVG, Markdown, text, and media inside the browser frame.
+- **Smart Connection Fallback:** Bottom status card detecting connection refusal with one-click **"⚡ Switch to Reader Mode"** and **"↗ Open in New Window"** shortcuts.
+
 ---
 
 ## 📱 Built-in & Community Applications
@@ -250,8 +268,8 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 | Application | ID | Category | Description |
 | :--- | :--- | :--- | :--- |
 | **Personal OS** | `personal-os` | Productivity | Engineering control center with missions, project studio, git diff viewer, editable DSA tracker, and academics. |
-| **Browser** | `browser` | Productivity | Sandboxed in-OS web browser with multi-tabs, URL/search omnibox, and quick bookmarks. |
-| **Files** | `file-explorer` | Utilities | Arc-style Workspace sidebar, breadcrumbs, high-density table/grid views, VFS file creation/deletion, and host export. |
+| **Browser** | `browser` | Productivity | Multi-mode in-OS browser with direct iframe embed, Jina Reader bypass for restricted sites, host device file viewer, tabs, and navigation history. |
+| **Files** | `file-explorer` | Utilities | Arc-style Workspace sidebar, W3C host device storage mounting (`/device/...`), Quick Look previewer, high-density table/grid views, and host import/export. |
 | **Code Editor** | `code-editor` | Development | Monospaced editor with line numbers gutter, syntax detection, `Ctrl+S` VFS save, and integrated WebWorker execution console. |
 | **Notes** | `notes` | Productivity | Obsidian-inspired markdown notes with `#tags`, word count, reading time, edit vs reading view, and VFS file loading. |
 | **Terminal** | `terminal` | Development | `flowsh` Unix Pipeline Edition — pipes, `grep`, `wc`, `head`, `tail`, `sort`, `tree`, Tab autocomplete, `eval`, `run`, `pkg`. |

@@ -20,6 +20,10 @@ import {
   Download,
   Eye,
   Tag,
+  Laptop,
+  FolderSync,
+  Plus,
+  X,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { VFSNode } from '@contracts/vfs';
@@ -30,9 +34,13 @@ import { downloadVFSToPC, importHostFileToVFS } from '@core/vfs/hostBridge';
 import { normalizePath } from '@core/vfs/vfsService';
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
 import { useBatchRenamerStore } from '@core/vfs/batchRenamerStore';
+import { useDeviceStorageStore } from '@core/vfs/deviceStorage';
 
 const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
   const { nodes, mkdir, writeFile, deleteNode } = useVFSStore();
+  const { mountedFolders, isMounting, mountDirectoryPicker, mountDirectoryFromInput, mountFilesFromInput, unmountFolder } = useDeviceStorageStore();
+  const directoryInputRef = React.useRef<HTMLInputElement>(null);
+  const filesInputRef = React.useRef<HTMLInputElement>(null);
   const customState = useWindowStore((state) => state.windows[windowId]?.customState as { initialData?: { initialPath?: string } } | undefined);
   const startPath = customState?.initialData?.initialPath || '/home/user';
 
@@ -119,6 +127,19 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
       await deleteNode(path);
       if (selectedPath === path) setSelectedPath(null);
     }
+  };
+
+  const handleMountLocalFolder = async () => {
+    if ('showDirectoryPicker' in window) {
+      const p = await mountDirectoryPicker();
+      if (p) navigateTo(p);
+    } else {
+      directoryInputRef.current?.click();
+    }
+  };
+
+  const handleMountLocalFiles = () => {
+    filesInputRef.current?.click();
   };
 
   const pathSegments = currentPath.split('/').filter(Boolean);
@@ -212,6 +233,74 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
               <HardDrive className="h-3.5 w-3.5 text-rose-400" />
               Root Inodes
             </button>
+          </div>
+
+          {/* Physical Device / Host PC Storage */}
+          <div className="pt-2 border-t border-border-subtle">
+            <div className="flex items-center justify-between px-2 pb-1 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+              <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+                <Laptop className="h-3 w-3" />
+                Device Storage
+              </span>
+              {isMounting && (
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              )}
+            </div>
+
+            <button
+              onClick={handleMountLocalFolder}
+              disabled={isMounting}
+              title="Grant FlowOS access to view and browse actual files from your computer"
+              className="flex w-full items-center justify-between rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-sm my-1"
+            >
+              <span className="flex items-center gap-1.5 truncate">
+                <FolderSync className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{isMounting ? 'Connecting...' : 'Mount Local Folder'}</span>
+              </span>
+              <Plus className="h-3 w-3 shrink-0" />
+            </button>
+
+            <button
+              onClick={handleMountLocalFiles}
+              disabled={isMounting}
+              title="Pick individual files from your PC"
+              className="flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-content-tertiary hover:bg-surface-subtle/50 hover:text-content-secondary transition-colors"
+            >
+              <FilePlus className="h-3 w-3" />
+              <span>Import PC Files...</span>
+            </button>
+
+            {mountedFolders.map((f) => (
+              <div
+                key={f.id}
+                className={`group flex items-center justify-between rounded-md px-2 py-1 text-xs transition-colors ${
+                  currentPath.startsWith(f.vfsPath)
+                    ? 'bg-surface-subtle text-content-primary font-medium shadow-sm'
+                    : 'text-content-secondary hover:bg-surface-subtle/50'
+                }`}
+              >
+                <button
+                  onClick={() => navigateTo(f.vfsPath)}
+                  className="flex items-center gap-2 truncate flex-1 text-left"
+                >
+                  <HardDrive className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">{f.name}</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    unmountFolder(f.vfsPath);
+                    if (currentPath.startsWith(f.vfsPath)) {
+                      navigateTo('/home/user');
+                    }
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-content-tertiary hover:bg-rose-500/20 hover:text-rose-400 transition-all"
+                  title="Unmount device folder"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -315,6 +404,16 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             </button>
 
             <button
+              onClick={handleMountLocalFolder}
+              disabled={isMounting}
+              title="Mount and browse actual files from your computer"
+              className="flex items-center gap-1.5 rounded border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 font-mono text-[10px] text-emerald-400 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-sm"
+            >
+              <Laptop className="h-3 w-3" />
+              <span>{isMounting ? 'Connecting...' : 'Connect PC Folder'}</span>
+            </button>
+
+            <button
               onClick={() => {
                 const targets = selectedPath ? [selectedPath] : currentNodes.map((n) => n.path);
                 if (targets.length > 0) {
@@ -379,11 +478,49 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           }}
           className="flex-1 overflow-y-auto p-4 select-none"
         >
-          {currentNodes.length === 0 ? (
-            <div className="flex h-48 flex-col items-center justify-center gap-2 font-mono text-xs text-content-tertiary">
-              <Folder className="h-6 w-6 opacity-30" />
-              <span>Empty directory</span>
+          {/* Device Storage notification banner */}
+          {currentPath.startsWith('/device') && (
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-mono text-emerald-300 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Laptop className="h-4 w-4 text-emerald-400 shrink-0" />
+                <div>
+                  <span className="font-semibold text-white">Physical PC Storage:</span>{' '}
+                  <span>Showing actual files from your computer synced into FlowOS.</span>
+                </div>
+              </div>
+              <button
+                onClick={handleMountLocalFolder}
+                className="rounded bg-emerald-500/20 px-2 py-1 text-[11px] text-emerald-300 hover:bg-emerald-500/30 transition-colors shrink-0"
+              >
+                + Connect Another
+              </button>
             </div>
+          )}
+
+          {currentNodes.length === 0 ? (
+            currentPath === '/device' ? (
+              <div className="flex h-56 flex-col items-center justify-center gap-3 text-center p-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  <Laptop className="h-6 w-6" />
+                </div>
+                <h3 className="text-sm font-semibold text-content-primary">Connect Device Storage</h3>
+                <p className="text-xs text-content-tertiary max-w-sm">
+                  Grant FlowOS access to browse and open actual folders and files from your real PC.
+                </p>
+                <button
+                  onClick={handleMountLocalFolder}
+                  className="flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 font-mono text-xs font-semibold text-black shadow-md hover:bg-emerald-400 transition-colors"
+                >
+                  <FolderSync className="h-4 w-4" />
+                  <span>Mount Local Folder</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex h-48 flex-col items-center justify-center gap-2 font-mono text-xs text-content-tertiary">
+                <Folder className="h-6 w-6 opacity-30" />
+                <span>Empty directory</span>
+              </div>
+            )
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
               {currentNodes.map((node) => {
@@ -490,6 +627,33 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
           <span>{selectedPath ? selectedPath : currentPath}</span>
         </footer>
       </main>
+
+      {/* Hidden inputs for directory and file fallbacks */}
+      <input
+        type="file"
+        ref={directoryInputRef}
+        {...{ webkitdirectory: '', directory: '' }}
+        multiple
+        className="hidden"
+        onChange={async (e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            const p = await mountDirectoryFromInput(e.target.files);
+            if (p) navigateTo(p);
+          }
+        }}
+      />
+      <input
+        type="file"
+        ref={filesInputRef}
+        multiple
+        className="hidden"
+        onChange={async (e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            const p = await mountFilesFromInput(e.target.files);
+            if (p) navigateTo(p);
+          }
+        }}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Globe,
   ArrowLeft,
@@ -12,22 +12,269 @@ import {
   ExternalLink,
   ShieldCheck,
   Bookmark,
+  Zap,
+  FolderSync,
+  FileCode,
+  FolderOpen,
+  AlertCircle,
+  Laptop,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
+import { useVFSStore } from '@core/vfs/vfsStore';
+import { useDeviceStorageStore } from '@core/vfs/deviceStorage';
+
+type BrowserMode = 'embed' | 'reader' | 'vfs' | 'local';
 
 interface BrowserTab {
   id: string;
   title: string;
   url: string;
   displayUrl: string;
+  mode: BrowserMode;
+  srcDoc?: string;
+  mediaSrc?: string;
+  history: { url: string; mode: BrowserMode; title: string }[];
+  historyIdx: number;
+  isLoading: boolean;
+  refreshKey: number;
+  error?: string | null;
 }
 
 const DEFAULT_BOOKMARKS = [
-  { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system' },
-  { name: 'Hacker News', url: 'https://news.ycombinator.com' },
-  { name: 'MDN Web', url: 'https://developer.mozilla.org/en-US/' },
-  { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/' },
+  { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system', mode: 'embed' as BrowserMode },
+  { name: 'Hacker News', url: 'https://news.ycombinator.com', mode: 'embed' as BrowserMode },
+  { name: 'MDN Web Docs', url: 'https://developer.mozilla.org/en-US/', mode: 'reader' as BrowserMode },
+  { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/', mode: 'embed' as BrowserMode },
+  { name: 'Localhost:3000', url: 'http://localhost:3000', mode: 'embed' as BrowserMode },
+  { name: 'Localhost:5173', url: 'http://localhost:5173', mode: 'embed' as BrowserMode },
 ];
+
+/**
+ * Escapes raw strings for safe inclusion in generated HTML.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
+ * Lightweight, safe parser for converting markdown/reader text into rich HTML.
+ */
+function buildReaderHtml(title: string, rawContent: string, sourceUrl: string): string {
+  const lines = rawContent.split(/\r?\n/);
+  const htmlParts: string[] = [];
+  let inCodeBlock = false;
+  let codeBuffer: string[] = [];
+
+  for (const line of lines) {
+    if (line.trim().startsWith('```')) {
+      if (inCodeBlock) {
+        htmlParts.push(
+          `<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`
+        );
+        codeBuffer = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBuffer.push(line);
+      continue;
+    }
+
+    const trimmed = line.trim();
+    if (!trimmed) {
+      continue;
+    }
+
+    // Headers
+    if (trimmed.startsWith('#### ')) {
+      htmlParts.push(`<h4>${escapeHtml(trimmed.slice(5))}</h4>`);
+    } else if (trimmed.startsWith('### ')) {
+      htmlParts.push(`<h3>${escapeHtml(trimmed.slice(4))}</h3>`);
+    } else if (trimmed.startsWith('## ')) {
+      htmlParts.push(`<h2>${escapeHtml(trimmed.slice(3))}</h2>`);
+    } else if (trimmed.startsWith('# ')) {
+      htmlParts.push(`<h1>${escapeHtml(trimmed.slice(2))}</h1>`);
+    } else if (trimmed.startsWith('> ')) {
+      htmlParts.push(`<blockquote>${escapeHtml(trimmed.slice(2))}</blockquote>`);
+    } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      htmlParts.push(`<li>${escapeHtml(trimmed.slice(2))}</li>`);
+    } else if (trimmed.startsWith('![')) {
+      // Basic image matcher: ![alt](url)
+      const match = trimmed.match(/^!\[(.*?)\]\((.*?)\)/);
+      if (match && match[2]) {
+        htmlParts.push(`<img src="${escapeHtml(match[2])}" alt="${escapeHtml(match[1] || '')}" loading="lazy" />`);
+      } else {
+        htmlParts.push(`<p>${escapeHtml(trimmed)}</p>`);
+      }
+    } else {
+      // Inline formatting: links [text](url) and `code`
+      let formatted = escapeHtml(trimmed);
+      // Inline code
+      formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Simple links
+      formatted = formatted.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+      );
+      htmlParts.push(`<p>${formatted}</p>`);
+    }
+  }
+
+  if (inCodeBlock && codeBuffer.length > 0) {
+    htmlParts.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(title)}</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card-bg: #111827;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #1e293b;
+      --code-bg: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 36px 20px 80px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    .reader-container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .header-bar {
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .source-link {
+      font-size: 12px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+    .source-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .source-link a:hover { text-decoration: underline; }
+    h1, h2, h3, h4 { color: #f8fafc; line-height: 1.35; margin-top: 1.8em; margin-bottom: 0.6em; }
+    h1 { font-size: 26px; margin-top: 0; }
+    h2 { font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    h3 { font-size: 17px; }
+    p { margin: 1.1em 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); line-height: 1.5; }
+    pre code { background: transparent; padding: 0; }
+    blockquote { border-left: 3px solid var(--accent); margin: 1.2em 0; padding-left: 16px; color: var(--text-muted); font-style: italic; }
+    ul, ol { padding-left: 24px; margin: 1em 0; }
+    li { margin: 0.4em 0; }
+    img { max-width: 100%; height: auto; border-radius: 8px; margin: 1.5em 0; display: block; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="reader-container">
+    <div class="header-bar">
+      <div class="badge">⚡ FlowOS Reader Engine</div>
+      <div class="source-link">
+        Source: <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceUrl)}</a>
+      </div>
+    </div>
+    <div class="reader-content">
+      ${htmlParts.join('\n')}
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Builds HTML document preview for raw text, code, or markdown files from host device / VFS.
+ */
+function buildLocalFileHtml(fileName: string, content: string, isMarkdown = false): string {
+  if (isMarkdown) {
+    return buildReaderHtml(fileName, content, `file:///${fileName}`);
+  }
+
+  const escaped = escapeHtml(content);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(fileName)}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .header {
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #30363d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 12px;
+      color: #8b949e;
+      display: flex;
+      justify-content: space-between;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span>💻 Local Host File: <strong>${escapeHtml(fileName)}</strong></span>
+    <span>Rendered in FlowOS</span>
+  </div>
+  <pre>${escaped}</pre>
+</body>
+</html>`;
+}
 
 export const BrowserApp: React.FC<AppProps> = () => {
   const [tabs, setTabs] = useState<BrowserTab[]>([
@@ -36,55 +283,263 @@ export const BrowserApp: React.FC<AppProps> = () => {
       title: 'FlowOS Start Page',
       url: 'flow://start',
       displayUrl: 'flow://start',
+      mode: 'embed',
+      history: [{ url: 'flow://start', mode: 'embed', title: 'FlowOS Start Page' }],
+      historyIdx: 0,
+      isLoading: false,
+      refreshKey: 0,
     },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
   const [inputUrl, setInputUrl] = useState<string>('flow://start');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // VFS & Device Storage stores
+  const vfsNodes = useVFSStore((s) => s.nodes);
+  const mountedFolders = useDeviceStorageStore((s) => s.mountedFolders);
+  const mountDirectoryPicker = useDeviceStorageStore((s) => s.mountDirectoryPicker);
+  const isMounting = useDeviceStorageStore((s) => s.isMounting);
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0]!;
 
-  const handleNavigate = (target: string) => {
-    let finalUrl = target.trim();
-    if (!finalUrl) return;
+  const updateTab = useCallback((tabId: string, patch: Partial<BrowserTab>) => {
+    setTabs((prev) => prev.map((t) => (t.id === tabId ? { ...t, ...patch } : t)));
+  }, []);
 
-    if (finalUrl === 'flow://start' || finalUrl === 'about:blank') {
-      // Internal start page
-    } else if (
-      finalUrl.startsWith('http://') ||
-      finalUrl.startsWith('https://')
-    ) {
-      // Fully qualified URL
-    } else if (finalUrl.includes('.') && !finalUrl.includes(' ')) {
-      // Domain without scheme
-      finalUrl = `https://${finalUrl}`;
-    } else {
-      // Search query via DuckDuckGo
-      finalUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(finalUrl)}`;
-    }
+  /**
+   * Main navigation dispatcher
+   */
+  const handleNavigate = useCallback(
+    async (target: string, forcedMode?: BrowserMode, pushToHistory = true) => {
+      let finalUrl = target.trim();
+      if (!finalUrl) return;
 
-    const hostName =
-      finalUrl === 'flow://start'
-        ? 'Start Page'
-        : finalUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web';
+      const currentTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0]!;
+      let mode: BrowserMode = forcedMode ?? 'embed';
+      let title = 'Web';
+      let srcDoc: string | undefined;
+      let mediaSrc: string | undefined;
 
-    setTabs((prev) =>
-      prev.map((t) =>
-        t.id === activeTabId
-          ? {
-              ...t,
-              title: hostName,
-              url: finalUrl,
-              displayUrl: finalUrl,
+      // 1. Start page / Blank
+      if (finalUrl === 'flow://start' || finalUrl === 'about:blank' || finalUrl === 'flow://newtab') {
+        finalUrl = 'flow://start';
+        title = 'Start Page';
+        mode = 'embed';
+      }
+      // 2. VFS / Device file: starts with /device/, /home/, file:///, or vfs:///
+      else if (
+        finalUrl.startsWith('/device/') ||
+        finalUrl.startsWith('/home/') ||
+        finalUrl.startsWith('file:///') ||
+        finalUrl.startsWith('vfs:///')
+      ) {
+        mode = 'vfs';
+        const cleanPath = finalUrl.replace(/^(file:\/\/\/|vfs:\/\/\/)/, '/');
+        const fileName = cleanPath.split('/').pop() || 'File';
+        title = fileName;
+
+        try {
+          const content = await useVFSStore.getState().readFile(cleanPath);
+          const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+          if (ext === 'html' || ext === 'htm') {
+            srcDoc = content;
+          } else if (ext === 'svg') {
+            srcDoc = content.startsWith('<svg')
+              ? content
+              : `<div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#111;">${content}</div>`;
+          } else if (content.startsWith('data:image/') || content.startsWith('data:video/')) {
+            mediaSrc = content;
+          } else {
+            srcDoc = buildLocalFileHtml(fileName, content, ext === 'md' || ext === 'markdown');
+          }
+        } catch {
+          srcDoc = `<!DOCTYPE html><html><body style="background:#0f141c;color:#f87171;font-family:sans-serif;padding:30px;"><h3>File Not Found</h3><p>Could not load ${escapeHtml(cleanPath)} from VFS.</p></body></html>`;
+        }
+      }
+      // 3. Web URL or Search
+      else {
+        if (finalUrl.startsWith('http://') || finalUrl.startsWith('https://')) {
+          // Valid URL
+        } else if (finalUrl.includes('.') && !finalUrl.includes(' ')) {
+          finalUrl = `https://${finalUrl}`;
+        } else {
+          // Search DuckDuckGo
+          finalUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(finalUrl)}`;
+        }
+
+        title = finalUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web';
+
+        // Check if forced into reader mode or explicitly requested
+        if (mode === 'reader') {
+          updateTab(activeTabId, { isLoading: true, error: null });
+          try {
+            const resp = await fetch(`https://r.jina.ai/${finalUrl}`);
+            if (!resp.ok) {
+              throw new Error(`Failed to fetch reader view (${resp.status})`);
             }
-          : t
-      )
-    );
-    setInputUrl(finalUrl);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 600);
+            const markdown = await resp.text();
+            srcDoc = buildReaderHtml(title, markdown, finalUrl);
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            srcDoc = `<!DOCTYPE html><html><body style="background:#0f141c;color:#f87171;font-family:sans-serif;padding:30px;"><h3>Reader Mode Error</h3><p>${escapeHtml(msg)}</p><p><a href="${escapeHtml(finalUrl)}" target="_blank" style="color:#38bdf8;">Open in external browser window</a></p></body></html>`;
+          }
+        }
+      }
+
+      // History management
+      let newHistory = currentTab.history;
+      let newIdx = currentTab.historyIdx;
+      if (pushToHistory) {
+        newHistory = currentTab.history.slice(0, currentTab.historyIdx + 1);
+        newHistory.push({ url: finalUrl, mode, title });
+        newIdx = newHistory.length - 1;
+      }
+
+      setTabs((prev) =>
+        prev.map((t) =>
+          t.id === activeTabId
+            ? {
+                ...t,
+                title,
+                url: finalUrl,
+                displayUrl: finalUrl,
+                mode,
+                srcDoc,
+                mediaSrc,
+                history: newHistory,
+                historyIdx: newIdx,
+                isLoading: false,
+                refreshKey: t.refreshKey + 1,
+              }
+            : t
+        )
+      );
+
+      setInputUrl(finalUrl);
+    },
+    [tabs, activeTabId, updateTab]
+  );
+
+  /**
+   * Back navigation
+   */
+  const handleBack = () => {
+    if (activeTab.historyIdx > 0) {
+      const prevEntry = activeTab.history[activeTab.historyIdx - 1];
+      if (prevEntry) {
+        updateTab(activeTabId, {
+          historyIdx: activeTab.historyIdx - 1,
+        });
+        handleNavigate(prevEntry.url, prevEntry.mode, false);
+      }
+    }
   };
 
+  /**
+   * Forward navigation
+   */
+  const handleForward = () => {
+    if (activeTab.historyIdx < activeTab.history.length - 1) {
+      const nextEntry = activeTab.history[activeTab.historyIdx + 1];
+      if (nextEntry) {
+        updateTab(activeTabId, {
+          historyIdx: activeTab.historyIdx + 1,
+        });
+        handleNavigate(nextEntry.url, nextEntry.mode, false);
+      }
+    }
+  };
+
+  /**
+   * Reload active tab
+   */
+  const handleReload = () => {
+    handleNavigate(activeTab.url, activeTab.mode, false);
+  };
+
+  /**
+   * Toggle between Direct Embed and Reader mode for web URLs
+   */
+  const handleToggleReader = () => {
+    if (activeTab.url === 'flow://start') return;
+    const targetMode: BrowserMode = activeTab.mode === 'reader' ? 'embed' : 'reader';
+    handleNavigate(activeTab.url, targetMode, false);
+  };
+
+  /**
+   * Handle picking local files from host device via native input
+   */
+  const handleLocalFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf';
+
+    if (isImage || isPdf) {
+      reader.onload = () => {
+        const result = reader.result as string;
+        const newId = `tab-${Date.now()}`;
+        const newTab: BrowserTab = {
+          id: newId,
+          title: file.name,
+          url: `file:///${file.name}`,
+          displayUrl: `file:///${file.name}`,
+          mode: 'local',
+          mediaSrc: result,
+          history: [{ url: `file:///${file.name}`, mode: 'local', title: file.name }],
+          historyIdx: 0,
+          isLoading: false,
+          refreshKey: 0,
+        };
+        setTabs((prev) => [...prev, newTab]);
+        setActiveTabId(newId);
+        setInputUrl(`file:///${file.name}`);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      reader.onload = () => {
+        const text = reader.result as string;
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        let srcDoc = '';
+
+        if (ext === 'html' || ext === 'htm') {
+          srcDoc = text;
+        } else if (ext === 'svg') {
+          srcDoc = text.startsWith('<svg')
+            ? text
+            : `<div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#111;">${text}</div>`;
+        } else {
+          srcDoc = buildLocalFileHtml(file.name, text, ext === 'md' || ext === 'markdown');
+        }
+
+        const newId = `tab-${Date.now()}`;
+        const newTab: BrowserTab = {
+          id: newId,
+          title: file.name,
+          url: `file:///${file.name}`,
+          displayUrl: `file:///${file.name}`,
+          mode: 'local',
+          srcDoc,
+          history: [{ url: `file:///${file.name}`, mode: 'local', title: file.name }],
+          historyIdx: 0,
+          isLoading: false,
+          refreshKey: 0,
+        };
+        setTabs((prev) => [...prev, newTab]);
+        setActiveTabId(newId);
+        setInputUrl(`file:///${file.name}`);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  /**
+   * New tab creation
+   */
   const handleNewTab = () => {
     const newId = `tab-${Date.now()}`;
     const newTab: BrowserTab = {
@@ -92,16 +547,23 @@ export const BrowserApp: React.FC<AppProps> = () => {
       title: 'New Tab',
       url: 'flow://start',
       displayUrl: 'flow://start',
+      mode: 'embed',
+      history: [{ url: 'flow://start', mode: 'embed', title: 'New Tab' }],
+      historyIdx: 0,
+      isLoading: false,
+      refreshKey: 0,
     };
     setTabs((prev) => [...prev, newTab]);
     setActiveTabId(newId);
     setInputUrl('flow://start');
   };
 
+  /**
+   * Close tab
+   */
   const handleCloseTab = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (tabs.length === 1) {
-      // Reset solitary tab to start page
       handleNavigate('flow://start');
       return;
     }
@@ -114,13 +576,34 @@ export const BrowserApp: React.FC<AppProps> = () => {
     }
   };
 
+  /**
+   * Select active tab
+   */
   const handleSelectTab = (tab: BrowserTab) => {
     setActiveTabId(tab.id);
     setInputUrl(tab.displayUrl);
   };
 
+  // Keep inputUrl synchronized when active tab changes
+  useEffect(() => {
+    setInputUrl(activeTab.displayUrl);
+  }, [activeTab.displayUrl, activeTabId]);
+
+  // Find mounted device files in VFS to show in quick access
+  const deviceFiles = Object.values(vfsNodes).filter(
+    (n) => n.type === 'file' && n.path.startsWith('/device/')
+  );
+
   return (
     <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none text-xs">
+      {/* Hidden file input for opening host PC files */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleLocalFileSelect}
+        className="hidden"
+      />
+
       {/* Browser Tab Bar */}
       <div className="flex h-9 items-center border-b border-border-subtle bg-surface-overlay/90 px-2 gap-1 overflow-x-auto">
         {tabs.map((tab) => {
@@ -129,19 +612,26 @@ export const BrowserApp: React.FC<AppProps> = () => {
             <div
               key={tab.id}
               onClick={() => handleSelectTab(tab)}
-              className={`group flex h-7 max-w-[180px] min-w-[110px] items-center justify-between rounded-md px-2.5 transition-colors cursor-pointer border ${
+              className={`group flex h-7 max-w-[190px] min-w-[110px] items-center justify-between rounded-md px-2.5 transition-colors cursor-pointer border ${
                 isActive
                   ? 'border-border-subtle bg-surface-panel text-content-primary shadow-sm font-medium'
                   : 'border-transparent text-content-tertiary hover:bg-surface-subtle/50 hover:text-content-secondary'
               }`}
             >
               <div className="flex items-center gap-1.5 truncate">
-                <Globe className="h-3 w-3 shrink-0 text-accent-primary" />
+                {tab.mode === 'reader' ? (
+                  <Zap className="h-3 w-3 shrink-0 text-amber-400" />
+                ) : tab.mode === 'vfs' || tab.mode === 'local' ? (
+                  <Laptop className="h-3 w-3 shrink-0 text-emerald-400" />
+                ) : (
+                  <Globe className="h-3 w-3 shrink-0 text-accent-primary" />
+                )}
                 <span className="truncate text-[11px]">{tab.title}</span>
               </div>
               <button
                 onClick={(e) => handleCloseTab(tab.id, e)}
                 className="rounded p-0.5 opacity-0 group-hover:opacity-100 hover:bg-surface-subtle hover:text-content-primary transition-all"
+                title="Close Tab"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -169,22 +659,34 @@ export const BrowserApp: React.FC<AppProps> = () => {
             <Home className="h-3.5 w-3.5" />
           </button>
           <button
+            onClick={handleBack}
+            disabled={activeTab.historyIdx <= 0}
             title="Back"
-            className="rounded p-1 hover:bg-surface-subtle hover:text-content-primary transition-colors opacity-50 cursor-not-allowed"
+            className={`rounded p-1 transition-colors ${
+              activeTab.historyIdx > 0
+                ? 'hover:bg-surface-subtle hover:text-content-primary'
+                : 'opacity-40 cursor-not-allowed'
+            }`}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
           </button>
           <button
+            onClick={handleForward}
+            disabled={activeTab.historyIdx >= activeTab.history.length - 1}
             title="Forward"
-            className="rounded p-1 hover:bg-surface-subtle hover:text-content-primary transition-colors opacity-50 cursor-not-allowed"
+            className={`rounded p-1 transition-colors ${
+              activeTab.historyIdx < activeTab.history.length - 1
+                ? 'hover:bg-surface-subtle hover:text-content-primary'
+                : 'opacity-40 cursor-not-allowed'
+            }`}
           >
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
           <button
-            onClick={() => handleNavigate(inputUrl)}
+            onClick={handleReload}
             title="Reload"
             className={`rounded p-1 hover:bg-surface-subtle hover:text-content-primary transition-colors ${
-              isLoading ? 'animate-spin text-accent-primary' : ''
+              activeTab.isLoading ? 'animate-spin text-accent-primary' : ''
             }`}
           >
             <RotateCw className="h-3.5 w-3.5" />
@@ -202,8 +704,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
           <div className="flex items-center gap-1.5 text-content-tertiary mr-1.5">
             {inputUrl.startsWith('https://') ? (
               <Lock className="h-3 w-3 text-emerald-400" />
-            ) : inputUrl === 'flow://start' ? (
+            ) : inputUrl.startsWith('flow://') ? (
               <ShieldCheck className="h-3 w-3 text-accent-primary" />
+            ) : inputUrl.startsWith('file:///') || inputUrl.startsWith('/device/') ? (
+              <Laptop className="h-3 w-3 text-emerald-400" />
             ) : (
               <Search className="h-3 w-3" />
             )}
@@ -212,82 +716,290 @@ export const BrowserApp: React.FC<AppProps> = () => {
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            placeholder="Search or enter web address..."
+            placeholder="Enter web address, search query, or file path (/device/...)..."
             className="w-full bg-transparent font-mono text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
           />
+
+          {/* Mode Switcher inside Omnibox */}
+          {activeTab.url !== 'flow://start' && !activeTab.url.startsWith('file:///') && (
+            <button
+              type="button"
+              onClick={handleToggleReader}
+              title={
+                activeTab.mode === 'reader'
+                  ? 'Switch to Direct Iframe Embed'
+                  : 'Switch to Reader Engine (Bypasses iframe blockers)'
+              }
+              className={`ml-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                activeTab.mode === 'reader'
+                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                  : 'bg-surface-subtle text-content-secondary hover:text-content-primary hover:bg-surface-subtle/80'
+              }`}
+            >
+              <Zap className="h-2.5 w-2.5" />
+              <span>{activeTab.mode === 'reader' ? 'Reader Active' : 'Reader'}</span>
+            </button>
+          )}
         </form>
+
+        {/* Quick Action: Open Host Device File */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          title="Open Local File from PC"
+          className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+        >
+          <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
+          <span className="hidden sm:inline text-[11px]">Open File</span>
+        </button>
+
+        {/* External Window Link */}
+        {activeTab.url.startsWith('http') && (
+          <a
+            href={activeTab.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open in native browser tab"
+            className="flex items-center rounded p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
       </div>
 
       {/* Bookmarks Bar */}
-      <div className="flex items-center gap-2 border-b border-border-subtle bg-surface-overlay/30 px-3 py-1 text-[11px] text-content-tertiary">
-        <Bookmark className="h-3 w-3 opacity-60" />
+      <div className="flex items-center gap-1.5 border-b border-border-subtle bg-surface-overlay/30 px-3 py-1 text-[11px] text-content-tertiary overflow-x-auto">
+        <Bookmark className="h-3 w-3 shrink-0 opacity-60 mr-1" />
         {DEFAULT_BOOKMARKS.map((bm) => (
           <button
             key={bm.name}
-            onClick={() => handleNavigate(bm.url)}
-            className="rounded px-1.5 py-0.5 hover:bg-surface-subtle hover:text-content-primary transition-colors font-medium"
+            onClick={() => handleNavigate(bm.url, bm.mode)}
+            className="rounded px-2 py-0.5 hover:bg-surface-subtle hover:text-content-primary transition-colors font-medium whitespace-nowrap"
           >
             {bm.name}
           </button>
         ))}
+
+        {/* Mounted Device Shortcut in Bookmarks */}
+        {mountedFolders.length > 0 && (
+          <div className="flex items-center gap-1 ml-auto pl-2 border-l border-border-subtle">
+            <Laptop className="h-3 w-3 text-emerald-400" />
+            <span className="text-[10px] text-emerald-400 font-medium truncate max-w-[120px]">
+              {mountedFolders[0]?.name}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Browser Viewport */}
       <div className="relative flex-1 overflow-hidden bg-surface-panel">
         {activeTab.url === 'flow://start' ? (
           /* FlowOS Start Page */
-          <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-accent-primary/20 bg-accent-primary/10 text-accent-primary mb-4 shadow-sm">
-              <Globe className="h-7 w-7" />
-            </div>
-            <h2 className="font-sans text-lg font-semibold tracking-tight text-content-primary">
-              FlowOS Web Browser
-            </h2>
-            <p className="mt-1 max-w-sm text-xs text-content-tertiary">
-              Sandboxed in-OS client browser. Enter any URL or search query to browse.
-            </p>
+          <div className="flex h-full w-full flex-col items-center justify-start p-6 overflow-y-auto">
+            <div className="flex flex-col items-center text-center max-w-xl w-full my-auto py-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-accent-primary/20 bg-accent-primary/10 text-accent-primary mb-3 shadow-sm">
+                <Globe className="h-6 w-6" />
+              </div>
+              <h2 className="font-sans text-xl font-bold tracking-tight text-content-primary">
+                FlowOS Web & Device Browser
+              </h2>
+              <p className="mt-1 text-xs text-content-tertiary">
+                Direct Iframe Web Embed, Bypass Reader Engine, and Real Host File Access.
+              </p>
 
-            {/* Quick Access Tiles */}
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg w-full">
-              {DEFAULT_BOOKMARKS.map((bm) => (
-                <button
-                  key={bm.name}
-                  onClick={() => handleNavigate(bm.url)}
-                  className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border-subtle bg-surface-subtle/50 p-4 hover:border-accent-primary/40 hover:bg-surface-subtle active:scale-95 transition-all shadow-sm"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-panel border border-border-subtle text-accent-primary">
-                    <Globe className="h-4 w-4" />
+              {/* Start Page Search Omnibox */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleNavigate(inputUrl);
+                }}
+                className="mt-5 flex w-full items-center rounded-xl border border-border-subtle bg-surface-subtle/50 px-3.5 py-2 shadow-sm transition-all focus-within:border-accent-primary focus-within:bg-surface-panel"
+              >
+                <Search className="h-4 w-4 text-content-tertiary mr-2.5" />
+                <input
+                  type="text"
+                  value={inputUrl === 'flow://start' ? '' : inputUrl}
+                  onChange={(e) => setInputUrl(e.target.value)}
+                  placeholder="Search the web with DuckDuckGo or enter URL / file path..."
+                  className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+                />
+              </form>
+
+              {/* Quick Bookmarks */}
+              <div className="mt-6 w-full">
+                <div className="text-[11px] font-medium text-content-secondary text-left mb-2 px-1">
+                  Featured Web Destinations
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full">
+                  {DEFAULT_BOOKMARKS.map((bm) => (
+                    <button
+                      key={bm.name}
+                      onClick={() => handleNavigate(bm.url, bm.mode)}
+                      className="flex items-center gap-2.5 rounded-lg border border-border-subtle bg-surface-subtle/30 p-2.5 hover:border-accent-primary/40 hover:bg-surface-subtle transition-all text-left group"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-surface-panel border border-border-subtle text-accent-primary group-hover:scale-105 transition-transform">
+                        {bm.mode === 'reader' ? <Zap className="h-3.5 w-3.5 text-amber-400" /> : <Globe className="h-3.5 w-3.5" />}
+                      </div>
+                      <div className="truncate">
+                        <div className="font-medium text-xs text-content-primary truncate">{bm.name}</div>
+                        <div className="text-[10px] text-content-tertiary truncate">{bm.url.replace(/^https?:\/\//, '')}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Host Device Storage Section */}
+              <div className="mt-6 w-full rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-left">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Laptop className="h-4 w-4 text-emerald-400" />
+                    <span className="font-semibold text-xs text-content-primary">
+                      Host Device Files & Storage
+                    </span>
                   </div>
-                  <span className="font-medium text-xs text-content-primary">{bm.name}</span>
-                </button>
-              ))}
-            </div>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-400/20">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    {mountedFolders.length > 0 ? `${mountedFolders.length} Folders Connected` : 'Ready to Connect'}
+                  </span>
+                </div>
 
-            <div className="mt-8 flex items-center gap-1.5 font-mono text-[10px] text-content-tertiary opacity-70">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Sandbox Isolation Enabled (iframe security perimeter)</span>
+                <p className="text-[11px] text-content-tertiary mb-3">
+                  Connect physical directories from your computer or pick individual HTML/SVG/text files to render directly inside the browser.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => mountDirectoryPicker()}
+                    disabled={isMounting}
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    <FolderSync className={`h-3.5 w-3.5 ${isMounting ? 'animate-spin' : ''}`} />
+                    <span>{isMounting ? 'Connecting...' : 'Mount Host PC Folder'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-1.5 rounded-lg bg-surface-subtle hover:bg-surface-panel text-content-primary border border-border-subtle px-3 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
+                    <span>Open File from PC</span>
+                  </button>
+                </div>
+
+                {/* Show list of real files if mounted */}
+                {deviceFiles.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-emerald-500/15">
+                    <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-400/80 mb-2">
+                      Mounted Device Files ({deviceFiles.length}):
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-36 overflow-y-auto">
+                      {deviceFiles.slice(0, 8).map((df) => (
+                        <button
+                          key={df.path}
+                          onClick={() => handleNavigate(df.path)}
+                          className="flex items-center gap-2 rounded px-2 py-1 bg-surface-panel/60 hover:bg-surface-panel border border-border-subtle text-left text-[11px] truncate transition-colors"
+                        >
+                          <FileCode className="h-3 w-3 text-accent-primary shrink-0" />
+                          <span className="truncate text-content-primary font-mono">{df.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Engine Capabilities Footer */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[10px] text-content-tertiary">
+                <div className="flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-accent-primary" />
+                  <span>Full Iframe Sandbox</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Zap className="h-3.5 w-3.5 text-amber-400" />
+                  <span>Jina Reader Engine</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Laptop className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>W3C File System Access</span>
+                </div>
+              </div>
             </div>
           </div>
-        ) : (
-          /* Live Web Frame */
+        ) : activeTab.isLoading ? (
+          /* Loading State */
+          <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary animate-spin mb-3">
+              <RotateCw className="h-5 w-5" />
+            </div>
+            <div className="font-medium text-xs text-content-primary">
+              {activeTab.mode === 'reader' ? 'Loading Reader View via Proxy...' : 'Connecting to host...'}
+            </div>
+            <div className="mt-1 font-mono text-[10px] text-content-tertiary truncate max-w-sm">
+              {activeTab.url}
+            </div>
+          </div>
+        ) : activeTab.mode === 'reader' || (activeTab.mode === 'vfs' && activeTab.srcDoc) || (activeTab.mode === 'local' && activeTab.srcDoc) ? (
+          /* Rendered via srcDoc (Reader mode or Local HTML / Markdown / Code) */
           <div className="relative h-full w-full">
             <iframe
+              title={activeTab.title}
+              srcDoc={activeTab.srcDoc}
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              className="h-full w-full border-none bg-surface-panel"
+            />
+          </div>
+        ) : (activeTab.mode === 'vfs' || activeTab.mode === 'local') && activeTab.mediaSrc ? (
+          /* Rendered Media / PDF from Local or VFS */
+          <div className="flex h-full w-full items-center justify-center bg-black/90 p-4">
+            {activeTab.mediaSrc.startsWith('data:image/') ? (
+              <img
+                src={activeTab.mediaSrc}
+                alt={activeTab.title}
+                className="max-h-full max-w-full object-contain rounded shadow-lg"
+              />
+            ) : (
+              <iframe
+                title={activeTab.title}
+                src={activeTab.mediaSrc}
+                className="h-full w-full border-none"
+              />
+            )}
+          </div>
+        ) : (
+          /* Direct Web Embed Iframe */
+          <div className="relative h-full w-full">
+            <iframe
+              key={activeTab.refreshKey}
               src={activeTab.url}
               title={activeTab.title}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
+              referrerPolicy="no-referrer-when-downgrade"
               className="h-full w-full border-none bg-white"
             />
-            {/* Disclaimer pill if site blocks iframes */}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface-panel/90 px-2 py-1 text-[10px] text-content-tertiary backdrop-blur shadow-sm select-none">
-              <span>Restricted by X-Frame-Options?</span>
+
+            {/* Smart Banner: Provides 1-click Reader Mode fallback if site blocks iframes */}
+            <div className="absolute bottom-2.5 right-2.5 flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-panel/95 backdrop-blur px-3 py-1.5 text-[11px] shadow-lg select-none">
+              <span className="text-content-secondary flex items-center gap-1">
+                <AlertCircle className="h-3 w-3 text-amber-400" />
+                Refused to connect?
+              </span>
+              <button
+                onClick={handleToggleReader}
+                className="flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 font-medium text-amber-300 hover:bg-amber-400/30 transition-colors"
+                title="Bypass X-Frame-Options with Jina Reader Engine"
+              >
+                <Zap className="h-3 w-3" />
+                <span>Reader Mode</span>
+              </button>
+              <span className="text-content-tertiary">|</span>
               <a
                 href={activeTab.url}
                 target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-0.5 text-accent-primary hover:underline"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-accent-primary hover:underline font-medium"
               >
-                <span>Open in Tab</span>
-                <ExternalLink className="h-2.5 w-2.5" />
+                <span>New Window</span>
+                <ExternalLink className="h-3 w-3" />
               </a>
             </div>
           </div>
@@ -300,11 +1012,11 @@ export const BrowserApp: React.FC<AppProps> = () => {
 export const browserManifest: AppManifest = {
   id: 'browser',
   name: 'Browser',
-  description: 'Sandboxed web browser with multi-tabs, address bar, bookmarks, and start page.',
+  description: 'Multi-mode web browser with direct embed, reader mode bypass, and host device file support.',
   category: 'productivity',
   icon: Globe,
-  defaultSize: { width: 780, height: 540 },
-  constraints: { minWidth: 460, minHeight: 320, maxWidth: 1600, maxHeight: 1100 },
+  defaultSize: { width: 840, height: 580 },
+  constraints: { minWidth: 480, minHeight: 320, maxWidth: 1600, maxHeight: 1100 },
   allowMultipleInstances: true,
   permissions: [],
   component: BrowserApp,
