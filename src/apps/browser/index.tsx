@@ -20,6 +20,7 @@ import {
   Laptop,
   Play,
   Info,
+  TrendingUp,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { useVFSStore } from '@core/vfs/vfsStore';
@@ -42,6 +43,13 @@ interface BrowserTab {
   error?: string | null;
 }
 
+export interface YouTubeVideoItem {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channel?: string;
+}
+
 const DEFAULT_BOOKMARKS = [
   { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system', mode: 'embed' as BrowserMode },
   { name: 'Hacker News', url: 'https://news.ycombinator.com', mode: 'embed' as BrowserMode },
@@ -51,6 +59,65 @@ const DEFAULT_BOOKMARKS = [
   { name: 'Localhost:3000', url: 'http://localhost:3000', mode: 'embed' as BrowserMode },
   { name: 'Localhost:5173', url: 'http://localhost:5173', mode: 'embed' as BrowserMode },
 ];
+
+const YOUTUBE_CATEGORIES = [
+  { label: '🔥 Trending', query: 'trending videos' },
+  { label: '💻 Coding', query: 'programming coding tutorial' },
+  { label: '🎵 Music', query: 'popular music hits official' },
+  { label: '🎮 Gaming', query: 'gaming gameplay walkthrough' },
+  { label: '⚡ Tech', query: 'tech gadget review mhd' },
+  { label: '🎧 Lo-Fi', query: 'lofi hip hop radio live' },
+  { label: '🚀 Science', query: 'science documentary veritasium' },
+  { label: '🍿 Trailers', query: 'movie trailer official 2026' },
+];
+
+const POPULAR_YOUTUBE_SEED: YouTubeVideoItem[] = [
+  { id: '2j_g2W9h9-E', title: 'The History of the Linux OS', channel: 'Fireship', thumbnail: 'https://i.ytimg.com/vi/2j_g2W9h9-E/hqdefault.jpg' },
+  { id: 'jfKfPfyJRdk', title: 'lofi hip hop radio - beats to relax/study to', channel: 'Lofi Girl', thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg' },
+  { id: 'A5w-dEgEx10', title: 'The Illusion of Speed', channel: 'Veritasium', thumbnail: 'https://i.ytimg.com/vi/A5w-dEgEx10/hqdefault.jpg' },
+  { id: 'rrB13utjYV4', title: 'Linux in 100 Seconds', channel: 'Fireship', thumbnail: 'https://i.ytimg.com/vi/rrB13utjYV4/hqdefault.jpg' },
+  { id: '4xDzrJKXOOY', title: 'Synthwave Radio - Chill Synth Vibes', channel: 'Lofi Beats', thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg' },
+  { id: '5yx6BWlEVcY', title: 'Chillhop Music - Jazzy Beats', channel: 'Chillhop Music', thumbnail: 'https://i.ytimg.com/vi/5yx6BWlEVcY/hqdefault.jpg' },
+  { id: 'xND0t1pr3KY', title: 'C Programming Full Course for free', channel: 'Bro Code', thumbnail: 'https://i.ytimg.com/vi/xND0t1pr3KY/hqdefault.jpg' },
+  { id: '_uQrJ0TkZlc', title: 'Python Full Course for Beginners', channel: 'Programming with Mosh', thumbnail: 'https://i.ytimg.com/vi/_uQrJ0TkZlc/hqdefault.jpg' },
+  { id: 'aircAruvnKk', title: 'Neural Networks and Deep Learning', channel: '3Blue1Brown', thumbnail: 'https://i.ytimg.com/vi/aircAruvnKk/hqdefault.jpg' },
+  { id: 'JyECrGp-Sw8', title: 'What If We Detonated All Nuclear Bombs at Once?', channel: 'Kurzgesagt', thumbnail: 'https://i.ytimg.com/vi/JyECrGp-Sw8/hqdefault.jpg' },
+  { id: '1WeIN3m3a4w', title: '$1 vs $1,000,000 Hotel Room!', channel: 'MrBeast', thumbnail: 'https://i.ytimg.com/vi/1WeIN3m3a4w/hqdefault.jpg' },
+  { id: '3bGNuRtl98Y', title: 'The Best Smartphone Camera Blind Test', channel: 'MKBHD', thumbnail: 'https://i.ytimg.com/vi/3bGNuRtl98Y/hqdefault.jpg' },
+];
+
+/**
+ * Parses live YouTube search results from proxy scrape.
+ */
+function parseYouTubeSearchResults(markdown: string): YouTubeVideoItem[] {
+  const items: YouTubeVideoItem[] = [];
+  const seen = new Set<string>();
+
+  // Extract Markdown links with YouTube watch URLs: [Title](https://www.youtube.com/watch?v=ID)
+  const regex = /(?:###\s+)?\[([^\]]{3,120})\]\(https:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})[^)]*\)/g;
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(markdown)) !== null) {
+    const rawTitle = m[1]?.trim() || '';
+    const id = m[2];
+    if (
+      id &&
+      !seen.has(id) &&
+      rawTitle &&
+      !rawTitle.startsWith('Image ') &&
+      !rawTitle.includes('Now playing') &&
+      !rawTitle.includes('chapters')
+    ) {
+      seen.add(id);
+      items.push({
+        id,
+        title: rawTitle,
+        thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+      });
+    }
+  }
+
+  return items;
+}
 
 /**
  * Parses and extracts a YouTube video ID from various URL formats.
@@ -340,9 +407,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
   const [inputUrl, setInputUrl] = useState<string>('flow://start');
 
-  // Dedicated YouTube Hub state
-  const [ytVideoId, setYtVideoId] = useState<string>('jfKfPfyJRdk');
-  const [ytInputUrl, setYtInputUrl] = useState<string>('');
+  // Universal Live YouTube Engine State
+  const [ytVideos, setYtVideos] = useState<YouTubeVideoItem[]>(POPULAR_YOUTUBE_SEED);
+  const [ytActiveVideo, setYtActiveVideo] = useState<YouTubeVideoItem | null>(null);
+  const [ytQuery, setYtQuery] = useState<string>('');
+  const [ytActiveCategory, setYtActiveCategory] = useState<string>('🔥 Trending');
+  const [ytIsSearching, setYtIsSearching] = useState<boolean>(false);
+  const [ytSearchError, setYtSearchError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -356,6 +427,56 @@ export const BrowserApp: React.FC<AppProps> = () => {
 
   const updateTab = useCallback((tabId: string, patch: Partial<BrowserTab>) => {
     setTabs((prev) => prev.map((t) => (t.id === tabId ? { ...t, ...patch } : t)));
+  }, []);
+
+  /**
+   * Performs live real-time YouTube search across the entire YouTube catalog.
+   */
+  const handleYouTubeSearch = useCallback(async (query: string, categoryLabel?: string) => {
+    const cleanQuery = query.trim();
+    if (!cleanQuery) return;
+
+    if (categoryLabel) {
+      setYtActiveCategory(categoryLabel);
+    } else {
+      setYtActiveCategory(`Search: "${cleanQuery}"`);
+    }
+
+    // Check if user entered a direct video link or ID
+    const directId = extractYouTubeVideoId(cleanQuery);
+    if (directId) {
+      setYtActiveVideo({
+        id: directId,
+        title: `YouTube Video (${directId})`,
+        thumbnail: `https://i.ytimg.com/vi/${directId}/hqdefault.jpg`,
+      });
+      return;
+    }
+
+    setYtIsSearching(true);
+    setYtSearchError(null);
+
+    try {
+      const resp = await fetch(
+        `https://r.jina.ai/https://www.youtube.com/results?search_query=${encodeURIComponent(cleanQuery)}`
+      );
+      if (!resp.ok) {
+        throw new Error(`Failed to fetch YouTube search (${resp.status})`);
+      }
+      const text = await resp.text();
+      const results = parseYouTubeSearchResults(text);
+
+      if (results.length > 0) {
+        setYtVideos(results);
+      } else {
+        setYtSearchError(`No direct video links found for "${cleanQuery}". Showing recommended catalog.`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setYtSearchError(`Search error: ${msg}. Showing recommended catalog.`);
+    } finally {
+      setYtIsSearching(false);
+    }
   }, []);
 
   /**
@@ -877,7 +998,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                 FlowOS Web & Device Browser
               </h2>
               <p className="mt-1 text-xs text-content-tertiary">
-                Direct Iframe Web Embed, Bypass Reader Engine, YouTube Player, and Real Host File Access.
+                Direct Iframe Web Embed, Bypass Reader Engine, Universal YouTube Client, and Real Host File Access.
               </p>
 
               {/* Start Page Search Omnibox */}
@@ -922,7 +1043,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                       <div className="truncate">
                         <div className="font-medium text-xs text-content-primary truncate">{bm.name}</div>
                         <div className="text-[10px] text-content-tertiary truncate">
-                          {bm.url === 'flow://youtube' ? 'Video Player Hub' : bm.url.replace(/^https?:\/\//, '')}
+                          {bm.url === 'flow://youtube' ? 'Video Player & Search' : bm.url.replace(/^https?:\/\//, '')}
                         </div>
                       </div>
                     </button>
@@ -998,7 +1119,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Play className="h-3.5 w-3.5 text-red-500 fill-red-500" />
-                  <span>YouTube Embed API</span>
+                  <span>Live Universal YouTube</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Zap className="h-3.5 w-3.5 text-amber-400" />
@@ -1012,137 +1133,240 @@ export const BrowserApp: React.FC<AppProps> = () => {
             </div>
           </div>
         ) : activeTab.url === 'flow://youtube' ? (
-          /* FlowOS YouTube Portal */
+          /* FlowTube - Universal Live YouTube Client */
           <div className="flex h-full w-full flex-col bg-surface-panel p-4 overflow-y-auto">
-            <div className="max-w-4xl w-full mx-auto flex flex-col gap-4">
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div className="max-w-6xl w-full mx-auto flex flex-col gap-4">
+              {/* Header / YouTube Bar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-border-subtle pb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm">
                     <Play className="h-4 w-4 fill-white ml-0.5" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-sm text-content-primary">FlowOS YouTube Player</h2>
+                    <div className="flex items-center gap-1.5">
+                      <h2 className="font-bold text-sm tracking-tight text-content-primary">FlowTube</h2>
+                      <span className="rounded bg-red-600/10 border border-red-600/30 px-1.5 py-0.2 text-[9px] font-bold text-red-400 uppercase tracking-wider">
+                        Universal
+                      </span>
+                    </div>
                     <p className="text-[11px] text-content-tertiary">
-                      Official Embed API Player for Sandboxed OS
+                      Search, browse, and watch any video in the entire YouTube catalog
                     </p>
                   </div>
                 </div>
 
+                {/* Real-time YouTube Search Bar */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (ytQuery.trim()) {
+                      handleYouTubeSearch(ytQuery);
+                    }
+                  }}
+                  className="flex flex-1 sm:max-w-md items-center gap-1.5"
+                >
+                  <div className="flex flex-1 items-center rounded-lg border border-border-subtle bg-surface-subtle/50 px-3 py-1.5 focus-within:border-red-500 focus-within:bg-surface-panel transition-all">
+                    <Search className="h-3.5 w-3.5 text-content-tertiary mr-2 shrink-0" />
+                    <input
+                      type="text"
+                      value={ytQuery}
+                      onChange={(e) => setYtQuery(e.target.value)}
+                      placeholder="Search any video, topic, or paste YouTube link..."
+                      className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+                    />
+                    {ytQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setYtQuery('')}
+                        className="text-content-tertiary hover:text-content-primary"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={ytIsSearching}
+                    className="flex items-center gap-1 rounded-lg bg-red-600 hover:bg-red-700 px-3 py-1.5 text-xs font-medium text-white transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                  >
+                    {ytIsSearching ? (
+                      <RotateCw className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Search className="h-3.5 w-3.5" />
+                    )}
+                    <span className="hidden sm:inline">Search</span>
+                  </button>
+                </form>
+
+                {/* External link */}
                 <a
                   href="https://www.youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-subtle px-3 py-1.5 text-[11px] font-medium text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-colors"
+                  className="hidden md:flex items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-subtle px-3 py-1.5 text-[11px] font-medium text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-colors shrink-0"
                 >
-                  <span>Open Full YouTube.com</span>
+                  <span>Native Tab</span>
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
 
-              {/* URL / Search input */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const parsed = extractYouTubeVideoId(ytInputUrl);
-                  if (parsed) {
-                    setYtVideoId(parsed);
-                    setYtInputUrl('');
-                  } else if (ytInputUrl.trim()) {
-                    handleNavigate(
-                      `https://html.duckduckgo.com/html/?q=${encodeURIComponent(ytInputUrl + ' site:youtube.com')}`
-                    );
-                  }
-                }}
-                className="flex gap-2"
-              >
-                <div className="flex flex-1 items-center rounded-lg border border-border-subtle bg-surface-subtle/50 px-3 py-1.5 focus-within:border-red-500">
-                  <Search className="h-3.5 w-3.5 text-content-tertiary mr-2" />
-                  <input
-                    type="text"
-                    value={ytInputUrl}
-                    onChange={(e) => setYtInputUrl(e.target.value)}
-                    placeholder="Paste any YouTube URL (e.g. https://www.youtube.com/watch?v=... or youtu.be/...)..."
-                    className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-1.5 text-xs font-medium text-white transition-colors shadow-sm cursor-pointer"
-                >
-                  <Play className="h-3.5 w-3.5 fill-white" />
-                  <span>Play Video</span>
-                </button>
-              </form>
-
-              {/* Active Player */}
-              <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border-subtle bg-black shadow-lg">
-                <iframe
-                  key={ytVideoId}
-                  src={`https://www.youtube-nocookie.com/embed/${ytVideoId}?autoplay=1&enablejsapi=1`}
-                  title="YouTube Video Player"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full border-none"
-                />
-              </div>
-
-              {/* Curated Channels / Quick Play */}
-              <div>
-                <div className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider mb-2">
-                  Featured & Instant Streams
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {[
-                    { title: 'Lofi Girl - Relax / Study Beats', id: 'jfKfPfyJRdk', tag: 'Lo-Fi Radio' },
-                    { title: 'Fireship - Linux in 100 Seconds', id: 'rrB13utjYV4', tag: 'Dev / Tech' },
-                    { title: 'Synthwave Radio - Chill Synth Vibes', id: '4xDzrJKXOOY', tag: 'Music Stream' },
-                    { title: 'Chillhop Music - Jazzy Beats', id: '5yx6BWlEVcY', tag: 'Chillhop' },
-                    { title: 'Veritasium - Illusion of Speed', id: 'A5w-dEgEx10', tag: 'Science' },
-                    { title: 'The History of Linux OS', id: '2j_g2W9h9-E', tag: 'Documentary' },
-                  ].map((item) => (
+              {/* Category Filter Rail */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                {YOUTUBE_CATEGORIES.map((cat) => {
+                  const isActive = ytActiveCategory === cat.label;
+                  return (
                     <button
-                      key={item.id}
-                      onClick={() => setYtVideoId(item.id)}
-                      className={`flex flex-col rounded-lg border p-2.5 text-left transition-all group ${
-                        ytVideoId === item.id
-                          ? 'border-red-500/50 bg-red-500/10'
-                          : 'border-border-subtle bg-surface-subtle/30 hover:border-border-strong hover:bg-surface-subtle'
+                      key={cat.label}
+                      onClick={() => handleYouTubeSearch(cat.query, cat.label)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+                        isActive
+                          ? 'bg-red-600 text-white shadow-sm'
+                          : 'bg-surface-subtle text-content-secondary hover:bg-surface-overlay hover:text-content-primary border border-border-subtle'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="rounded bg-surface-panel px-1.5 py-0.5 text-[9px] font-mono text-content-tertiary border border-border-subtle">
-                          {item.tag}
-                        </span>
-                        <Play
-                          className={`h-3 w-3 ${
-                            ytVideoId === item.id
-                              ? 'text-red-500 fill-red-500'
-                              : 'text-content-tertiary group-hover:text-red-400'
-                          }`}
-                        />
-                      </div>
-                      <span className="font-medium text-xs text-content-primary line-clamp-1">
-                        {item.title}
-                      </span>
+                      {cat.label}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
 
-              {/* Educational Notice: Why does YouTube block standard iframes? */}
-              <div className="rounded-xl border border-border-subtle bg-surface-subtle/30 p-3.5 text-xs text-content-secondary flex gap-3">
+              {/* Active Video Player (Theater Mode) */}
+              {ytActiveVideo && (
+                <div className="relative w-full rounded-2xl overflow-hidden border border-border-subtle bg-black shadow-2xl">
+                  {/* Top Bar inside Player */}
+                  <div className="flex items-center justify-between bg-black/90 backdrop-blur px-4 py-2 border-b border-white/10 text-white">
+                    <div className="flex items-center gap-2 truncate pr-4">
+                      <Play className="h-3.5 w-3.5 text-red-500 fill-red-500 shrink-0" />
+                      <span className="font-semibold text-xs truncate">{ytActiveVideo.title}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a
+                        href={`https://www.youtube.com/watch?v=${ytActiveVideo.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Open in native YouTube tab"
+                        className="p-1 rounded hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <button
+                        onClick={() => setYtActiveVideo(null)}
+                        title="Close Player and view feed"
+                        className="p-1 rounded hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 16:9 Responsive Embed */}
+                  <div className="aspect-video w-full bg-black">
+                    <iframe
+                      key={ytActiveVideo.id}
+                      src={`https://www.youtube-nocookie.com/embed/${ytActiveVideo.id}?autoplay=1&enablejsapi=1`}
+                      title={ytActiveVideo.title}
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full border-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Feed Header */}
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-red-500" />
+                  <span className="font-semibold text-xs text-content-primary">
+                    {ytActiveCategory}
+                  </span>
+                  <span className="text-[10px] text-content-tertiary">
+                    ({ytVideos.length} videos loaded)
+                  </span>
+                </div>
+
+                {ytIsSearching && (
+                  <div className="flex items-center gap-1.5 text-[11px] text-red-400 font-medium">
+                    <RotateCw className="h-3.5 w-3.5 animate-spin" />
+                    <span>Searching YouTube in real time...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Search Error Notice (if any) */}
+              {ytSearchError && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
+                  {ytSearchError}
+                </div>
+              )}
+
+              {/* Universal Video Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-6">
+                {ytVideos.map((video) => {
+                  const isCurrent = ytActiveVideo?.id === video.id;
+                  return (
+                    <div
+                      key={video.id}
+                      onClick={() => {
+                        setYtActiveVideo(video);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`group flex flex-col rounded-xl border overflow-hidden cursor-pointer transition-all duration-200 ${
+                        isCurrent
+                          ? 'border-red-500 bg-red-500/10 shadow-md ring-1 ring-red-500'
+                          : 'border-border-subtle bg-surface-subtle/30 hover:border-red-500/50 hover:bg-surface-subtle hover:shadow-lg hover:-translate-y-0.5'
+                      }`}
+                    >
+                      {/* Video Thumbnail */}
+                      <div className="relative aspect-video w-full bg-black/60 overflow-hidden">
+                        <img
+                          src={video.thumbnail}
+                          alt={video.title}
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/mqdefault.jpg`;
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {/* Play Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="h-9 w-9 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <Play className="h-4 w-4 fill-white ml-0.5" />
+                          </div>
+                        </div>
+                        {isCurrent && (
+                          <span className="absolute top-2 left-2 rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shadow">
+                            Playing Now
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Video Details */}
+                      <div className="p-2.5 flex flex-col flex-1 justify-between">
+                        <h3 className="font-semibold text-xs text-content-primary line-clamp-2 leading-snug group-hover:text-red-400 transition-colors">
+                          {video.title}
+                        </h3>
+                        {video.channel && (
+                          <p className="mt-1 text-[10px] text-content-tertiary truncate">
+                            {video.channel}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Informative Security Banner */}
+              <div className="rounded-xl border border-border-subtle bg-surface-subtle/30 p-3 text-xs text-content-secondary flex gap-3">
                 <Info className="h-4 w-4 text-accent-primary shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <div className="font-medium text-content-primary">
-                    Why can't the standard youtube.com homepage be embedded directly?
+                    How FlowTube Universal Engine Works
                   </div>
                   <p className="text-[11px] text-content-tertiary leading-relaxed">
-                    Google serves <code>X-Frame-Options: SAMEORIGIN</code> and <code>frame-ancestors 'self'</code> headers on the root <code>youtube.com</code> domain. Web browsers strictly refuse to embed the main site inside an iframe to prevent clickjacking attacks (protecting logged-in Google accounts).
-                  </p>
-                  <p className="text-[11px] text-content-tertiary leading-relaxed">
-                    However, YouTube officially provides its <strong>Embed API</strong> (<code>youtube.com/embed/...</code>), which FlowOS seamlessly uses here. You can paste any video URL or ID above to watch it inside FlowOS without restrictions!
+                    Google serves <code>X-Frame-Options: SAMEORIGIN</code> on <code>youtube.com</code> to prevent clickjacking of account cookies. FlowTube queries YouTube’s live catalog in real time and streams videos through YouTube’s official Embed Engine (<code>youtube.com/embed/...</code>), providing unrestricted access to the entire YouTube library directly inside FlowOS!
                   </p>
                 </div>
               </div>
@@ -1239,7 +1463,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 export const browserManifest: AppManifest = {
   id: 'browser',
   name: 'Browser',
-  description: 'Multi-mode web browser with direct embed, YouTube player, reader mode bypass, and host device file support.',
+  description: 'Multi-mode web browser with direct embed, universal YouTube engine, reader mode bypass, and host device file support.',
   category: 'productivity',
   icon: Globe,
   defaultSize: { width: 840, height: 580 },
