@@ -261,6 +261,21 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
   - 💻 **Host Device & VFS File Viewer:** Direct access to mounted PC folders (`/device/...`) and individual local files via native file picker, rendering HTML, SVG, Markdown, text, and media inside the browser frame.
 - **Smart Connection Fallback:** Bottom status card detecting connection refusal with one-click **"⚡ Switch to Reader Mode"** and **"↗ Open in New Window"** shortcuts.
 
+### 38. Retro Multiplayer Arcade & AirBridge Dual Suite
+- **CyberPong Arena (`cyber-pong`):**
+  - **Local Split-Keyboard Duel:** 2 players battle simultaneously on the same machine (Player 1: `W / S`, Player 2: `↑ / ↓`).
+  - **VS Cyber Bot:** Adaptive AI bot with Easy, Medium, and Hard difficulty levels.
+  - **AirBridge P2P Sync:** Zero-latency cross-window / cross-tab multiplayer via `BroadcastChannel` with room code pairing.
+  - **Ball Physics & Effects:** Accelerating rally velocity, paddle deflection angles, particle spark bursts, CRT court glow, and synthesized Web Audio sound effects.
+- **Snake Arena / Tron Lightcycles (`snake-arena`):**
+  - **2-Player Real-Time Grid Battle:** Player 1 (Cyan Lightcycle: `WASD`) vs Player 2 (Amber Lightcycle: `Arrow Keys`).
+  - **Collision Rules:** Wall crashes, self-collisions, and tail trapping with pixel explosion feedback.
+  - **VS Bot Snake & AirBridge P2P:** Smart pathfinding AI opponent and cross-window real-time multiplayer.
+- **Connect 4 Tactical Duel (`connect-four`):**
+  - **Turn-Based Gravity Grid (7x6):** Player 1 (Red) vs Player 2 (Yellow).
+  - **3 Game Modes:** Pass-and-play local duel, Minimax heuristic AI bot, and AirBridge cross-window P2P sync.
+  - **Tactile Board Engine:** Column hover indicators, gravity drop animations, winning 4-in-a-row glowing streak, move undo, and match score counter.
+
 ---
 
 ## 📱 Built-in & Community Applications
@@ -270,6 +285,9 @@ FlowOS delivers authentic desktop ergonomics inside the browser, marrying the re
 | **Personal OS** | `personal-os` | Productivity | Engineering control center with missions, project studio, git diff viewer, editable DSA tracker, and academics. |
 | **Browser** | `browser` | Productivity | Multi-mode in-OS browser with direct iframe embed, Jina Reader bypass for restricted sites, host device file viewer, tabs, and navigation history. |
 | **Files** | `file-explorer` | Utilities | Arc-style Workspace sidebar, W3C host device storage mounting (`/device/...`), Quick Look previewer, high-density table/grid views, and host import/export. |
+| **CyberPong** | `cyber-pong` | Games | 2-Player multiplayer arcade table tennis with local split-keyboard, AI bot, and AirBridge P2P cross-window sync. |
+| **Snake Arena** | `snake-arena` | Games | 2-Player Tron lightcycle grid battle with local split controls, AI bot, and AirBridge P2P cross-window sync. |
+| **Connect 4** | `connect-four` | Games | Tactical 2-player multiplayer gravity grid with pass-and-play, Minimax AI bot, and AirBridge P2P sync. |
 | **Code Editor** | `code-editor` | Development | Monospaced editor with line numbers gutter, syntax detection, `Ctrl+S` VFS save, and integrated WebWorker execution console. |
 | **Notes** | `notes` | Productivity | Obsidian-inspired markdown notes with `#tags`, word count, reading time, edit vs reading view, and VFS file loading. |
 | **Terminal** | `terminal` | Development | `flowsh` Unix Pipeline Edition — pipes, `grep`, `wc`, `head`, `tail`, `sort`, `tree`, Tab autocomplete, `eval`, `run`, `pkg`. |

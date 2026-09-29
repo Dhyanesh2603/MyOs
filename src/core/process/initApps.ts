@@ -19,6 +19,9 @@ import { flowcamManifest } from '@apps/flowcam';
 import { flowtapeManifest } from '@apps/flowtape';
 import { flowboardManifest } from '@apps/flowboard';
 import { personalOsManifest } from '@apps/personal-os';
+import { cyberPongManifest } from '@apps/cyber-pong';
+import { snakeArenaManifest } from '@apps/snake-arena';
+import { connectFourManifest } from '@apps/connect-four';
 
 let initialized = false;
 
@@ -49,6 +52,9 @@ export function initializeApplications(): void {
   appRegistry.register(flowcamManifest);
   appRegistry.register(flowtapeManifest);
   appRegistry.register(flowboardManifest);
+  appRegistry.register(cyberPongManifest);
+  appRegistry.register(snakeArenaManifest);
+  appRegistry.register(connectFourManifest);
 
   initialized = true;
 }
