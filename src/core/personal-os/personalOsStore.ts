@@ -1,12 +1,17 @@
 import { create } from 'zustand';
 import type {
   Mission,
+  MissionPriority,
   Project,
+  ProjectStatus,
+  ProjectMilestone,
   AcademicSubject,
+  AcademicAssignment,
   CgpaPlan,
   SkillItem,
   DsaQuestion,
   CareerCompany,
+  InterviewRound,
   DailyPlan,
   TimelineEvent,
   KnowledgeNode,
@@ -66,6 +71,8 @@ export interface PersonalOsState {
   timeline: TimelineEvent[];
   knowledgeNodes: KnowledgeNode[];
   knowledgeEdges: KnowledgeEdge[];
+  portfolioChecklist: { id: string; title: string; completed: boolean }[];
+  resumeVersions: { id: string; name: string; tag: string; updated: string }[];
 
   // Focus Mode
   focusMode: FocusModeState;
@@ -74,18 +81,60 @@ export interface PersonalOsState {
   // Missions
   toggleMissionObjective: (missionId: string, objectiveId: string) => void;
   updateMissionStatus: (missionId: string, status: MissionStatus) => void;
-  addMission: (title: string, tagline?: string) => void;
+  addMission: (title: string, tagline?: string, category?: Mission['category'], priority?: MissionPriority, deadline?: string) => void;
+  updateMission: (missionId: string, updates: Partial<Mission>) => void;
+  deleteMission: (missionId: string) => void;
+  addMissionObjective: (missionId: string, text: string) => void;
+  deleteMissionObjective: (missionId: string, objectiveId: string) => void;
 
   // Projects
+  addProject: (project: {
+    name: string;
+    tagline: string;
+    description: string;
+    repoUrl: string;
+    demoUrl?: string;
+    techStack: string[];
+    architectureOverview: string;
+    status?: ProjectStatus;
+    milestones?: string[];
+  }) => void;
+  updateProject: (projectId: string, updates: Partial<Project>) => void;
+  deleteProject: (projectId: string) => void;
   toggleProjectMilestone: (projectId: string, milestoneId: string) => void;
+  addProjectMilestone: (projectId: string, title: string) => void;
+  deleteProjectMilestone: (projectId: string, milestoneId: string) => void;
   addProjectBug: (projectId: string, description: string, severity: 'critical' | 'moderate' | 'minor') => void;
   addProjectIssue: (projectId: string, title: string) => void;
   resolveProjectBug: (projectId: string, bugId: string) => void;
 
   // Academics
+  addSubject: (subject: {
+    code: string;
+    name: string;
+    credits: number;
+    professor?: string;
+    minimumTarget?: number;
+    attended?: number;
+    total?: number;
+  }) => void;
+  updateSubject: (subjectId: string, updates: Partial<AcademicSubject>) => void;
+  deleteSubject: (subjectId: string) => void;
   logAttendance: (subjectId: string, attended: boolean) => void;
+  adjustAttendanceCount: (subjectId: string, attended: number, total: number) => void;
   toggleAssignment: (subjectId: string, assignmentId: string) => void;
+  addAssignment: (
+    subjectId: string,
+    title: string,
+    dueDate: string,
+    weightage?: number,
+    type?: AcademicAssignment['type']
+  ) => void;
+  deleteAssignment: (subjectId: string, assignmentId: string) => void;
   updateRevisionStatus: (subjectId: string, topicId: string, status: 'not_started' | 'revising' | 'mastered') => void;
+  addRevisionTopic: (subjectId: string, topic: string) => void;
+  deleteRevisionTopic: (subjectId: string, topicId: string) => void;
+  updateCgpaPlan: (updates: Partial<CgpaPlan>) => void;
 
   // DSA
   toggleDsaStatus: (questionId: string) => void;
@@ -102,12 +151,40 @@ export interface PersonalOsState {
   deleteSkill: (skillId: string) => void;
 
   // Career
+  addCompany: (company: {
+    companyName: string;
+    role: string;
+    stage?: CareerStage;
+    ctcRange?: string;
+    location?: string;
+    jobUrl?: string;
+    notes?: string;
+    resumeVersionUsed?: string;
+  }) => void;
+  updateCompany: (companyId: string, updates: Partial<CareerCompany>) => void;
+  deleteCompany: (companyId: string) => void;
   updateCompanyStage: (companyId: string, stage: CareerStage) => void;
+  addInterviewRound: (companyId: string, roundName: string, date?: string, feedback?: string) => void;
+  deleteInterviewRound: (companyId: string, roundId: string) => void;
+  toggleInterviewRoundPassed: (companyId: string, roundId: string) => void;
+  togglePortfolioChecklist: (id: string) => void;
+  addPortfolioChecklist: (title: string) => void;
+  deletePortfolioChecklist: (id: string) => void;
+  addResumeVersion: (name: string, tag: string) => void;
+  deleteResumeVersion: (id: string) => void;
 
   // Daily
   toggleMorningPriority: (priorityId: string) => void;
   addMorningPriority: (text: string, tag?: string) => void;
+  deleteMorningPriority: (priorityId: string) => void;
   logDeepWorkMinutes: (minutes: number) => void;
+  updateEveningReflection: (notes: string, wins?: string[], mistakes?: string[]) => void;
+  addDailyWin: (win: string) => void;
+  deleteDailyWin: (index: number) => void;
+  addDailyMistake: (mistake: string) => void;
+  deleteDailyMistake: (index: number) => void;
+  updateDailyLevels: (focusLevel: 1 | 2 | 3 | 4 | 5, energyLevel: 1 | 2 | 3 | 4 | 5) => void;
+  addTimelineEvent: (event: Omit<TimelineEvent, 'id' | 'timestamp'>) => void;
 
   // Focus Mode
   startFocusMode: (taskTitle: string, targetMinutes?: number) => void;
@@ -147,12 +224,29 @@ function saveState(state: Partial<PersonalOsState>): void {
       timeline: state.timeline,
       knowledgeNodes: state.knowledgeNodes,
       knowledgeEdges: state.knowledgeEdges,
+      portfolioChecklist: state.portfolioChecklist,
+      resumeVersions: state.resumeVersions,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
   } catch {
     // Storage quota exceeded or disabled
   }
 }
+
+const DEFAULT_PORTFOLIO_CHECKLIST = [
+  { id: 'port-1', title: 'Flow OS Web Desktop Production Demo', completed: true },
+  { id: 'port-2', title: 'NeuralCache Vector DB Benchmark Specs', completed: true },
+  { id: 'port-3', title: 'Single-Page ATS 95+ Resume (v4 Systems Edition)', completed: true },
+  { id: 'port-4', title: 'MockForge OpenAPI 3.1 Synthesis Engine', completed: true },
+  { id: 'port-5', title: 'System Design: Distributed Ledger & Idempotency Notes', completed: false },
+  { id: 'port-6', title: 'Record 5-minute technical walkthrough video', completed: false },
+];
+
+const DEFAULT_RESUME_VERSIONS = [
+  { id: 'res-1', name: 'Resume_v4_Systems_Focused.pdf', tag: 'Distributed / Backend', updated: '2026-09-18' },
+  { id: 'res-2', name: 'Resume_v4_Frontend_Systems.pdf', tag: 'UI Engineering / React', updated: '2026-09-15' },
+  { id: 'res-3', name: 'Resume_v4_General_SDE.pdf', tag: 'Generalist SWE', updated: '2026-09-10' },
+];
 
 const initialSaved = loadPersistedState();
 
@@ -171,6 +265,8 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
   timeline: initialSaved.timeline || SEED_TIMELINE,
   knowledgeNodes: initialSaved.knowledgeNodes || SEED_KNOWLEDGE_NODES,
   knowledgeEdges: initialSaved.knowledgeEdges || SEED_KNOWLEDGE_EDGES,
+  portfolioChecklist: initialSaved.portfolioChecklist || DEFAULT_PORTFOLIO_CHECKLIST,
+  resumeVersions: initialSaved.resumeVersions || DEFAULT_RESUME_VERSIONS,
 
   focusMode: {
     isActive: false,
@@ -208,18 +304,18 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     });
   },
 
-  addMission: (title, tagline) => {
+  addMission: (title, tagline, category, priority, deadline) => {
     set((state) => {
       const newMission: Mission = {
         id: `mission-${Date.now()}`,
         title,
-        tagline: tagline || 'Captured via Quick Scratchpad',
-        category: 'engineering',
+        tagline: tagline || 'Custom Engineering Campaign',
+        category: category || 'engineering',
         status: 'active',
-        priority: 'high',
+        priority: priority || 'high',
         progress: 0,
-        deadline: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0] || '2026-09-30',
-        estimatedCompletion: '1-2 weeks',
+        deadline: deadline || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0] || '2026-10-15',
+        estimatedCompletion: '2-3 weeks',
         objectives: [
           { id: `obj-${Date.now()}-1`, text: 'Initial technical specification & architecture', completed: false },
           { id: `obj-${Date.now()}-2`, text: 'Core implementation and verification', completed: false },
@@ -235,7 +331,116 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     });
   },
 
+  updateMission: (missionId, updates) => {
+    set((state) => {
+      const missions = state.missions.map((m) =>
+        m.id === missionId ? { ...m, ...updates } : m
+      );
+      saveState({ ...state, missions });
+      return { missions };
+    });
+  },
+
+  deleteMission: (missionId) => {
+    set((state) => {
+      const missions = state.missions.filter((m) => m.id !== missionId);
+      saveState({ ...state, missions });
+      return { missions };
+    });
+  },
+
+  addMissionObjective: (missionId, text) => {
+    set((state) => {
+      const missions = state.missions.map((m) => {
+        if (m.id !== missionId) return m;
+        const objectives = [
+          ...m.objectives,
+          { id: `obj-${Date.now()}`, text, completed: false },
+        ];
+        const completedCount = objectives.filter((o) => o.completed).length;
+        const progress = Math.round((completedCount / (objectives.length || 1)) * 100);
+        return { ...m, objectives, progress };
+      });
+      saveState({ ...state, missions });
+      return { missions };
+    });
+  },
+
+  deleteMissionObjective: (missionId, objectiveId) => {
+    set((state) => {
+      const missions = state.missions.map((m) => {
+        if (m.id !== missionId) return m;
+        const objectives = m.objectives.filter((o) => o.id !== objectiveId);
+        const completedCount = objectives.filter((o) => o.completed).length;
+        const progress = Math.round((completedCount / (objectives.length || 1)) * 100);
+        return { ...m, objectives, progress };
+      });
+      saveState({ ...state, missions });
+      return { missions };
+    });
+  },
+
   // Projects
+  addProject: (project) => {
+    set((state) => {
+      const newId = `proj-${Date.now()}`;
+      const defaultMilestones: ProjectMilestone[] = project.milestones?.map((m, idx) => ({
+        id: `ms-${Date.now()}-${idx}`,
+        title: m,
+        completed: false,
+      })) || [
+        { id: `ms-${Date.now()}-1`, title: 'Architecture and initial repo setup', completed: false },
+        { id: `ms-${Date.now()}-2`, title: 'Core implementation and unit tests', completed: false },
+        { id: `ms-${Date.now()}-3`, title: 'Production deployment and live docs', completed: false },
+      ];
+
+      const newProject: Project = {
+        id: newId,
+        name: project.name,
+        tagline: project.tagline,
+        description: project.description,
+        status: project.status || 'in_progress',
+        progress: 0,
+        repoUrl: project.repoUrl,
+        demoUrl: project.demoUrl,
+        techStack: project.techStack,
+        architectureOverview: project.architectureOverview,
+        milestones: defaultMilestones,
+        knownBugs: [],
+        ideas: ['Optimize memory allocations', 'Benchmark end-to-end throughput'],
+        changelog: [
+          { version: 'v0.1.0', date: new Date().toISOString().split('T')[0] || '2026-09-30', notes: ['Project repository initialized'] },
+        ],
+        recentCommits: [
+          { hash: Math.random().toString(16).slice(2, 9), message: 'feat: initialize project scaffold', date: 'Just now' },
+        ],
+        skillIds: [],
+      };
+
+      const projects = [newProject, ...state.projects];
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
+  updateProject: (projectId, updates) => {
+    set((state) => {
+      const projects = state.projects.map((p) =>
+        p.id === projectId ? { ...p, ...updates } : p
+      );
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
+  deleteProject: (projectId) => {
+    set((state) => {
+      const projects = state.projects.filter((p) => p.id !== projectId);
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
   toggleProjectMilestone: (projectId, milestoneId) => {
     set((state) => {
       const projects = state.projects.map((p) => {
@@ -243,6 +448,37 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
         const milestones = p.milestones.map((m) =>
           m.id === milestoneId ? { ...m, completed: !m.completed } : m
         );
+        const completedCount = milestones.filter((m) => m.completed).length;
+        const progress = Math.round((completedCount / (milestones.length || 1)) * 100);
+        return { ...p, milestones, progress };
+      });
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
+  addProjectMilestone: (projectId, title) => {
+    set((state) => {
+      const projects = state.projects.map((p) => {
+        if (p.id !== projectId) return p;
+        const milestones = [
+          ...p.milestones,
+          { id: `ms-${Date.now()}`, title, completed: false },
+        ];
+        const completedCount = milestones.filter((m) => m.completed).length;
+        const progress = Math.round((completedCount / (milestones.length || 1)) * 100);
+        return { ...p, milestones, progress };
+      });
+      saveState({ ...state, projects });
+      return { projects };
+    });
+  },
+
+  deleteProjectMilestone: (projectId, milestoneId) => {
+    set((state) => {
+      const projects = state.projects.map((p) => {
+        if (p.id !== projectId) return p;
+        const milestones = p.milestones.filter((m) => m.id !== milestoneId);
         const completedCount = milestones.filter((m) => m.completed).length;
         const progress = Math.round((completedCount / (milestones.length || 1)) * 100);
         return { ...p, milestones, progress };
@@ -305,6 +541,62 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
   },
 
   // Academics
+  addSubject: (subject) => {
+    set((state) => {
+      const newSubject: AcademicSubject = {
+        id: `subj-${Date.now()}`,
+        code: subject.code,
+        name: subject.name,
+        credits: subject.credits,
+        professor: subject.professor || 'Department Faculty',
+        attendance: {
+          attended: subject.attended ?? 0,
+          total: subject.total ?? 0,
+          minimumTarget: subject.minimumTarget ?? 75,
+        },
+        internalMarks: {
+          maxMarks: 100,
+        },
+        assignments: [
+          {
+            id: `as-${Date.now()}-1`,
+            title: `${subject.code} Coursework Assignment 1`,
+            dueDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0] || '2026-10-10',
+            completed: false,
+            type: 'assignment',
+            weightagePercent: 10,
+          },
+        ],
+        examSchedule: {},
+        revisionTopics: [
+          { id: `rt-${Date.now()}-1`, topic: 'Module 1: Foundations & Core Concepts', status: 'not_started' },
+          { id: `rt-${Date.now()}-2`, topic: 'Module 2: Advanced Implementations', status: 'not_started' },
+        ],
+      };
+      const subjects = [...state.subjects, newSubject];
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  updateSubject: (subjectId, updates) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) =>
+        s.id === subjectId ? { ...s, ...updates } : s
+      );
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  deleteSubject: (subjectId) => {
+    set((state) => {
+      const subjects = state.subjects.filter((s) => s.id !== subjectId);
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
   logAttendance: (subjectId, attended) => {
     set((state) => {
       const subjects = state.subjects.map((s) => {
@@ -315,6 +607,24 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
             ...s.attendance,
             attended: attended ? s.attendance.attended + 1 : s.attendance.attended,
             total: s.attendance.total + 1,
+          },
+        };
+      });
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  adjustAttendanceCount: (subjectId, attended, total) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        return {
+          ...s,
+          attendance: {
+            ...s.attendance,
+            attended: Math.max(0, attended),
+            total: Math.max(0, Math.max(attended, total)),
           },
         };
       });
@@ -339,6 +649,50 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     });
   },
 
+  addAssignment: (subjectId, title, dueDate, weightage, type) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        const newAssignment: AcademicAssignment = {
+          id: `as-${Date.now()}`,
+          title,
+          dueDate: dueDate || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0] || '2026-10-07',
+          completed: false,
+          type: type || 'assignment',
+          weightagePercent: weightage ?? 10,
+        };
+        return {
+          ...s,
+          assignments: [...s.assignments, newAssignment],
+        };
+      });
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  deleteAssignment: (subjectId, assignmentId) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        return {
+          ...s,
+          assignments: s.assignments.filter((a) => a.id !== assignmentId),
+        };
+      });
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  updateCgpaPlan: (updates) => {
+    set((state) => {
+      const cgpaPlan = { ...state.cgpaPlan, ...updates };
+      saveState({ ...state, cgpaPlan });
+      return { cgpaPlan };
+    });
+  },
+
   updateRevisionStatus: (subjectId, topicId, status) => {
     set((state) => {
       const subjects = state.subjects.map((s) => {
@@ -348,6 +702,39 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
           revisionTopics: s.revisionTopics.map((t) =>
             t.id === topicId ? { ...t, status } : t
           ),
+        };
+      });
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  addRevisionTopic: (subjectId, topic) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        const newTopic = {
+          id: `topic-${Date.now()}`,
+          topic,
+          status: 'not_started' as const,
+        };
+        return {
+          ...s,
+          revisionTopics: [...s.revisionTopics, newTopic],
+        };
+      });
+      saveState({ ...state, subjects });
+      return { subjects };
+    });
+  },
+
+  deleteRevisionTopic: (subjectId, topicId) => {
+    set((state) => {
+      const subjects = state.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        return {
+          ...s,
+          revisionTopics: s.revisionTopics.filter((t) => t.id !== topicId),
         };
       });
       saveState({ ...state, subjects });
@@ -468,6 +855,47 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
   },
 
   // Career
+  addCompany: (company) => {
+    set((state) => {
+      const newCompany: CareerCompany = {
+        id: `comp-${Date.now()}`,
+        companyName: company.companyName,
+        role: company.role,
+        stage: company.stage || 'wishlist',
+        applicationDate: new Date().toISOString().split('T')[0] || '2026-09-30',
+        ctcRange: company.ctcRange || 'Competitive',
+        location: company.location || 'Remote / Hybrid',
+        jobUrl: company.jobUrl,
+        notes: company.notes,
+        interviewRounds: [
+          { id: `rnd-${Date.now()}-1`, roundName: 'Resume Screening & Profile Review', passed: true },
+          { id: `rnd-${Date.now()}-2`, roundName: 'Technical Architecture & Coding Round', passed: false },
+        ],
+      };
+      const companies = [newCompany, ...state.companies];
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
+  updateCompany: (companyId, updates) => {
+    set((state) => {
+      const companies = state.companies.map((c) =>
+        c.id === companyId ? { ...c, ...updates } : c
+      );
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
+  deleteCompany: (companyId) => {
+    set((state) => {
+      const companies = state.companies.filter((c) => c.id !== companyId);
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
   updateCompanyStage: (companyId, stage) => {
     set((state) => {
       const companies = state.companies.map((c) =>
@@ -475,6 +903,110 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
       );
       saveState({ ...state, companies });
       return { companies };
+    });
+  },
+
+  addInterviewRound: (companyId, roundName, date, feedback) => {
+    set((state) => {
+      const companies = state.companies.map((c) => {
+        if (c.id !== companyId) return c;
+        const newRound: InterviewRound = {
+          id: `rnd-${Date.now()}`,
+          roundName,
+          date,
+          feedback,
+          passed: false,
+        };
+        return {
+          ...c,
+          interviewRounds: [...c.interviewRounds, newRound],
+        };
+      });
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
+  deleteInterviewRound: (companyId, roundId) => {
+    set((state) => {
+      const companies = state.companies.map((c) => {
+        if (c.id !== companyId) return c;
+        return {
+          ...c,
+          interviewRounds: c.interviewRounds.filter((r) => r.id !== roundId),
+        };
+      });
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
+  toggleInterviewRoundPassed: (companyId, roundId) => {
+    set((state) => {
+      const companies = state.companies.map((c) => {
+        if (c.id !== companyId) return c;
+        return {
+          ...c,
+          interviewRounds: c.interviewRounds.map((r) =>
+            r.id === roundId ? { ...r, passed: !r.passed } : r
+          ),
+        };
+      });
+      saveState({ ...state, companies });
+      return { companies };
+    });
+  },
+
+  togglePortfolioChecklist: (id) => {
+    set((state) => {
+      const portfolioChecklist = state.portfolioChecklist.map((item) =>
+        item.id === id ? { ...item, completed: !item.completed } : item
+      );
+      saveState({ ...state, portfolioChecklist });
+      return { portfolioChecklist };
+    });
+  },
+
+  addPortfolioChecklist: (title) => {
+    set((state) => {
+      const newItem = {
+        id: `port-${Date.now()}`,
+        title,
+        completed: false,
+      };
+      const portfolioChecklist = [...state.portfolioChecklist, newItem];
+      saveState({ ...state, portfolioChecklist });
+      return { portfolioChecklist };
+    });
+  },
+
+  deletePortfolioChecklist: (id) => {
+    set((state) => {
+      const portfolioChecklist = state.portfolioChecklist.filter((item) => item.id !== id);
+      saveState({ ...state, portfolioChecklist });
+      return { portfolioChecklist };
+    });
+  },
+
+  addResumeVersion: (name, tag) => {
+    set((state) => {
+      const newItem = {
+        id: `res-${Date.now()}`,
+        name,
+        tag,
+        updated: new Date().toISOString().split('T')[0] || 'Today',
+      };
+      const resumeVersions = [newItem, ...state.resumeVersions];
+      saveState({ ...state, resumeVersions });
+      return { resumeVersions };
+    });
+  },
+
+  deleteResumeVersion: (id) => {
+    set((state) => {
+      const resumeVersions = state.resumeVersions.filter((item) => item.id !== id);
+      saveState({ ...state, resumeVersions });
+      return { resumeVersions };
     });
   },
 
@@ -507,6 +1039,17 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     });
   },
 
+  deleteMorningPriority: (priorityId) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        morningPriorities: state.dailyPlan.morningPriorities.filter((p) => p.id !== priorityId),
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
   logDeepWorkMinutes: (minutes) => {
     set((state) => {
       const dailyPlan = {
@@ -515,6 +1058,106 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
       };
       saveState({ ...state, dailyPlan });
       return { dailyPlan };
+    });
+  },
+
+  updateEveningReflection: (notes, wins, mistakes) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          notes: notes !== undefined ? notes : state.dailyPlan.eveningReflection.notes,
+          wins: wins || state.dailyPlan.eveningReflection.wins,
+          mistakes: mistakes || state.dailyPlan.eveningReflection.mistakes,
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  addDailyWin: (win) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          wins: [...state.dailyPlan.eveningReflection.wins, win],
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  deleteDailyWin: (index) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          wins: state.dailyPlan.eveningReflection.wins.filter((_, i) => i !== index),
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  addDailyMistake: (mistake) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          mistakes: [...state.dailyPlan.eveningReflection.mistakes, mistake],
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  deleteDailyMistake: (index) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          mistakes: state.dailyPlan.eveningReflection.mistakes.filter((_, i) => i !== index),
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  updateDailyLevels: (focusLevel, energyLevel) => {
+    set((state) => {
+      const dailyPlan = {
+        ...state.dailyPlan,
+        eveningReflection: {
+          ...state.dailyPlan.eveningReflection,
+          focusLevel,
+          energyLevel,
+        },
+      };
+      saveState({ ...state, dailyPlan });
+      return { dailyPlan };
+    });
+  },
+
+  addTimelineEvent: (event) => {
+    set((state) => {
+      const newEvent: TimelineEvent = {
+        id: `event-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        ...event,
+      };
+      const timeline = [newEvent, ...state.timeline];
+      saveState({ ...state, timeline });
+      return { timeline };
     });
   },
 
