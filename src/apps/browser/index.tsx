@@ -16,7 +16,6 @@ import {
   FolderSync,
   FileCode,
   FolderOpen,
-  AlertCircle,
   Laptop,
   Play,
   Info,
@@ -85,39 +84,6 @@ const POPULAR_YOUTUBE_SEED: YouTubeVideoItem[] = [
   { id: '1WeIN3m3a4w', title: '$1 vs $1,000,000 Hotel Room!', channel: 'MrBeast', thumbnail: 'https://i.ytimg.com/vi/1WeIN3m3a4w/hqdefault.jpg' },
   { id: '3bGNuRtl98Y', title: 'The Best Smartphone Camera Blind Test', channel: 'MKBHD', thumbnail: 'https://i.ytimg.com/vi/3bGNuRtl98Y/hqdefault.jpg' },
 ];
-
-/**
- * Parses live YouTube search results from proxy scrape.
- */
-function parseYouTubeSearchResults(markdown: string): YouTubeVideoItem[] {
-  const items: YouTubeVideoItem[] = [];
-  const seen = new Set<string>();
-
-  // Extract Markdown links with YouTube watch URLs: [Title](https://www.youtube.com/watch?v=ID)
-  const regex = /(?:###\s+)?\[([^\]]{3,120})\]\(https:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})[^)]*\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = regex.exec(markdown)) !== null) {
-    const rawTitle = m[1]?.trim() || '';
-    const id = m[2];
-    if (
-      id &&
-      !seen.has(id) &&
-      rawTitle &&
-      !rawTitle.startsWith('Image ') &&
-      !rawTitle.includes('Now playing') &&
-      !rawTitle.includes('chapters')
-    ) {
-      seen.add(id);
-      items.push({
-        id,
-        title: rawTitle,
-        thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
-      });
-    }
-  }
-
-  return items;
-}
 
 /**
  * Parses and extracts a YouTube video ID from various URL formats.
@@ -457,26 +423,54 @@ export const BrowserApp: React.FC<AppProps> = () => {
     setYtSearchError(null);
 
     try {
-      const resp = await fetch(
-        `https://r.jina.ai/https://www.youtube.com/results?search_query=${encodeURIComponent(cleanQuery)}`
-      );
-      if (!resp.ok) {
-        throw new Error(`Failed to fetch YouTube search (${resp.status})`);
+      // 1. Try local Vite dev backend search proxy (extracts live real-time videos)
+      const proxyResp = await fetch(`/api/youtube/search?q=${encodeURIComponent(cleanQuery)}`);
+      if (proxyResp.ok) {
+        const data = await proxyResp.json();
+        if (data.success && Array.isArray(data.videos) && data.videos.length > 0) {
+          setYtVideos(data.videos);
+          return;
+        }
       }
-      const text = await resp.text();
-      const results = parseYouTubeSearchResults(text);
-
-      if (results.length > 0) {
-        setYtVideos(results);
-      } else {
-        setYtSearchError(`No direct video links found for "${cleanQuery}". Showing recommended catalog.`);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setYtSearchError(`Search error: ${msg}. Showing recommended catalog.`);
-    } finally {
-      setYtIsSearching(false);
+    } catch {
+      // Fall through to public proxy / invidious
     }
+
+    try {
+      // 2. Fallback to public Invidious instance search
+      const invResp = await fetch(
+        `https://invidious.privacyredirect.com/api/v1/search?q=${encodeURIComponent(cleanQuery)}&type=video`
+      );
+      if (invResp.ok) {
+        const invData = await invResp.json();
+        if (Array.isArray(invData) && invData.length > 0) {
+          const invVideos: YouTubeVideoItem[] = invData.slice(0, 16).map((v: any) => ({
+            id: v.videoId,
+            title: v.title,
+            channel: v.author,
+            thumbnail: v.videoThumbnails?.[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
+          }));
+          setYtVideos(invVideos);
+          return;
+        }
+      }
+    } catch {
+      // Invidious fallback failed
+    }
+
+    // 3. Fallback: filter seed catalog
+    const filtered = POPULAR_YOUTUBE_SEED.filter(
+      (v) =>
+        v.title.toLowerCase().includes(cleanQuery.toLowerCase()) ||
+        v.channel?.toLowerCase().includes(cleanQuery.toLowerCase())
+    );
+    if (filtered.length > 0) {
+      setYtVideos(filtered);
+    } else {
+      setYtSearchError(`No direct video links found for "${cleanQuery}". Showing recommended catalog.`);
+      setYtVideos(POPULAR_YOUTUBE_SEED);
+    }
+    setYtIsSearching(false);
   }, []);
 
   /**
@@ -499,16 +493,41 @@ export const BrowserApp: React.FC<AppProps> = () => {
         title = 'Start Page';
         mode = 'embed';
       }
-      // 2. YouTube Portal or Root YouTube Home (bypasses X-Frame-Options SAMEORIGIN block)
-      else if (finalUrl === 'flow://youtube' || isYouTubeHome(finalUrl)) {
-        finalUrl = 'flow://youtube';
-        title = 'YouTube';
-        mode = 'embed';
+      // 2. YouTube Portal or Root YouTube Home or search
+      else if (
+        finalUrl === 'flow://youtube' ||
+        isYouTubeHome(finalUrl) ||
+        finalUrl.startsWith('youtube.com') ||
+        finalUrl.startsWith('www.youtube.com') ||
+        finalUrl.startsWith('https://youtube.com') ||
+        finalUrl.startsWith('https://www.youtube.com') ||
+        finalUrl.startsWith('http://youtube.com') ||
+        finalUrl.startsWith('http://www.youtube.com')
+      ) {
+        const videoId = extractYouTubeVideoId(finalUrl);
+        if (videoId) {
+          finalUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0`;
+          title = 'YouTube Player';
+          mode = 'embed';
+        } else {
+          try {
+            const parsed = new URL(finalUrl.startsWith('http') ? finalUrl : `https://${finalUrl}`);
+            const query = parsed.searchParams.get('search_query');
+            if (query) {
+              handleYouTubeSearch(query);
+            }
+          } catch {
+            // Ignore parse error
+          }
+          finalUrl = 'flow://youtube';
+          title = 'YouTube';
+          mode = 'embed';
+        }
       }
       // 3. YouTube Video (watch?v=, youtu.be/, shorts/, embed/)
       else if (extractYouTubeVideoId(finalUrl)) {
         const videoId = extractYouTubeVideoId(finalUrl)!;
-        finalUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+        finalUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0`;
         title = 'YouTube Player';
         mode = 'embed';
       }
@@ -793,7 +812,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
       <div className="flex h-9 items-center border-b border-border-subtle bg-surface-overlay/90 px-2 gap-1 overflow-x-auto">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
-          const isYouTubeTab = tab.url === 'flow://youtube' || tab.url.includes('youtube-nocookie.com');
+          const isYouTubeTab =
+            tab.url === 'flow://youtube' ||
+            tab.url.includes('youtube.com/embed') ||
+            tab.url.includes('youtube-nocookie.com');
           return (
             <div
               key={tab.id}
@@ -1263,10 +1285,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
                   <div className="aspect-video w-full bg-black">
                     <iframe
                       key={ytActiveVideo.id}
-                      src={`https://www.youtube-nocookie.com/embed/${ytActiveVideo.id}?autoplay=1&enablejsapi=1`}
+                      src={`https://www.youtube.com/embed/${ytActiveVideo.id}?autoplay=1&enablejsapi=1&rel=0`}
                       title={ytActiveVideo.title}
-                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
                       allowFullScreen
                       className="w-full h-full border-none"
                     />
@@ -1415,28 +1437,34 @@ export const BrowserApp: React.FC<AppProps> = () => {
             )}
           </div>
         ) : (
-          /* Direct Web Embed Iframe */
+          /* Direct / Proxied Web Embed Iframe */
           <div className="relative h-full w-full">
             <iframe
               key={activeTab.refreshKey}
-              src={activeTab.url}
+              src={
+                activeTab.url.startsWith('http') &&
+                !activeTab.url.includes('localhost:') &&
+                !activeTab.url.includes('youtube.com/embed/')
+                  ? `/api/proxy?url=${encodeURIComponent(activeTab.url)}`
+                  : activeTab.url
+              }
               title={activeTab.title}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
               className="h-full w-full border-none bg-black"
             />
 
-            {/* Smart Banner: Provides 1-click Reader Mode fallback if site blocks iframes */}
+            {/* Smart Banner: Provides status and 1-click Reader Mode fallback */}
             <div className="absolute bottom-2.5 right-2.5 flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-panel/95 backdrop-blur px-3 py-1.5 text-[11px] shadow-lg select-none">
-              <span className="text-content-secondary flex items-center gap-1">
-                <AlertCircle className="h-3 w-3 text-amber-400" />
-                Refused to connect?
+              <span className="text-emerald-400 flex items-center gap-1 font-medium">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Unblocked Proxy
               </span>
+              <span className="text-content-tertiary">|</span>
               <button
                 onClick={handleToggleReader}
-                className="flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 font-medium text-amber-300 hover:bg-amber-400/30 transition-colors"
+                className="flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 font-medium text-amber-300 hover:bg-amber-400/30 transition-colors cursor-pointer"
                 title="Bypass X-Frame-Options with Jina Reader Engine"
               >
                 <Zap className="h-3 w-3" />
