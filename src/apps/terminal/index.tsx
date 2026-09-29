@@ -22,9 +22,11 @@ interface TerminalBlock {
 }
 
 const COMMAND_SUGGESTIONS = [
-  'help', 'pwd', 'ls', 'cd', 'cat', 'touch', 'mkdir', 'rm',
-  'echo', 'tree', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq',
-  'tr', 'eval', 'run', 'node', 'ps', 'kill', 'pkg', 'clear',
+  'help', 'pwd', 'ls', 'cd', 'cat', 'cp', 'mv', 'rm', 'touch', 'mkdir',
+  'echo', 'tree', 'find', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq',
+  'tr', 'which', 'whoami', 'hostname', 'uname', 'date', 'uptime', 'env',
+  'export', 'ping', 'curl', 'calc', 'df', 'free', 'device', 'mount', 'open',
+  'eval', 'run', 'node', 'ps', 'kill', 'pkg', 'clear',
 ];
 
 const TerminalApp: React.FC<AppProps> = ({ windowId }) => {

@@ -2,11 +2,23 @@ import { vfs, normalizePath } from '@core/vfs/vfsService';
 import { useProcessStore } from '@core/process/processStore';
 import { executeCode } from '@core/runtime/codeRunner';
 import { usePackageStore } from '@core/packages/packageStore';
+import { useDeviceStorageStore } from '@core/vfs/deviceStorage';
 
 export interface ShellResult {
   output: string;
   newCwd?: string;
 }
+
+// ─── Environment Variables Store ──────────────────────────────────────────────
+const envVars: Record<string, string> = {
+  USER: 'user',
+  HOME: '/home/user',
+  SHELL: '/bin/flowsh',
+  PATH: '/bin:/usr/bin:/usr/local/bin',
+  TERM: 'xterm-256color',
+  OS: 'FlowOS',
+  ARCH: 'x86_64-synthetic-wasm',
+};
 
 // ─── Pipe-aware command splitter ─────────────────────────────────────────────
 function splitPipeline(input: string): string[] {
@@ -128,6 +140,26 @@ async function renderTree(path: string, prefix = '', depth = 0): Promise<string>
   return lines.join('\n');
 }
 
+// ─── Recursive file finder ───────────────────────────────────────────────────
+async function findFiles(startPath: string, nameFilter?: string): Promise<string[]> {
+  const results: string[] = [];
+  try {
+    const nodes = await vfs.readDir(startPath);
+    for (const node of nodes) {
+      if (!nameFilter || node.name.toLowerCase().includes(nameFilter.toLowerCase())) {
+        results.push(node.path);
+      }
+      if (node.type === 'directory') {
+        const sub = await findFiles(node.path, nameFilter);
+        results.push(...sub);
+      }
+    }
+  } catch {
+    // Ignore unreadable
+  }
+  return results;
+}
+
 // ─── Main command executor ────────────────────────────────────────────────────
 export async function executeCommand(
   input: string,
@@ -135,6 +167,33 @@ export async function executeCommand(
 ): Promise<ShellResult> {
   const trimmed = input.trim();
   if (!trimmed) return { output: '' };
+
+  // ── Redirection Check (> or >>) ──────────────────────────────────────────
+  if (trimmed.includes('>>')) {
+    const [cmdPart, destPart] = trimmed.split('>>');
+    if (cmdPart && destPart) {
+      const dest = destPart.trim();
+      const res = await executeCommand(cmdPart.trim(), cwd);
+      const destPath = dest.startsWith('/') ? dest : normalizePath(`${cwd}/${dest}`);
+      let existing = '';
+      try {
+        existing = await vfs.readFile(destPath);
+      } catch {
+        // file doesn't exist yet
+      }
+      await vfs.writeFile(destPath, existing ? `${existing}\n${res.output}` : res.output);
+      return { output: '', newCwd: res.newCwd };
+    }
+  } else if (trimmed.includes('>')) {
+    const [cmdPart, destPart] = trimmed.split('>');
+    if (cmdPart && destPart) {
+      const dest = destPart.trim();
+      const res = await executeCommand(cmdPart.trim(), cwd);
+      const destPath = dest.startsWith('/') ? dest : normalizePath(`${cwd}/${dest}`);
+      await vfs.writeFile(destPath, res.output);
+      return { output: '', newCwd: res.newCwd };
+    }
+  }
 
   // ── Pipeline detection ────────────────────────────────────────────────────
   const segments = splitPipeline(trimmed);
@@ -158,48 +217,159 @@ export async function executeCommand(
     case 'help':
       return {
         output: [
-          'FlowOS Shell v0.3.0  —  Unix Pipeline Edition',
-          '─────────────────────────────────────────────',
+          'FlowOS Shell v0.4.0 — Full Unix & Device Pipeline Edition',
+          '────────────────────────────────────────────────────────',
           'File System:',
           '  pwd                   Print current working directory',
           '  ls [path]             List directory contents',
           '  cd <path>             Change directory',
           '  cat <file>            Print file contents',
-          '  tree [path]           Visual directory tree',
+          '  cp <src> <dst>        Copy file',
+          '  mv <src> <dst>        Move or rename file',
+          '  rm <path>             Delete file or directory',
           '  touch <file>          Create an empty file',
           '  mkdir <dir>           Create a directory',
-          '  rm <path>             Delete file or directory',
+          '  tree [path]           Visual directory tree',
+          '  find [path] [query]   Find files matching query',
           '',
-          'Text Processing (pipeline-compatible):',
-          '  echo <text>           Print text',
-          '  grep <pattern>        Filter lines matching regex/text',
-          '  wc [-l|-w|-c]         Count lines / words / chars',
-          '  head [n]              First N lines (default 10)',
-          '  tail [n]              Last N lines (default 10)',
-          '  sort                  Sort lines alphabetically',
-          '  uniq                  Remove consecutive duplicates',
+          'Device & Host Storage:',
+          '  device                List mounted physical PC folders',
+          '  device mount          Mount local computer folder via File System API',
+          '  mount                 Show mounted file systems',
+          '',
+          'Text Processing & Redirection:',
+          '  echo <text>           Print text (supports > and >> file redirection)',
+          '  grep <pat> [file]     Filter lines matching regex/text',
+          '  wc [-l|-w|-c] [file]  Count lines / words / chars',
+          '  head [n] [file]       First N lines (default 10)',
+          '  tail [n] [file]       Last N lines (default 10)',
+          '  sort [file]           Sort lines alphabetically',
+          '  uniq [file]           Remove consecutive duplicates',
           '  tr <from> <to>        Translate characters',
           '',
-          'Development:',
+          'Network & Utilities:',
+          '  ping <host>           Simulate ICMP ping with latency statistics',
+          '  curl <url>            Fetch public API or web page text',
+          '  calc <expr>           Evaluate math arithmetic (e.g. calc 45*12)',
+          '  date                  Display current system date and time',
+          '  uptime                Display OS uptime',
+          '  whoami                Display current user',
+          '  hostname              Display system hostname',
+          '  uname [-a]            Display OS architecture and kernel details',
+          '  which <cmd>           Locate command path',
+          '  env                   Print environment variables',
+          '  export KEY=VAL        Set environment variable',
+          '  open <path>           Open file in system app',
+          '',
+          'Runtime & Processes:',
           '  eval <js>             Evaluate JavaScript expression',
           '  run <file>            Execute a .js file from VFS',
-          '',
-          'System:',
           '  ps                    List active OS processes',
           '  kill <pid>            Terminate a process by ID',
-          '  pkg [cmd]             Package manager',
+          '  pkg [cmd]             Package manager (list/install/remove/search)',
           '  clear                 Clear terminal screen',
-          '',
-          'Pipeline Examples:',
-          '  cat notes.txt | grep TODO',
-          '  ls | wc -l',
-          '  cat log.txt | grep error | wc -l',
-          '  ls | sort | head 5',
         ].join('\n'),
       };
 
     case 'pwd':
       return { output: cwd };
+
+    case 'whoami':
+      return { output: envVars['USER'] || 'user' };
+
+    case 'hostname':
+      return { output: 'flowos-desktop' };
+
+    case 'uname': {
+      if (args[0] === '-a' || args[0] === '-all') {
+        return {
+          output: `FlowOS flowos-desktop 6.10.0-flow #1 SMP PREEMPT 2026 x86_64 synthetic-wasm GNU/Linux`,
+        };
+      }
+      return { output: 'FlowOS' };
+    }
+
+    case 'date':
+      return { output: new Date().toString() };
+
+    case 'uptime': {
+      const ms = performance.now();
+      const mins = Math.floor(ms / 60000);
+      const secs = Math.floor((ms % 60000) / 1000);
+      return { output: `up ${mins} min(s), ${secs} sec(s), 1 user, load average: 0.08, 0.05, 0.01` };
+    }
+
+    case 'env':
+    case 'printenv':
+      return {
+        output: Object.entries(envVars)
+          .map(([k, v]) => `${k}=${v}`)
+          .join('\n'),
+      };
+
+    case 'export': {
+      const expr = args[0];
+      if (!expr || !expr.includes('=')) {
+        return { output: 'export: usage: export KEY=VALUE' };
+      }
+      const [key, val] = expr.split('=');
+      if (key && val !== undefined) {
+        envVars[key.trim()] = val.trim();
+        return { output: '' };
+      }
+      return { output: 'export: invalid syntax' };
+    }
+
+    case 'which': {
+      const target = args[0];
+      if (!target) return { output: 'which: missing command operand' };
+      return { output: `/bin/${target}` };
+    }
+
+    case 'ping': {
+      const host = args[0] || '8.8.8.8';
+      const lines = [
+        `PING ${host} (${host}): 56 data bytes`,
+        `64 bytes from ${host}: icmp_seq=0 ttl=117 time=14.2 ms`,
+        `64 bytes from ${host}: icmp_seq=1 ttl=117 time=15.8 ms`,
+        `64 bytes from ${host}: icmp_seq=2 ttl=117 time=13.9 ms`,
+        `64 bytes from ${host}: icmp_seq=3 ttl=117 time=15.1 ms`,
+        '',
+        `--- ${host} ping statistics ---`,
+        `4 packets transmitted, 4 packets received, 0.0% packet loss`,
+        `round-trip min/avg/max = 13.9/14.7/15.8 ms`,
+      ];
+      return { output: lines.join('\n') };
+    }
+
+    case 'curl': {
+      const url = args[0];
+      if (!url) return { output: 'curl: try \'curl --help\' for more information\ncurl: missing URL' };
+      const targetUrl = url.startsWith('http') ? url : `https://${url}`;
+      try {
+        const resp = await fetch(`https://r.jina.ai/${targetUrl}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const text = await resp.text();
+        return { output: text.slice(0, 3000) + (text.length > 3000 ? '\n... (output truncated)' : '') };
+      } catch (err: unknown) {
+        return { output: `curl: (6) Could not resolve host: ${targetUrl}` };
+      }
+    }
+
+    case 'calc':
+    case 'bc': {
+      if (args.length === 0) return { output: 'calc: missing mathematical expression' };
+      try {
+        const expr = args.join(' ');
+        // Evaluate safe arithmetic
+        const sanitized = expr.replace(/[^0-9+\-*/().%^eE ]/g, '');
+        // eslint-disable-next-line no-eval
+        const result = Function(`"use strict"; return (${sanitized})`)();
+        return { output: `${expr} = ${result}` };
+      } catch {
+        return { output: 'calc: syntax error in expression' };
+      }
+    }
 
     case 'ls': {
       const targetPath = args[0]
@@ -222,6 +392,104 @@ export async function executeCommand(
       } catch {
         return { output: `ls: cannot access '${targetPath}': No such directory` };
       }
+    }
+
+    case 'find': {
+      const startPath = args[0]?.startsWith('/') ? args[0] : cwd;
+      const query = args[1] === '-name' ? args[2] : args[1];
+      const matches = await findFiles(startPath, query);
+      if (matches.length === 0) return { output: '(no matching files)' };
+      return { output: matches.join('\n') };
+    }
+
+    case 'device': {
+      const sub = args[0]?.toLowerCase();
+      const devStore = useDeviceStorageStore.getState();
+
+      if (!sub || sub === 'list') {
+        if (devStore.mountedFolders.length === 0) {
+          return {
+            output:
+              'No host device directories currently mounted.\nRun "device mount" to mount a folder from your physical computer.',
+          };
+        }
+        const lines = devStore.mountedFolders.map(
+          (f) => `${f.vfsPath.padEnd(24)} (${f.fileCount} files, ${(f.totalSize / 1024).toFixed(1)} KB)`
+        );
+        return { output: ['MOUNTED HOST DIRECTORY      METRICS', ...lines].join('\n') };
+      }
+
+      if (sub === 'mount') {
+        try {
+          const res = await devStore.mountDirectoryPicker();
+          return {
+            output: res
+              ? `Mounted host directory successfully at ${res}`
+              : 'Directory picker dismissed or completed.',
+          };
+        } catch (err: unknown) {
+          return { output: `device: error mounting directory: ${String(err)}` };
+        }
+      }
+
+      if (sub === 'unmount') {
+        const target = args[1];
+        if (!target) return { output: 'device unmount: missing directory name or path' };
+        const vfsPath = target.startsWith('/device/') ? target : `/device/${target}`;
+        await devStore.unmountFolder(vfsPath);
+        return { output: `Unmounted host folder ${vfsPath}` };
+      }
+
+      return { output: 'Usage: device [list | mount | unmount <name>]' };
+    }
+
+    case 'mount': {
+      const devStore = useDeviceStorageStore.getState();
+      const header = 'FILESYSTEM            TYPE            MOUNTPOINT';
+      const rows = [
+        'idb://flowos_vfs      IndexedDB       /',
+        'procfs                Virtual         /proc',
+        ...devStore.mountedFolders.map((f) => `host://local-fs       FileSysAccess   ${f.vfsPath}`),
+      ];
+      return { output: [header, ...rows].join('\n') };
+    }
+
+    case 'df': {
+      return {
+        output: [
+          'Filesystem       1K-blocks      Used Available Use% Mounted on',
+          'idb://flowos_vfs  10485760    142850  10342910   2% /',
+          'host://device     52428800   1842000  50586800   4% /device',
+        ].join('\n'),
+      };
+    }
+
+    case 'free': {
+      return {
+        output: [
+          '               total        used        free      shared  buff/cache   available',
+          'Mem:         4194304      838860     3355444           0           0     3355444',
+          'Swap:              0           0           0',
+        ].join('\n'),
+      };
+    }
+
+    case 'open': {
+      const target = args[0];
+      if (!target) return { output: 'open: missing file operand' };
+      const targetPath = target.startsWith('/') ? target : normalizePath(`${cwd}/${target}`);
+      const ext = target.split('.').pop()?.toLowerCase();
+
+      if (ext === 'html' || ext === 'htm') {
+        useProcessStore.getState().launchApp('browser');
+        return { output: `Opening ${targetPath} in Browser...` };
+      }
+      if (ext === 'md' || ext === 'txt') {
+        useProcessStore.getState().launchApp('notes');
+        return { output: `Opening ${targetPath} in Notes...` };
+      }
+      useProcessStore.getState().launchApp('code-editor');
+      return { output: `Opening ${targetPath} in Code Editor...` };
     }
 
     case 'tree': {
@@ -280,23 +548,121 @@ export async function executeCommand(
       }
     }
 
-    case 'grep':
-      return { output: 'grep: no input. Usage: cat <file> | grep <pattern>' };
+    case 'cp': {
+      const src = args[0];
+      const dst = args[1];
+      if (!src || !dst) return { output: 'cp: missing destination file operand after source' };
 
-    case 'wc':
-      return { output: 'wc: no input. Usage: cat <file> | wc [-l|-w|-c]' };
+      const srcPath = src.startsWith('/') ? src : normalizePath(`${cwd}/${src}`);
+      const dstPath = dst.startsWith('/') ? dst : normalizePath(`${cwd}/${dst}`);
 
-    case 'head':
-      return { output: 'head: no input. Usage: cat <file> | head [n]' };
+      try {
+        const content = await vfs.readFile(srcPath);
+        await vfs.writeFile(dstPath, content);
+        return { output: '' };
+      } catch (err: unknown) {
+        return { output: `cp: cannot copy '${src}': ${(err as Error).message}` };
+      }
+    }
 
-    case 'tail':
-      return { output: 'tail: no input. Usage: cat <file> | tail [n]' };
+    case 'mv': {
+      const src = args[0];
+      const dst = args[1];
+      if (!src || !dst) return { output: 'mv: missing destination file operand after source' };
 
-    case 'sort':
-      return { output: 'sort: no input. Usage: cat <file> | sort' };
+      const srcPath = src.startsWith('/') ? src : normalizePath(`${cwd}/${src}`);
+      const dstPath = dst.startsWith('/') ? dst : normalizePath(`${cwd}/${dst}`);
 
-    case 'uniq':
-      return { output: 'uniq: no input. Usage: cat <file> | uniq' };
+      try {
+        const content = await vfs.readFile(srcPath);
+        await vfs.writeFile(dstPath, content);
+        await vfs.deleteNode(srcPath);
+        return { output: '' };
+      } catch (err: unknown) {
+        return { output: `mv: cannot move '${src}': ${(err as Error).message}` };
+      }
+    }
+
+    case 'grep': {
+      const pattern = args[0];
+      const targetFile = args[1];
+      if (!pattern) return { output: 'grep: missing pattern' };
+      if (!targetFile) return { output: 'grep: no input. Usage: grep <pattern> <file> or cat <file> | grep <pattern>' };
+
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, `grep ${pattern}`) };
+      } catch {
+        return { output: `grep: ${targetFile}: No such file or directory` };
+      }
+    }
+
+    case 'wc': {
+      const targetFile = args.find((a) => !a.startsWith('-'));
+      const flag = args.find((a) => a.startsWith('-')) || '-l';
+      if (!targetFile) return { output: 'wc: no input. Usage: wc [-l|-w|-c] <file> or cat <file> | wc' };
+
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, `wc ${flag}`) };
+      } catch {
+        return { output: `wc: ${targetFile}: No such file or directory` };
+      }
+    }
+
+    case 'head': {
+      const n = args.find((a) => /^\d+$/.test(a)) || '10';
+      const targetFile = args.find((a) => !/^\d+$/.test(a));
+      if (!targetFile) return { output: 'head: missing file operand' };
+
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, `head ${n}`) };
+      } catch {
+        return { output: `head: ${targetFile}: No such file or directory` };
+      }
+    }
+
+    case 'tail': {
+      const n = args.find((a) => /^\d+$/.test(a)) || '10';
+      const targetFile = args.find((a) => !/^\d+$/.test(a));
+      if (!targetFile) return { output: 'tail: missing file operand' };
+
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, `tail ${n}`) };
+      } catch {
+        return { output: `tail: ${targetFile}: No such file or directory` };
+      }
+    }
+
+    case 'sort': {
+      const targetFile = args[0];
+      if (!targetFile) return { output: 'sort: missing file operand' };
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, 'sort') };
+      } catch {
+        return { output: `sort: ${targetFile}: No such file or directory` };
+      }
+    }
+
+    case 'uniq': {
+      const targetFile = args[0];
+      if (!targetFile) return { output: 'uniq: missing file operand' };
+      const targetPath = targetFile.startsWith('/') ? targetFile : normalizePath(`${cwd}/${targetFile}`);
+      try {
+        const content = await vfs.readFile(targetPath);
+        return { output: applyFilter(content, 'uniq') };
+      } catch {
+        return { output: `uniq: ${targetFile}: No such file or directory` };
+      }
+    }
 
     case 'touch': {
       const target = args[0];
@@ -323,7 +689,7 @@ export async function executeCommand(
     }
 
     case 'rm': {
-      const target = args[0];
+      const target = args.find((a) => !a.startsWith('-'));
       if (!target) return { output: 'rm: missing operand' };
 
       const targetPath = target.startsWith('/')
@@ -370,9 +736,9 @@ export async function executeCommand(
         }
         if (result.error) out.push(`Runtime Error:\n${result.error}`);
         return { output: out.join('\n') };
-      } catch (err: any) {
+      } catch (err: unknown) {
         return {
-          output: `run: cannot read script '${targetPath}': ${err.message || 'No such file'}`,
+          output: `run: cannot read script '${targetPath}': ${(err as Error).message || 'No such file'}`,
         };
       }
     }
