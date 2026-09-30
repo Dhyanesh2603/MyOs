@@ -20,19 +20,6 @@ import type {
   MissionStatus,
   CareerStage,
 } from './types';
-import {
-  SEED_MISSIONS,
-  SEED_PROJECTS,
-  SEED_SUBJECTS,
-  SEED_CGPA,
-  SEED_SKILLS,
-  SEED_DSA_QUESTIONS,
-  SEED_COMPANIES,
-  SEED_DAILY_PLAN,
-  SEED_TIMELINE,
-  SEED_KNOWLEDGE_NODES,
-  SEED_KNOWLEDGE_EDGES,
-} from './seedData';
 
 export type PersonalOsTab =
   | 'home'
@@ -196,11 +183,34 @@ export interface PersonalOsState {
   getAttendanceAlerts: () => AcademicSubject[];
 }
 
-const STORAGE_KEY = 'flowos_personal_os_state_v2';
+const STORAGE_KEY = 'flowos_personal_os_state_v3';
+
+export const EMPTY_CGPA_PLAN: CgpaPlan = {
+  currentCgpa: 0,
+  targetCgpa: 0,
+  totalCreditsCompleted: 0,
+  semesterTargetCredits: 0,
+};
+
+export const EMPTY_DAILY_PLAN: DailyPlan = {
+  date: new Date().toISOString().split('T')[0] || '2026-09-30',
+  deepWorkLoggedMinutes: 0,
+  deepWorkTargetMinutes: 240,
+  morningPriorities: [],
+  eveningReflection: {
+    wins: [],
+    mistakes: [],
+    focusLevel: 3,
+    energyLevel: 3,
+    notes: '',
+  },
+};
 
 function loadPersistedState(): Partial<PersonalOsState> {
   if (typeof window === 'undefined') return {};
   try {
+    // Clear old mock seed storage if present
+    localStorage.removeItem('flowos_personal_os_state_v2');
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
     return JSON.parse(raw) as Partial<PersonalOsState>;
@@ -233,40 +243,25 @@ function saveState(state: Partial<PersonalOsState>): void {
   }
 }
 
-const DEFAULT_PORTFOLIO_CHECKLIST = [
-  { id: 'port-1', title: 'Flow OS Web Desktop Production Demo', completed: true },
-  { id: 'port-2', title: 'NeuralCache Vector DB Benchmark Specs', completed: true },
-  { id: 'port-3', title: 'Single-Page ATS 95+ Resume (v4 Systems Edition)', completed: true },
-  { id: 'port-4', title: 'MockForge OpenAPI 3.1 Synthesis Engine', completed: true },
-  { id: 'port-5', title: 'System Design: Distributed Ledger & Idempotency Notes', completed: false },
-  { id: 'port-6', title: 'Record 5-minute technical walkthrough video', completed: false },
-];
-
-const DEFAULT_RESUME_VERSIONS = [
-  { id: 'res-1', name: 'Resume_v4_Systems_Focused.pdf', tag: 'Distributed / Backend', updated: '2026-09-18' },
-  { id: 'res-2', name: 'Resume_v4_Frontend_Systems.pdf', tag: 'UI Engineering / React', updated: '2026-09-15' },
-  { id: 'res-3', name: 'Resume_v4_General_SDE.pdf', tag: 'Generalist SWE', updated: '2026-09-10' },
-];
-
 const initialSaved = loadPersistedState();
 
 export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
   activeTab: 'home',
   setActiveTab: (activeTab) => set({ activeTab }),
 
-  missions: initialSaved.missions || SEED_MISSIONS,
-  projects: initialSaved.projects || SEED_PROJECTS,
-  subjects: initialSaved.subjects || SEED_SUBJECTS,
-  cgpaPlan: initialSaved.cgpaPlan || SEED_CGPA,
-  skills: initialSaved.skills || SEED_SKILLS,
-  dsaQuestions: initialSaved.dsaQuestions || SEED_DSA_QUESTIONS,
-  companies: initialSaved.companies || SEED_COMPANIES,
-  dailyPlan: initialSaved.dailyPlan || SEED_DAILY_PLAN,
-  timeline: initialSaved.timeline || SEED_TIMELINE,
-  knowledgeNodes: initialSaved.knowledgeNodes || SEED_KNOWLEDGE_NODES,
-  knowledgeEdges: initialSaved.knowledgeEdges || SEED_KNOWLEDGE_EDGES,
-  portfolioChecklist: initialSaved.portfolioChecklist || DEFAULT_PORTFOLIO_CHECKLIST,
-  resumeVersions: initialSaved.resumeVersions || DEFAULT_RESUME_VERSIONS,
+  missions: initialSaved.missions || [],
+  projects: initialSaved.projects || [],
+  subjects: initialSaved.subjects || [],
+  cgpaPlan: initialSaved.cgpaPlan || EMPTY_CGPA_PLAN,
+  skills: initialSaved.skills || [],
+  dsaQuestions: initialSaved.dsaQuestions || [],
+  companies: initialSaved.companies || [],
+  dailyPlan: initialSaved.dailyPlan || EMPTY_DAILY_PLAN,
+  timeline: initialSaved.timeline || [],
+  knowledgeNodes: initialSaved.knowledgeNodes || [],
+  knowledgeEdges: initialSaved.knowledgeEdges || [],
+  portfolioChecklist: initialSaved.portfolioChecklist || [],
+  resumeVersions: initialSaved.resumeVersions || [],
 
   focusMode: {
     isActive: false,
@@ -1221,7 +1216,7 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
 
     // 1. Regulatory Attendance Alert (<75%)
     const criticalSubject = subjects.find(
-      (s) => (s.attendance.attended / (s.attendance.total || 1)) * 100 < 75
+      (s) => s.attendance.total > 0 && (s.attendance.attended / s.attendance.total) * 100 < s.attendance.minimumTarget
     );
     if (criticalSubject) {
       const pct = Math.round((criticalSubject.attendance.attended / criticalSubject.attendance.total) * 100);
@@ -1279,17 +1274,17 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
 
     // Default fallback
     return {
-      title: 'Continue Deep Work Block',
-      context: 'All immediate tasks up to date. Continue high-momentum engineering.',
+      title: 'Welcome to Personal OS',
+      context: 'Start by creating your first project, logging coursework, or setting today\'s intentional priorities.',
       urgency: 'medium',
-      actionLabel: 'Start Timer',
+      actionLabel: 'Set Priority',
       targetTab: 'daily',
     };
   },
 
   getAttendanceAlerts: () => {
     return get().subjects.filter(
-      (s) => (s.attendance.attended / (s.attendance.total || 1)) * 100 < 75
+      (s) => s.attendance.total > 0 && (s.attendance.attended / s.attendance.total) * 100 < s.attendance.minimumTarget
     );
   },
 }));

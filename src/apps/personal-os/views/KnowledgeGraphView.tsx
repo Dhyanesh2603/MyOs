@@ -16,36 +16,19 @@ import { usePersonalOsStore, PersonalOsTab } from '@core/personal-os/personalOsS
 import type { KnowledgeNode } from '@core/personal-os/types';
 import { soundEngine } from '@core/audio/soundEngine';
 
-// Node layout coordinates for balanced cluster visualization
-const NODE_COORDINATES: Record<string, { x: number; y: number }> = {
-  // Center Missions
-  'kn-m1': { x: 380, y: 160 },
-  'kn-m2': { x: 580, y: 160 },
-  'kn-m3': { x: 780, y: 160 },
-  // Projects
-  'kn-p1': { x: 480, y: 300 },
-  'kn-p2': { x: 280, y: 300 },
-  'kn-p3': { x: 680, y: 300 },
-  // Skills
-  'kn-s1': { x: 400, y: 440 },
-  'kn-s2': { x: 220, y: 440 },
-  'kn-s3': { x: 300, y: 440 },
-  'kn-s4': { x: 180, y: 320 },
-  'kn-s5': { x: 560, y: 440 },
-  // Subjects
-  'kn-sub1': { x: 700, y: 380 },
-  'kn-sub2': { x: 820, y: 340 },
-  'kn-sub3': { x: 860, y: 220 },
-  // Companies
-  'kn-c1': { x: 260, y: 80 },
-  'kn-c2': { x: 440, y: 60 },
-  'kn-c3': { x: 600, y: 60 },
-};
-
 export const KnowledgeGraphView: React.FC = () => {
-  const { knowledgeNodes, knowledgeEdges, setActiveTab } = usePersonalOsStore();
+  const {
+    knowledgeNodes,
+    knowledgeEdges,
+    missions,
+    projects,
+    skills,
+    subjects,
+    companies,
+    setActiveTab,
+  } = usePersonalOsStore();
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string>('kn-p1');
+  const [selectedNodeId, setSelectedNodeId] = useState<string>('');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [pan, setPan] = useState({ x: 40, y: 20 });
@@ -55,10 +38,136 @@ export const KnowledgeGraphView: React.FC = () => {
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
-  const activeNode = knowledgeNodes.find((n) => n.id === selectedNodeId) || knowledgeNodes[0];
+  // Dynamically derive graph from user entities plus any custom knowledgeNodes
+  const allNodes: KnowledgeNode[] = React.useMemo(() => {
+    const derived: KnowledgeNode[] = [];
+
+    missions.forEach((m) => {
+      derived.push({
+        id: m.id,
+        type: 'mission',
+        label: m.title,
+        details: m.tagline,
+      });
+    });
+
+    projects.forEach((p) => {
+      derived.push({
+        id: p.id,
+        type: 'project',
+        label: p.name,
+        details: p.description,
+      });
+    });
+
+    skills.forEach((s) => {
+      derived.push({
+        id: s.id,
+        type: 'skill',
+        label: s.name,
+        details: `${s.level} • ${s.estimatedMastery}% mastery`,
+      });
+    });
+
+    subjects.forEach((sub) => {
+      derived.push({
+        id: sub.id,
+        type: 'subject',
+        label: `${sub.code} ${sub.name}`,
+        details: sub.professor ? `Prof. ${sub.professor}` : undefined,
+      });
+    });
+
+    companies.forEach((c) => {
+      derived.push({
+        id: c.id,
+        type: 'company',
+        label: c.companyName,
+        details: `${c.role} • ${c.stage}`,
+      });
+    });
+
+    knowledgeNodes.forEach((kn) => {
+      if (!derived.some((d) => d.id === kn.id)) {
+        derived.push(kn);
+      }
+    });
+
+    return derived;
+  }, [missions, projects, skills, subjects, companies, knowledgeNodes]);
+
+  const allEdges = React.useMemo(() => {
+    const edges: typeof knowledgeEdges = [...knowledgeEdges];
+
+    missions.forEach((m) => {
+      m.projectIds?.forEach((pid) => {
+        edges.push({
+          id: `edge-${m.id}-${pid}`,
+          source: m.id,
+          target: pid,
+          relation: 'funds / organizes',
+        });
+      });
+    });
+
+    skills.forEach((s) => {
+      s.projectIds?.forEach((pid) => {
+        edges.push({
+          id: `edge-${s.id}-${pid}`,
+          source: s.id,
+          target: pid,
+          relation: 'powers',
+        });
+      });
+    });
+
+    return edges;
+  }, [missions, skills, knowledgeEdges]);
+
+  // Dynamically compute layout coordinates per group
+  const nodeCoordinates = React.useMemo(() => {
+    const coords: Record<string, { x: number; y: number }> = {};
+    const groups: Record<string, KnowledgeNode[]> = {
+      company: [],
+      mission: [],
+      project: [],
+      skill: [],
+      subject: [],
+    };
+
+    allNodes.forEach((n) => {
+      const list = groups[n.type] ?? [];
+      list.push(n);
+      groups[n.type] = list;
+    });
+
+    const yOffsets: Record<string, number> = {
+      company: 90,
+      mission: 220,
+      project: 360,
+      skill: 500,
+      subject: 630,
+    };
+
+    Object.entries(groups).forEach(([type, typeNodes]) => {
+      const y = yOffsets[type] || 320;
+      const spacing = 220;
+      const startX = 220;
+      typeNodes.forEach((node, i) => {
+        coords[node.id] = {
+          x: startX + i * spacing,
+          y: y,
+        };
+      });
+    });
+
+    return coords;
+  }, [allNodes]);
+
+  const activeNode = allNodes.find((n) => n.id === selectedNodeId) || allNodes[0];
 
   // Connected edges for the selected node
-  const connectedEdges = knowledgeEdges.filter(
+  const connectedEdges = allEdges.filter(
     (e) => e.source === activeNode?.id || e.target === activeNode?.id
   );
 
@@ -68,7 +177,7 @@ export const KnowledgeGraphView: React.FC = () => {
     ...connectedEdges.map((e) => (e.source === activeNode?.id ? e.target : e.source)),
   ]);
 
-  const filteredNodes = knowledgeNodes.filter((n) => {
+  const filteredNodes = allNodes.filter((n) => {
     const matchesFilter = filterType === 'all' || n.type === filterType;
     const matchesSearch = n.label.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
@@ -207,7 +316,38 @@ export const KnowledgeGraphView: React.FC = () => {
         ))}
       </div>
 
-      {/* 3. Main Vector Graph Canvas & Relational Inspector */}
+      {/* 3. Main Vector Graph Canvas & Relational Inspector or Empty State */}
+      {allNodes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 rounded-2xl border border-white/10 bg-white/[0.02] text-center my-auto min-h-[460px]">
+          <Network className="h-12 w-12 text-neutral-600 mb-4" />
+          <h3 className="text-base font-medium text-white">Knowledge Graph Empty</h3>
+          <p className="text-xs text-neutral-400 mt-1 max-w-md">
+            As you define engineering campaigns, software projects, skills, and university coursework, FlowOS automatically connects and plots their relational graph here.
+          </p>
+          <div className="mt-5 flex items-center gap-3">
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                setActiveTab('missions');
+              }}
+              className="flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-mono text-white hover:bg-white/20 transition-all shadow-sm"
+            >
+              <Compass className="h-3.5 w-3.5" />
+              <span>Create Campaign</span>
+            </button>
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                setActiveTab('projects');
+              }}
+              className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-mono text-neutral-300 hover:bg-white/10 transition-all shadow-sm"
+            >
+              <FolderGit2 className="h-3.5 w-3.5" />
+              <span>Add Project</span>
+            </button>
+          </div>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-[460px]">
         {/* Graph Canvas (8 cols) */}
         <div
@@ -244,9 +384,9 @@ export const KnowledgeGraphView: React.FC = () => {
                 </marker>
               </defs>
 
-              {knowledgeEdges.map((edge) => {
-                const srcPos = NODE_COORDINATES[edge.source] || { x: 300, y: 300 };
-                const tgtPos = NODE_COORDINATES[edge.target] || { x: 500, y: 300 };
+              {allEdges.map((edge) => {
+                const srcPos = nodeCoordinates[edge.source] || { x: 300, y: 300 };
+                const tgtPos = nodeCoordinates[edge.target] || { x: 500, y: 300 };
                 const isHighlighted =
                   edge.source === activeNode?.id || edge.target === activeNode?.id;
 
@@ -270,7 +410,7 @@ export const KnowledgeGraphView: React.FC = () => {
 
             {/* Nodes Layer */}
             {filteredNodes.map((node) => {
-              const pos = NODE_COORDINATES[node.id] || { x: 400, y: 300 };
+              const pos = nodeCoordinates[node.id] || { x: 400, y: 300 };
               const isSelected = activeNode?.id === node.id;
               const isConnected = connectedNodeIds.has(node.id);
               const colorDef = getNodeColor(node.type);
@@ -347,7 +487,7 @@ export const KnowledgeGraphView: React.FC = () => {
                   {connectedEdges.map((edge) => {
                     const isOutbound = edge.source === activeNode.id;
                     const otherNodeId = isOutbound ? edge.target : edge.source;
-                    const otherNode = knowledgeNodes.find((n) => n.id === otherNodeId);
+                    const otherNode = allNodes.find((n) => n.id === otherNodeId);
                     if (!otherNode) return null;
 
                     return (
@@ -388,6 +528,7 @@ export const KnowledgeGraphView: React.FC = () => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

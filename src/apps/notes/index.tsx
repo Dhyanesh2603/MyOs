@@ -24,16 +24,14 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
 
   const { writeFile, readFile, nodes } = useVFSStore();
 
-  // Load existing file if present, or set default template
+  // Load existing file if present, or start with empty note
   useEffect(() => {
     if (nodes[filePath]) {
       readFile(filePath)
         .then((text) => setContent(text))
         .catch(() => {});
     } else {
-      setContent(
-        `# FlowOS Notes\n\n> "Knowledge is a network, not a hierarchy." — Obsidian Philosophy\n\n### Document: ${filePath.split('/').pop()}\nPersistently stored in the **Virtual File System** in browser IndexedDB.\n\n- [x] Hardware-accelerated shell\n- [x] Universal file associations\n- [ ] Deep knowledge linking\n\n#notes #flowos #vfs`
-      );
+      setContent('');
     }
   }, [filePath, nodes, readFile]);
 
@@ -58,7 +56,7 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
   // Extract hashtags
   const tags = useMemo(() => {
     const matches = content.match(/#[a-zA-Z0-9_\-]+/g);
-    return matches ? Array.from(new Set(matches)) : ['#notes', '#flowos'];
+    return matches ? Array.from(new Set(matches)) : [];
   }, [content]);
 
   // Simple clean markdown renderer for Obsidian preview mode
@@ -203,15 +201,19 @@ const NotesApp: React.FC<AppProps> = ({ windowId, processId }) => {
         <span className="flex items-center gap-1 text-content-secondary">
           <Tag className="h-2.5 w-2.5" /> Tags:
         </span>
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="flex items-center gap-0.5 rounded border border-border-subtle bg-surface-subtle/60 px-1.5 py-0.2 text-accent-primary"
-          >
-            <Hash className="h-2 w-2 opacity-50" />
-            {tag.replace('#', '')}
-          </span>
-        ))}
+        {tags.length === 0 ? (
+          <span className="italic opacity-60">None (use #tag in note)</span>
+        ) : (
+          tags.map((tag) => (
+            <span
+              key={tag}
+              className="flex items-center gap-0.5 rounded border border-border-subtle bg-surface-subtle/60 px-1.5 py-0.2 text-accent-primary"
+            >
+              <Hash className="h-2 w-2 opacity-50" />
+              {tag.replace('#', '')}
+            </span>
+          ))
+        )}
         <span className="ml-auto opacity-50">{wordsCount} words · {readingTimeMin} min read</span>
       </div>
 

@@ -144,8 +144,8 @@ export const LearningDsaView: React.FC = () => {
     setQPattern('Sliding Window');
     setQPlatform('LeetCode');
     setQStatus('solved');
-    setQTimeComplexity('O(N)');
-    setQSpaceComplexity('O(1)');
+    setQTimeComplexity('');
+    setQSpaceComplexity('');
     setQMistakeTakeaways('');
     setIsQuestionModalOpen(true);
   };
@@ -211,8 +211,8 @@ export const LearningDsaView: React.FC = () => {
     setSName('');
     setSCategory('systems');
     setSLevel('intermediate');
-    setSMastery(75);
-    setSPracticeCount(12);
+    setSMastery(0);
+    setSPracticeCount(0);
     setSTopics('');
     setIsSkillModalOpen(true);
   };
@@ -651,6 +651,22 @@ export const LearningDsaView: React.FC = () => {
         </>
       ) : (
         /* 5. Skill Matrix & Learning Hub Grid (Editable & Addable) */
+        skills.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 rounded-2xl border border-white/10 bg-white/[0.02] text-center my-6">
+            <Brain className="h-12 w-12 text-neutral-600 mb-4" />
+            <h3 className="text-base font-medium text-white">No Skills Added Yet</h3>
+            <p className="text-xs text-neutral-400 mt-1 max-w-md">
+              Catalog your technical proficiencies, track your mastery percentages, and connect them directly to production projects.
+            </p>
+            <button
+              onClick={openAddSkillModal}
+              className="mt-5 flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-mono text-white hover:bg-white/20 transition-all shadow-sm"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Your First Skill</span>
+            </button>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {skills.map((skill) => (
             <div
@@ -746,6 +762,7 @@ export const LearningDsaView: React.FC = () => {
             </div>
           ))}
         </div>
+        )
       )}
 
       {/* ─── Add / Edit Question Modal ────────────────────────────────────────── */}

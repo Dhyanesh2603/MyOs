@@ -84,86 +84,68 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
   const [zoom, setZoom] = useState(1.0);
   const [activeTool, setActiveTool] = useState<ToolType>('select');
 
-  // Board Elements
-  const [cards, setCards] = useState<StickyCard[]>([
-    {
-      id: 'card-core',
-      type: 'card',
-      x: 100,
-      y: 120,
-      width: 240,
-      height: 180,
-      title: '🧠 Reactive Microkernel',
-      content: 'Zero-latency synthetic event bus, strict process isolation, and dynamic IPC pipes.',
-      color: '#fef08a',
-      textColor: '#713f12',
-      tag: 'KERNEL',
-    },
-    {
-      id: 'card-ui',
-      type: 'card',
-      x: 440,
-      y: 120,
-      width: 250,
-      height: 180,
-      title: '🎨 Neural Fluid UI',
-      content: 'Aero glass shaders, dynamic typography scaling, and tactile acoustic soundscapes.',
-      color: '#a5f3fc',
-      textColor: '#155e75',
-      tag: 'DESIGN',
-    },
-    {
-      id: 'card-airbridge',
-      type: 'card',
-      x: 100,
-      y: 380,
-      width: 240,
-      height: 170,
-      title: '📡 Spatial AirBridge',
-      content: 'Radar-scanning P2P data packets and high-throughput zero-config device sync.',
-      color: '#fbcfe8',
-      textColor: '#831843',
-      tag: 'NETWORK',
-    },
-    {
-      id: 'card-zones',
-      type: 'card',
-      x: 440,
-      y: 380,
-      width: 250,
-      height: 170,
-      title: '📐 FancyZones Snap',
-      content: 'Multi-monitor wireframe spatial layouts with Shift+Drag magnetic docking.',
-      color: '#bbf7d0',
-      textColor: '#14532d',
-      tag: 'WINDOW',
-    },
-  ]);
+  // Board Elements initialized from localStorage or empty
+  const [cards, setCards] = useState<StickyCard[]>(() => {
+    try {
+      const saved = localStorage.getItem('flowos_flowboard_cards_v3');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
-  const [shapes, setShapes] = useState<ShapeBlock[]>([
-    {
-      id: 'shape-hub',
-      type: 'shape',
-      shapeKind: 'pill',
-      x: 290,
-      y: 20,
-      width: 200,
-      height: 52,
-      label: 'FlowOS 2.0 Engine',
-      fillColor: 'rgba(56, 189, 248, 0.15)',
-      borderColor: '#38bdf8',
-      textColor: '#38bdf8',
-    },
-  ]);
+  const [shapes, setShapes] = useState<ShapeBlock[]>(() => {
+    try {
+      const saved = localStorage.getItem('flowos_flowboard_shapes_v3');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
-  const [connectors, setConnectors] = useState<ConnectorLine[]>([
-    { id: 'c1', fromId: 'shape-hub', toId: 'card-core', color: '#38bdf8' },
-    { id: 'c2', fromId: 'shape-hub', toId: 'card-ui', color: '#38bdf8' },
-    { id: 'c3', fromId: 'card-core', toId: 'card-airbridge', color: '#f43f5e' },
-    { id: 'c4', fromId: 'card-ui', toId: 'card-zones', color: '#10b981' },
-  ]);
+  const [connectors, setConnectors] = useState<ConnectorLine[]>(() => {
+    try {
+      const saved = localStorage.getItem('flowos_flowboard_connectors_v3');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
-  const [strokes, setStrokes] = useState<DoodleStroke[]>([]);
+  const [strokes, setStrokes] = useState<DoodleStroke[]>(() => {
+    try {
+      const saved = localStorage.getItem('flowos_flowboard_strokes_v3');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowos_flowboard_cards_v3', JSON.stringify(cards));
+    } catch {}
+  }, [cards]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowos_flowboard_shapes_v3', JSON.stringify(shapes));
+    } catch {}
+  }, [shapes]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowos_flowboard_connectors_v3', JSON.stringify(connectors));
+    } catch {}
+  }, [connectors]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('flowos_flowboard_strokes_v3', JSON.stringify(strokes));
+    } catch {}
+  }, [strokes]);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [connectorSourceId, setConnectorSourceId] = useState<string | null>(null);
 
@@ -923,6 +905,16 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
               </div>
             );
           })}
+
+          {cards.length === 0 && shapes.length === 0 && strokes.length === 0 && (
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-8 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md text-center max-w-sm pointer-events-none select-none">
+              <LayoutDashboard className="h-10 w-10 text-neutral-600 mb-3" />
+              <h4 className="text-sm font-semibold text-white">Whiteboard Canvas</h4>
+              <p className="text-xs text-neutral-400 mt-1">
+                Select Sticky Note, Shape, or Pen from the toolbar below to begin drafting.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

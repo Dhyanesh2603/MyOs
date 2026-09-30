@@ -11,52 +11,22 @@ export interface Track {
   isStream?: boolean;
 }
 
-export const DEFAULT_TRACKS: Track[] = [
-  {
-    id: 'track-stream-1',
-    title: 'Lofi Chill Study Beats',
-    artist: 'Lofi Radio 24/7 Live Stream',
-    audioUrl: 'https://stream.zeno.fm/f3wvbbqmdg8uv',
-    durationSec: 0,
-    isStream: true,
-  },
-  {
-    id: 'track-stream-2',
-    title: 'Synthwave & Retrowave Lounge',
-    artist: 'Nightdrive Audio Stream',
-    audioUrl: 'https://stream.zeno.fm/0r0xa792kwzuv',
-    durationSec: 0,
-    isStream: true,
-  },
-  {
-    id: 'track-1',
-    title: 'Kinetic Drift',
-    artist: 'FlowOS Soundscape Lab (Synth)',
-    baseFreq: 110, // A2
-    durationSec: 184,
-  },
-  {
-    id: 'track-2',
-    title: 'Obsidian Horizons',
-    artist: 'Synthetic Pulse Studio (Synth)',
-    baseFreq: 130.81, // C3
-    durationSec: 212,
-  },
-  {
-    id: 'track-3',
-    title: 'Subtle Aurora',
-    artist: 'Ambient Micro-Kernel (Synth)',
-    baseFreq: 164.81, // E3
-    durationSec: 195,
-  },
-  {
-    id: 'track-4',
-    title: 'Cybernetic Echoes',
-    artist: 'Linear Resonance (Synth)',
-    baseFreq: 146.83, // D3
-    durationSec: 230,
-  },
-];
+export const DEFAULT_TRACKS: Track[] = [];
+
+const loadPersistedTracks = (): Track[] => {
+  try {
+    const raw = localStorage.getItem('flowos_media_tracks_v3');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const savePersistedTracks = (tracks: Track[]) => {
+  try {
+    localStorage.setItem('flowos_media_tracks_v3', JSON.stringify(tracks));
+  } catch {}
+};
 
 export interface MediaStoreState {
   tracks: Track[];
@@ -77,6 +47,7 @@ export interface MediaStoreState {
 }
 
 function startCurrentTrack(track: Track, volume: number, onEnded?: () => void) {
+  if (!track) return;
   if (track.audioUrl) {
     audioEngine.playUrl(track.audioUrl, onEnded);
   } else {
@@ -86,7 +57,7 @@ function startCurrentTrack(track: Track, volume: number, onEnded?: () => void) {
 }
 
 export const useMediaStore = create<MediaStoreState>((set, get) => ({
-  tracks: DEFAULT_TRACKS,
+  tracks: loadPersistedTracks(),
   currentTrackIndex: 0,
   isPlaying: false,
   volume: 0.8,
@@ -94,7 +65,9 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
 
   togglePlay: () => {
     const { isPlaying, currentTrackIndex, tracks, volume } = get();
-    const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
+    if (tracks.length === 0) return;
+    const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
+    if (!currentTrack) return;
 
     if (isPlaying) {
       audioEngine.stop();
@@ -109,8 +82,11 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
 
   play: () => {
     const { isPlaying, currentTrackIndex, tracks, volume } = get();
+    if (tracks.length === 0) return;
+    const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
+    if (!currentTrack) return;
+
     if (!isPlaying) {
-      const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
       startCurrentTrack(currentTrack, volume, () => {
         get().nextTrack();
       });
@@ -128,8 +104,11 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
 
   nextTrack: () => {
     const { currentTrackIndex, tracks, isPlaying, volume } = get();
+    if (tracks.length === 0) return;
     const nextIdx = (currentTrackIndex + 1) % tracks.length;
-    const nextTrack = tracks[nextIdx]!;
+    const nextTrack = tracks[nextIdx];
+    if (!nextTrack) return;
+
     if (isPlaying) {
       audioEngine.stop();
       startCurrentTrack(nextTrack, volume, () => {
@@ -141,8 +120,11 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
 
   prevTrack: () => {
     const { currentTrackIndex, tracks, isPlaying, volume } = get();
+    if (tracks.length === 0) return;
     const prevIdx = (currentTrackIndex - 1 + tracks.length) % tracks.length;
-    const prevTrack = tracks[prevIdx]!;
+    const prevTrack = tracks[prevIdx];
+    if (!prevTrack) return;
+
     if (isPlaying) {
       audioEngine.stop();
       startCurrentTrack(prevTrack, volume, () => {
@@ -174,8 +156,10 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
 
   tickProgress: () => {
     const { isPlaying, playbackProgressSec, currentTrackIndex, tracks } = get();
-    if (!isPlaying) return;
-    const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
+    if (!isPlaying || tracks.length === 0) return;
+    const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
+    if (!currentTrack) return;
+
     if (currentTrack.durationSec > 0 && playbackProgressSec >= currentTrack.durationSec) {
       get().nextTrack();
     } else {
@@ -186,14 +170,23 @@ export const useMediaStore = create<MediaStoreState>((set, get) => ({
   addTrack: (track: Track) => {
     const { tracks } = get();
     const updated = [track, ...tracks];
+    savePersistedTracks(updated);
     set({ tracks: updated, currentTrackIndex: 0 });
     get().play();
   },
 
   removeTrack: (id: string) => {
     const { tracks, currentTrackIndex, isPlaying } = get();
-    if (tracks.length <= 1) return;
+    if (tracks.length === 0) return;
     const filtered = tracks.filter((t) => t.id !== id);
+    savePersistedTracks(filtered);
+
+    if (filtered.length === 0) {
+      if (isPlaying) audioEngine.stop();
+      set({ tracks: [], currentTrackIndex: 0, isPlaying: false, playbackProgressSec: 0 });
+      return;
+    }
+
     const newIdx = Math.min(currentTrackIndex, filtered.length - 1);
     if (isPlaying) {
       audioEngine.stop();

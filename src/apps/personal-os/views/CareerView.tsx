@@ -80,11 +80,11 @@ export const CareerView: React.FC = () => {
     soundEngine.playClick();
     setCompanyModalMode('add');
     setCompName('');
-    setCompRole('Software Development Engineer');
+    setCompRole('');
     setCompStage('applied');
-    setCompCtc('₹45 - 55 LPA');
-    setCompLocation('Bengaluru / Remote');
-    setCompResumeVersion(resumeVersions[0]?.name || 'Resume_v4.pdf');
+    setCompCtc('');
+    setCompLocation('');
+    setCompResumeVersion('');
     setCompJobUrl('');
     setCompNotes('');
     setIsCompanyModalOpen(true);
@@ -205,7 +205,9 @@ export const CareerView: React.FC = () => {
 
           <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-right font-mono">
             <div className="text-[10px] uppercase text-neutral-400">Target CTC Band</div>
-            <div className="text-sm font-semibold text-white">₹45 - 55 LPA</div>
+            <div className="text-sm font-semibold text-white">
+              {companies.find((c) => c.ctcRange)?.ctcRange || 'Not Set'}
+            </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-right font-mono">
             <div className="text-[10px] uppercase text-neutral-400">Active Pipelines</div>
@@ -274,11 +276,12 @@ export const CareerView: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Company Detail Studio & Interview Rounds */}
-      {activeCompany && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Active Company Details (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-5">
+      {/* 3. Company Detail Studio, Interview Rounds & Resume/Portfolio */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Active Company Details (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col gap-5">
+          {activeCompany ? (
+            <>
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
               <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-white/10">
                 <div>
@@ -332,15 +335,15 @@ export const CareerView: React.FC = () => {
               <div className="grid grid-cols-3 gap-2.5 mt-4 text-xs font-mono">
                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-2.5">
                   <div className="text-[10px] text-neutral-400 uppercase">CTC Package</div>
-                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.ctcRange || 'Competitive'}</div>
+                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.ctcRange || '—'}</div>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-2.5">
                   <div className="text-[10px] text-neutral-400 uppercase">Location</div>
-                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.location || 'Remote'}</div>
+                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.location || '—'}</div>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-2.5">
                   <div className="text-[10px] text-neutral-400 uppercase">Resume Used</div>
-                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.resumeVersionUsed || 'v4 Systems'}</div>
+                  <div className="text-white font-semibold mt-1 truncate">{activeCompany.resumeVersionUsed || '—'}</div>
                 </div>
               </div>
 
@@ -448,132 +451,160 @@ export const CareerView: React.FC = () => {
                 )}
               </div>
             </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-white/10 bg-white/[0.02] text-center min-h-[260px]">
+            <Building2 className="h-10 w-10 text-neutral-600 mb-3" />
+            <h3 className="text-base font-medium text-white">No Target Companies Yet</h3>
+            <p className="text-xs text-neutral-400 mt-1 max-w-sm">
+              Add target companies to your recruitment pipeline to track stages, compensation, and interview rounds.
+            </p>
+            <button
+              onClick={handleOpenAddCompany}
+              className="mt-4 flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-mono text-white hover:bg-white/20 transition-all shadow-sm"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add First Target Company</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Right: Resume Versions & Portfolio Checklist (5 cols) */}
+      <div className="lg:col-span-5 flex flex-col gap-5">
+        {/* Resume Versions */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-neutral-300" />
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                Resume Versions
+              </h4>
+            </div>
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                setResumeName('');
+                setResumeTag('');
+                setIsResumeModalOpen(true);
+              }}
+              className="flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] font-mono text-neutral-200 hover:bg-white/10 transition-colors"
+            >
+              <Plus className="h-3 w-3" />
+              <span>Add</span>
+            </button>
           </div>
 
-          {/* Right: Resume Versions & Portfolio Checklist (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col gap-5">
-            {/* Resume Versions */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-neutral-300" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
-                    Resume Versions (ATS 95+)
-                  </h4>
-                </div>
-                <button
-                  onClick={() => {
-                    soundEngine.playClick();
-                    setResumeName('');
-                    setResumeTag('Systems / Backend');
-                    setIsResumeModalOpen(true);
-                  }}
-                  className="flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] font-mono text-neutral-200 hover:bg-white/10 transition-colors"
-                >
-                  <Plus className="h-3 w-3" />
-                  <span>Add</span>
-                </button>
+          <div className="mt-3.5 flex flex-col gap-2">
+            {resumeVersions.length === 0 ? (
+              <div className="p-4 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/10 rounded-xl">
+                No resume versions tracked yet. Click &quot;Add&quot; to log your tailored resumes.
               </div>
-
-              <div className="mt-3.5 flex flex-col gap-2">
-                {resumeVersions.map((r) => (
-                  <div
-                    key={r.id}
-                    className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3 hover:border-white/15 transition-all text-xs"
-                  >
-                    <div>
-                      <div className="font-mono text-neutral-200 font-medium">{r.name}</div>
-                      <div className="text-[10px] text-neutral-400 mt-0.5">{r.tag}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] text-neutral-500">{r.updated}</span>
-                      <button
-                        onClick={() => {
-                          soundEngine.playClick();
-                          deleteResumeVersion(r.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-400 hover:text-rose-400 transition-opacity"
-                        title="Delete Resume"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
+            ) : (
+              resumeVersions.map((r) => (
+                <div
+                  key={r.id}
+                  className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3 hover:border-white/15 transition-all text-xs"
+                >
+                  <div>
+                    <div className="font-mono text-neutral-200 font-medium">{r.name}</div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5">{r.tag}</div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Portfolio Checklist */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <Award className="h-4 w-4 text-neutral-300" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
-                    Portfolio Readiness Checklist
-                  </h4>
-                </div>
-                <span className="font-mono text-xs text-neutral-400">
-                  {portfolioChecklist.filter((i) => i.completed).length}/{portfolioChecklist.length} Ready
-                </span>
-              </div>
-
-              {/* Inline Add Item Form */}
-              <form onSubmit={handleAddPortfolioItem} className="mt-3 flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Add target portfolio asset..."
-                  value={newPortfolioTitle}
-                  onChange={(e) => setNewPortfolioTitle(e.target.value)}
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
-                />
-                <button
-                  type="submit"
-                  className="flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-mono text-white hover:bg-white/20 transition-all"
-                >
-                  <Plus className="h-3 w-3" />
-                  <span>Add</span>
-                </button>
-              </form>
-
-              <div className="mt-3.5 flex flex-col gap-2">
-                {portfolioChecklist.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      soundEngine.playClick();
-                      togglePortfolioChecklist(item.id);
-                    }}
-                    className="group flex items-center justify-between gap-2.5 text-xs text-neutral-300 rounded-xl border border-white/5 bg-white/[0.01] p-2 hover:border-white/15 cursor-pointer transition-all"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      {item.completed ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                      ) : (
-                        <Circle className="h-4 w-4 text-neutral-500 shrink-0" />
-                      )}
-                      <span className={`truncate ${item.completed ? 'text-neutral-300' : 'text-neutral-400'}`}>
-                        {item.title}
-                      </span>
-                    </div>
-
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-neutral-500">{r.updated}</span>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         soundEngine.playClick();
-                        deletePortfolioChecklist(item.id);
+                        deleteResumeVersion(r.id);
                       }}
                       className="opacity-0 group-hover:opacity-100 p-1 text-neutral-400 hover:text-rose-400 transition-opacity"
-                      title="Delete Item"
+                      title="Delete Resume"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
-      )}
+
+        {/* Portfolio Checklist */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Award className="h-4 w-4 text-neutral-300" />
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
+                Portfolio Readiness Checklist
+              </h4>
+            </div>
+            <span className="font-mono text-xs text-neutral-400">
+              {portfolioChecklist.filter((i) => i.completed).length}/{portfolioChecklist.length} Ready
+            </span>
+          </div>
+
+          {/* Inline Add Item Form */}
+          <form onSubmit={handleAddPortfolioItem} className="mt-3 flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Add target portfolio asset..."
+              value={newPortfolioTitle}
+              onChange={(e) => setNewPortfolioTitle(e.target.value)}
+              className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
+            />
+            <button
+              type="submit"
+              className="flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-mono text-white hover:bg-white/20 transition-all"
+            >
+              <Plus className="h-3 w-3" />
+              <span>Add</span>
+            </button>
+          </form>
+
+          <div className="mt-3.5 flex flex-col gap-2">
+            {portfolioChecklist.length === 0 ? (
+              <div className="p-4 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/10 rounded-xl">
+                No portfolio items yet. Add target assets above (e.g. GitHub repos, live demos, blogs).
+              </div>
+            ) : (
+              portfolioChecklist.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    togglePortfolioChecklist(item.id);
+                  }}
+                  className="group flex items-center justify-between gap-2.5 text-xs text-neutral-300 rounded-xl border border-white/5 bg-white/[0.01] p-2 hover:border-white/15 cursor-pointer transition-all"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    {item.completed ? (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                    ) : (
+                      <Circle className="h-4 w-4 text-neutral-500 shrink-0" />
+                    )}
+                    <span className={`truncate ${item.completed ? 'text-neutral-300' : 'text-neutral-400'}`}>
+                      {item.title}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundEngine.playClick();
+                      deletePortfolioChecklist(item.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 text-neutral-400 hover:text-rose-400 transition-opacity"
+                    title="Delete Item"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
 
       {/* Modal 1: Add or Edit Company */}
       {isCompanyModalOpen && (

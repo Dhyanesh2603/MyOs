@@ -42,7 +42,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
   const animFrameRef = useRef<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
+  const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
 
   const handleTogglePlay = () => {
     togglePlay();
@@ -227,74 +227,112 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
           <div className="text-[10px] font-mono uppercase text-content-tertiary px-2 py-1">
             Track Queue & Channels
           </div>
-          {tracks.map((track, idx) => {
-            const isCurrent = idx === currentTrackIndex;
-            return (
-              <div
-                key={track.id}
-                onClick={() => setTrack(idx)}
-                className={`group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-mono transition-all cursor-pointer ${
-                  isCurrent
-                    ? 'bg-accent-primary/20 border border-accent-primary/40 text-content-primary'
-                    : 'hover:bg-surface-subtle text-content-secondary'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <span className="text-[10px] text-content-tertiary w-4">
-                    {isCurrent && isPlaying ? '▶' : `${idx + 1}`}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate text-content-primary">{track.title}</div>
-                    <div className="text-[10px] text-content-tertiary truncate">{track.artist}</div>
+          {tracks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center my-auto">
+              <MusicIcon className="h-8 w-8 text-content-tertiary mb-2" />
+              <p className="text-xs text-content-secondary font-medium">Playlist is empty</p>
+              <p className="text-[11px] text-content-tertiary mt-1">
+                Click &quot;Open Audio File&quot; or &quot;Add Stream&quot; above to add tracks.
+              </p>
+            </div>
+          ) : (
+            tracks.map((track, idx) => {
+              const isCurrent = idx === currentTrackIndex;
+              return (
+                <div
+                  key={track.id}
+                  onClick={() => setTrack(idx)}
+                  className={`group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-mono transition-all cursor-pointer ${
+                    isCurrent
+                      ? 'bg-accent-primary/20 border border-accent-primary/40 text-content-primary'
+                      : 'hover:bg-surface-subtle text-content-secondary'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <span className="text-[10px] text-content-tertiary w-4">
+                      {isCurrent && isPlaying ? '▶' : `${idx + 1}`}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate text-content-primary">{track.title}</div>
+                      <div className="text-[10px] text-content-tertiary truncate">{track.artist}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {track.isStream && (
+                      <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] text-emerald-400 border border-emerald-500/30">
+                        LIVE
+                      </span>
+                    )}
+                    {track.audioUrl && !track.isStream && (
+                      <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[9px] text-sky-400 border border-sky-500/30">
+                        AUDIO
+                      </span>
+                    )}
+                    {tracks.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeTrack(track.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-content-tertiary hover:text-rose-400 transition-opacity"
+                        title="Remove from playlist"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  {track.isStream && (
-                    <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] text-emerald-400 border border-emerald-500/30">
-                      LIVE
-                    </span>
-                  )}
-                  {track.audioUrl && !track.isStream && (
-                    <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[9px] text-sky-400 border border-sky-500/30">
-                      AUDIO
-                    </span>
-                  )}
-                  {tracks.length > 1 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeTrack(track.id);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-content-tertiary hover:text-rose-400 transition-opacity"
-                      title="Remove from playlist"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       ) : (
-        /* Visualizer Canvas Card */
+        /* Visualizer Canvas Card or Empty State */
         <div className="relative flex flex-1 flex-col items-center justify-center rounded-2xl border border-border-subtle bg-surface-overlay/50 my-3 p-4 overflow-hidden">
-          <canvas
-            ref={canvasRef}
-            width={440}
-            height={130}
-            className="w-full h-32 rounded-xl"
-          />
+          {tracks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center p-6 select-none">
+              <MusicIcon className="h-10 w-10 text-content-tertiary mb-3 animate-pulse" />
+              <h4 className="text-sm font-semibold text-content-primary">No Tracks in Queue</h4>
+              <p className="text-xs text-content-secondary mt-1 max-w-xs">
+                Import MP3, WAV, or AAC audio files from your system or add an internet radio stream URL.
+              </p>
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1 rounded-xl bg-accent-primary px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-accent-hover transition-colors"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  <span>Open Audio File</span>
+                </button>
+                <button
+                  onClick={() => setIsStreamModalOpen(true)}
+                  className="flex items-center gap-1 rounded-xl border border-border-subtle bg-surface-overlay px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-subtle transition-colors"
+                >
+                  <Radio className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Add Stream</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <canvas
+                ref={canvasRef}
+                width={440}
+                height={130}
+                className="w-full h-32 rounded-xl"
+              />
 
-          {/* Ambient Disc Glyph */}
-          <div className="absolute top-4 right-4 flex items-center gap-2 text-content-tertiary">
-            <Disc
-              className={`h-5 w-5 text-accent-primary transition-transform duration-1000 ${
-                isPlaying ? 'animate-spin' : ''
-              }`}
-            />
-          </div>
+              {/* Ambient Disc Glyph */}
+              <div className="absolute top-4 right-4 flex items-center gap-2 text-content-tertiary">
+                <Disc
+                  className={`h-5 w-5 text-accent-primary transition-transform duration-1000 ${
+                    isPlaying ? 'animate-spin' : ''
+                  }`}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -302,14 +340,14 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
       <div className="flex items-center justify-between">
         <div className="space-y-0.5 min-w-0 flex-1 pr-3">
           <h3 className="font-semibold text-sm text-content-primary truncate">
-            {currentTrack.title}
+            {currentTrack ? currentTrack.title : 'No track loaded'}
           </h3>
           <p className="font-mono text-xs text-content-secondary truncate">
-            {currentTrack.artist}
+            {currentTrack ? currentTrack.artist : 'Playback idle • Open an audio file or stream'}
           </p>
         </div>
         <span className="font-mono text-[10px] text-accent-hover bg-accent-primary/15 border border-accent-primary/30 px-2 py-0.5 rounded-full shrink-0">
-          {isPlaying ? (currentTrack.isStream ? 'Streaming Live' : 'Playing') : 'Paused'}
+          {isPlaying ? (currentTrack?.isStream ? 'Streaming Live' : 'Playing') : 'Idle'}
         </span>
       </div>
 

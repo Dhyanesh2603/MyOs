@@ -186,11 +186,32 @@ export const MissionsView: React.FC = () => {
         ))}
       </div>
 
-      {/* 3. Split Campaign Master / Detail View */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: Campaign List (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-3">
-          {filteredMissions.map((mission) => {
+      {/* 3. Split Campaign Master / Detail View or Empty State */}
+      {missions.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 rounded-2xl border border-white/10 bg-white/[0.02] text-center my-6">
+          <Compass className="h-12 w-12 text-neutral-600 mb-4" />
+          <h3 className="text-base font-medium text-white">No Campaigns Defined Yet</h3>
+          <p className="text-xs text-neutral-400 mt-1 max-w-md">
+            Define high-leverage engineering missions to align your projects, skills, and daily execution towards concrete milestones.
+          </p>
+          <button
+            onClick={handleOpenAddMission}
+            className="mt-5 flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-mono text-white hover:bg-white/20 transition-all shadow-sm"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Launch Your First Campaign</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Campaign List (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col gap-3">
+            {filteredMissions.length === 0 ? (
+              <div className="p-6 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/10 rounded-xl">
+                No campaigns matching status &quot;{filterStatus}&quot;.
+              </div>
+            ) : null}
+            {filteredMissions.map((mission) => {
             const isSelected = activeMission?.id === mission.id;
             const completedCount = mission.objectives.filter((o) => o.completed).length;
 
@@ -506,6 +527,7 @@ export const MissionsView: React.FC = () => {
           </div>
         )}
       </div>
+      )}
 
       {/* Modal: Add or Edit Mission */}
       {isMissionModalOpen && (

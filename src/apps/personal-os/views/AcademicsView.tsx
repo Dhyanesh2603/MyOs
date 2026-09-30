@@ -83,7 +83,7 @@ export const AcademicsView: React.FC = () => {
   ).toFixed(2);
 
   const lowAttendanceSubjects = subjects.filter(
-    (s) => (s.attendance.attended / (s.attendance.total || 1)) * 100 < s.attendance.minimumTarget
+    (s) => s.attendance.total > 0 && (s.attendance.attended / s.attendance.total) * 100 < s.attendance.minimumTarget
   );
 
   const handleOpenAddSubject = () => {
@@ -253,11 +253,13 @@ export const AcademicsView: React.FC = () => {
 
           <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-right font-mono">
             <div className="text-[10px] uppercase text-neutral-400">Current CGPA</div>
-            <div className="text-sm font-semibold text-white">{cgpaPlan.currentCgpa} / 10.0</div>
+            <div className="text-sm font-semibold text-white">
+              {cgpaPlan.currentCgpa > 0 ? `${cgpaPlan.currentCgpa} / 10.0` : '—'}
+            </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-right font-mono">
             <div className="text-[10px] uppercase text-neutral-400">Credits Completed</div>
-            <div className="text-sm font-semibold text-white">{cgpaPlan.totalCreditsCompleted}</div>
+            <div className="text-sm font-semibold text-white">{cgpaPlan.totalCreditsCompleted || 0}</div>
           </div>
         </div>
       </div>
@@ -291,8 +293,25 @@ export const AcademicsView: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Subjects Matrix Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {subjects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-white/10 bg-white/[0.01] p-8">
+          <GraduationCap className="h-12 w-12 text-neutral-500 mb-3" />
+          <h3 className="text-base font-semibold text-white">No Academic Subjects Enrolled</h3>
+          <p className="text-xs text-neutral-400 mt-1 max-w-md">
+            Add your college courses, attendance requirements (≥75%), faculty information, CAT/FAT exams, and assignments.
+          </p>
+          <button
+            onClick={handleOpenAddSubject}
+            className="mt-4 flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-neutral-200 transition-all shadow-md font-mono"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Your First Subject</span>
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* 3. Subjects Matrix Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {subjects.map((s) => {
           const total = s.attendance.total || 1;
           const pct = Math.round((s.attendance.attended / total) * 100);
@@ -699,6 +718,8 @@ export const AcademicsView: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
 
       {/* Modal 1: Add or Edit Subject */}
