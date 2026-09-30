@@ -127,22 +127,32 @@ export const SystemTray: React.FC = () => {
         )}
       </button>
 
-      {/* Network Indicator */}
-      <div
-        title={isOnline ? 'Network Connected (Wi-Fi)' : 'Network Offline'}
-        className="flex items-center text-content-secondary"
+      {/* Network Indicator (Wi-Fi) */}
+      <button
+        data-control-center-trigger
+        onClick={() => {
+          soundEngine.playClick();
+          useControlCenterStore.getState().toggleControlCenter();
+        }}
+        title={isOnline ? 'Wi-Fi: Connected (Click for Control Center)' : 'Wi-Fi: Disconnected (Click for Control Center)'}
+        className="flex items-center rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
       >
         {isOnline ? (
           <Wifi className="h-3.5 w-3.5 text-content-secondary" />
         ) : (
           <WifiOff className="h-3.5 w-3.5 text-rose-400" />
         )}
-      </div>
+      </button>
 
       {/* Battery Indicator */}
-      <div
-        title={`Battery: ${batteryLevel ?? 100}% ${isCharging ? '(Charging)' : ''}`}
-        className="flex items-center gap-1 text-content-secondary"
+      <button
+        data-control-center-trigger
+        onClick={() => {
+          soundEngine.playClick();
+          useControlCenterStore.getState().toggleControlCenter();
+        }}
+        title={`Battery: ${batteryLevel ?? 100}% ${isCharging ? '(Charging)' : ''} (Click for Control Center)`}
+        className="flex items-center gap-1 rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
       >
         {isCharging ? (
           <BatteryCharging className="h-3.5 w-3.5 text-emerald-400" />
@@ -152,7 +162,7 @@ export const SystemTray: React.FC = () => {
         <span className="font-mono text-[10px] hidden sm:inline">
           {batteryLevel ?? 100}%
         </span>
-      </div>
+      </button>
 
       {/* Theme Quick Toggle */}
       <button

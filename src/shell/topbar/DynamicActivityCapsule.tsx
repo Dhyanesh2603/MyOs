@@ -24,7 +24,7 @@ import { soundEngine } from '@core/audio/soundEngine';
 export const DynamicActivityCapsule: React.FC = () => {
   const { isPlaying, tracks, currentTrackIndex, togglePlay, nextTrack } = useMediaStore();
   const { isRunning: isPomoRunning, timeLeft, mode: pomoMode, toggle: togglePomo, reset: resetPomo } = usePomodoroStore();
-  const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
+  const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { currentTrack: ambientTrack, playTrack, stopTrack } = useAmbientSoundStore();
@@ -43,7 +43,7 @@ export const DynamicActivityCapsule: React.FC = () => {
     return () => window.removeEventListener('mousedown', handleClickOutside);
   }, [isExpanded]);
 
-  const hasActivity = isPlaying || isPomoRunning || ambientTrack !== 'none';
+  const hasActivity = (isPlaying && !!currentTrack) || isPomoRunning || ambientTrack !== 'none';
 
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
@@ -91,7 +91,7 @@ export const DynamicActivityCapsule: React.FC = () => {
         className="flex items-center gap-2 rounded-full border border-white/15 bg-black/90 px-2.5 py-0.5 text-xs text-white shadow-md backdrop-blur-xl hover:border-accent-primary/60 transition-colors"
       >
         {/* Media state */}
-        {isPlaying && (
+        {isPlaying && currentTrack && (
           <div className="flex items-center gap-1.5">
             <div className="flex items-end gap-0.5 h-3">
               <span className="w-0.5 bg-accent-primary animate-[bounce_1s_infinite_100ms] h-2.5 rounded-full" />
@@ -138,7 +138,7 @@ export const DynamicActivityCapsule: React.FC = () => {
             className="absolute left-1/2 -translate-x-1/2 top-8 z-[9500] w-76 rounded-2xl border border-white/15 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-2xl"
           >
             {/* Now Playing section */}
-            {isPlaying && (
+            {isPlaying && currentTrack && (
               <div className="mb-3 border-b border-white/10 pb-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 min-w-0">

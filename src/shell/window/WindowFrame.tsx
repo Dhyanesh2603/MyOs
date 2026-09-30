@@ -7,6 +7,7 @@ import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { appRegistry } from '@core/process/registry';
 import { WindowHeader } from './WindowHeader';
 import { ResizeHandle } from './ResizeHandle';
+import { ErrorBoundary } from '@core/errors/ErrorBoundary';
 
 export interface WindowFrameProps {
   windowState: WindowState;
@@ -113,11 +114,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
           }`}
         >
           {AppComponent ? (
-            <AppComponent
-              windowId={windowState.id}
-              processId={windowState.processId}
-              initialData={windowState.customState?.initialData}
-            />
+            <ErrorBoundary fallbackTitle={`${manifest?.name || 'Application'} Error`}>
+              <AppComponent
+                windowId={windowState.id}
+                processId={windowState.processId}
+                initialData={windowState.customState?.initialData}
+              />
+            </ErrorBoundary>
           ) : (
             <div className="flex h-full w-full items-center justify-center p-6 text-center text-xs text-content-secondary">
               Application component &apos;{windowState.appId}&apos; could not be resolved.

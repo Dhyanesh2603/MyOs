@@ -58,7 +58,7 @@ export const ControlCenterShade: React.FC = () => {
   const isCopilotOpen = useCopilotStore((s) => s.isOpen);
   const toggleCopilot = useCopilotStore((s) => s.toggleCopilot);
 
-  const currentTrack = tracks[currentTrackIndex] ?? tracks[0]!;
+  const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
   const containerRef = useRef<HTMLDivElement>(null);
   const [ambientTrack, setAmbientTrack] = useState<AmbientTrack>(ambientSoundEngine.getCurrentTrack());
   const [ambientVol, setAmbientVol] = useState(ambientSoundEngine.getVolume());
@@ -130,7 +130,7 @@ export const ControlCenterShade: React.FC = () => {
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Wi-Fi</div>
               <div className="truncate text-[10px] opacity-75">
-                {isWifiEnabled ? 'FlowNet-5G' : 'Disabled'}
+                {isWifiEnabled ? (navigator.onLine ? 'Connected' : 'No Internet') : 'Disabled'}
               </div>
             </div>
           </button>
@@ -157,7 +157,7 @@ export const ControlCenterShade: React.FC = () => {
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Bluetooth</div>
               <div className="truncate text-[10px] opacity-75">
-                {isBluetoothEnabled ? 'Connected' : 'Off'}
+                {isBluetoothEnabled ? 'Ready' : 'Off'}
               </div>
             </div>
           </button>
@@ -488,24 +488,32 @@ export const ControlCenterShade: React.FC = () => {
             </div>
             <div className="min-w-0">
               <div className="truncate text-xs font-semibold text-content-primary">
-                {currentTrack.title}
+                {currentTrack ? currentTrack.title : 'No track playing'}
               </div>
               <div className="truncate text-[10px] text-content-tertiary">
-                {currentTrack.artist}
+                {currentTrack ? currentTrack.artist : 'Audio queue idle'}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={togglePlay}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-fg shadow-sm hover:scale-105 active:scale-95 transition-all"
+              onClick={() => {
+                if (currentTrack) togglePlay();
+              }}
+              disabled={!currentTrack}
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-fg shadow-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-40 disabled:hover:scale-100"
+              title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <Pause className="h-3.5 w-3.5 fill-current" /> : <Play className="h-3.5 w-3.5 fill-current ml-0.5" />}
             </button>
             <button
-              onClick={nextTrack}
-              className="rounded p-1 text-content-secondary hover:bg-surface-hover hover:text-content-primary transition-colors"
+              onClick={() => {
+                if (currentTrack) nextTrack();
+              }}
+              disabled={!currentTrack}
+              className="rounded p-1 text-content-secondary hover:bg-surface-hover hover:text-content-primary transition-colors disabled:opacity-40"
+              title="Next Track"
             >
               <SkipForward className="h-3.5 w-3.5" />
             </button>

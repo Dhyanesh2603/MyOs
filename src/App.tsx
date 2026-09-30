@@ -39,6 +39,7 @@ import { useSplitScreenStore } from '@core/window/splitScreenStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { soundEngine } from '@core/audio/soundEngine';
+import { ErrorBoundary } from '@core/errors/ErrorBoundary';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -190,7 +191,9 @@ export const App: React.FC = () => {
       <NotificationCenter />
 
       {/* Control Center Glass Shade */}
-      <ControlCenterShade />
+      <ErrorBoundary fallbackTitle="Control Center" onReset={() => useControlCenterStore.getState().closeControlCenter()}>
+        <ControlCenterShade />
+      </ErrorBoundary>
 
       {/* Visual Alt+Tab Task Switcher */}
       <TaskSwitcher />
