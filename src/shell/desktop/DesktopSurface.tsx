@@ -19,6 +19,14 @@ export interface DesktopSurfaceProps {
 
 export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showDesktopIcons, setShowDesktopIcons] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('flowos_show_desktop_icons') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+
   const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
   const wallpaper = wallpapers.find((w) => w.id === currentWallpaperId) ?? wallpapers[0]!;
   const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
@@ -66,6 +74,25 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
           },
         },
         { type: 'separator', id: 'sep-1' },
+        {
+          type: 'item',
+          item: {
+            id: 'toggle-icons',
+            label: showDesktopIcons ? 'Hide Desktop Icons' : 'Show Desktop Icons',
+            icon: LayoutGrid,
+            action: () => {
+              setShowDesktopIcons((prev) => {
+                const next = !prev;
+                try {
+                  localStorage.setItem('flowos_show_desktop_icons', String(next));
+                } catch {
+                  // ignored
+                }
+                return next;
+              });
+            },
+          },
+        },
         {
           type: 'item',
           item: {
@@ -223,8 +250,8 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         currentPos={selectionCurrent}
       />
 
-      {/* Desktop Icons Spatial Grid (renders only genuine user files in /home/user/Desktop) */}
-      <DesktopIcons />
+      {/* Curated Modern Desktop Icons Grid */}
+      {showDesktopIcons && <DesktopIcons />}
 
       {/* Persistent Desktop HUD Widgets (if user opts in) */}
       <DesktopWidgets />

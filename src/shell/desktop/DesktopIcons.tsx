@@ -7,6 +7,11 @@ import { downloadVFSToPC } from '@core/vfs/hostBridge';
 import {
   Folder,
   File,
+  Globe,
+  Code2,
+  FileText,
+  Terminal,
+  Layers,
   ExternalLink,
   Download,
   Eye,
@@ -19,6 +24,8 @@ interface DesktopShortcut {
   type: 'app' | 'file' | 'folder';
   target: string;
   icon: React.ComponentType<{ className?: string }>;
+  colorClass?: string;
+  badge?: string;
 }
 
 export const DesktopIcons: React.FC = () => {
@@ -27,28 +34,76 @@ export const DesktopIcons: React.FC = () => {
   const openContextMenu = useContextMenuStore((state) => state.openMenu);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Clean macOS desktop: Only show genuine files and folders in /home/user/Desktop
-  // No hardcoded app shortcuts cluttering the wallpaper
-  const shortcuts: DesktopShortcut[] = [];
+  // Option B: Curated, clean, high-design grid of essential desktop apps
+  const curatedApps: DesktopShortcut[] = [
+    {
+      id: 'app-personal-os',
+      name: 'Flow OS',
+      type: 'app',
+      target: 'personal-os',
+      icon: Layers,
+      colorClass: 'from-indigo-500/25 to-purple-500/15 border-indigo-400/30 text-indigo-300 group-hover:border-indigo-400/60 shadow-[0_4px_16px_rgba(99,102,241,0.15)]',
+    },
+    {
+      id: 'app-files',
+      name: 'Files',
+      type: 'app',
+      target: 'file-explorer',
+      icon: Folder,
+      colorClass: 'from-blue-500/25 to-cyan-500/15 border-blue-400/30 text-blue-300 group-hover:border-blue-400/60 shadow-[0_4px_16px_rgba(59,130,246,0.15)]',
+    },
+    {
+      id: 'app-browser',
+      name: 'Browser',
+      type: 'app',
+      target: 'browser',
+      icon: Globe,
+      colorClass: 'from-cyan-500/25 to-teal-500/15 border-cyan-400/30 text-cyan-300 group-hover:border-cyan-400/60 shadow-[0_4px_16px_rgba(6,182,212,0.15)]',
+    },
+    {
+      id: 'app-code',
+      name: 'Code',
+      type: 'app',
+      target: 'code-editor',
+      icon: Code2,
+      colorClass: 'from-emerald-500/25 to-teal-500/15 border-emerald-400/30 text-emerald-300 group-hover:border-emerald-400/60 shadow-[0_4px_16px_rgba(16,185,129,0.15)]',
+    },
+    {
+      id: 'app-notes',
+      name: 'Notes',
+      type: 'app',
+      target: 'notes',
+      icon: FileText,
+      colorClass: 'from-amber-500/25 to-orange-500/15 border-amber-400/30 text-amber-300 group-hover:border-amber-400/60 shadow-[0_4px_16px_rgba(245,158,11,0.15)]',
+    },
+    {
+      id: 'app-terminal',
+      name: 'Terminal',
+      type: 'app',
+      target: 'terminal',
+      icon: Terminal,
+      colorClass: 'from-zinc-700/35 to-zinc-900/35 border-zinc-600/40 text-zinc-200 group-hover:border-zinc-400/60 shadow-[0_4px_16px_rgba(0,0,0,0.3)]',
+    },
+  ];
 
+  // Dynamic user files & folders created inside /home/user/Desktop
   const desktopNodes = Object.values(nodes).filter(
     (n) => n.parentPath === '/home/user/Desktop'
   );
 
-  desktopNodes.forEach((node) => {
-    shortcuts.push({
-      id: `vfs-${node.path}`,
-      name: node.name,
-      type: node.type === 'directory' ? 'folder' : 'file',
-      target: node.path,
-      icon: node.type === 'directory' ? Folder : File,
-    });
-  });
+  const userItems: DesktopShortcut[] = desktopNodes.map((node) => ({
+    id: `vfs-${node.path}`,
+    name: node.name,
+    type: node.type === 'directory' ? 'folder' : 'file',
+    target: node.path,
+    icon: node.type === 'directory' ? Folder : File,
+    colorClass:
+      node.type === 'directory'
+        ? 'from-blue-600/20 to-indigo-600/15 border-blue-400/30 text-blue-300'
+        : 'from-surface-panel/80 to-surface-panel/60 border-border-subtle text-content-primary',
+  }));
 
-  // If desktop folder has no files, keep the homepage canvas 100% pristine and clean
-  if (shortcuts.length === 0) {
-    return null;
-  }
+  const allShortcuts = [...curatedApps, ...userItems];
 
   const handleOpen = (item: DesktopShortcut) => {
     if (item.type === 'app') {
@@ -118,9 +173,9 @@ export const DesktopIcons: React.FC = () => {
   return (
     <div
       aria-label="Desktop Grid"
-      className="absolute top-12 left-8 z-[20] flex max-h-[85vh] flex-col flex-wrap gap-4 select-none pointer-events-auto"
+      className="absolute top-12 left-6 z-[20] flex max-h-[calc(100vh-140px)] flex-col flex-wrap gap-3.5 select-none pointer-events-auto"
     >
-      {shortcuts.map((item) => {
+      {allShortcuts.map((item) => {
         const IconComponent = item.icon;
         const isSelected = selectedId === item.id;
 
@@ -145,23 +200,27 @@ export const DesktopIcons: React.FC = () => {
               }
             }}
             onContextMenu={(e) => handleContextMenu(e, item)}
-            className={`group flex w-20 flex-col items-center gap-1.5 rounded-xl p-2 cursor-pointer transition-all outline-none ${
+            className={`group flex w-20 flex-col items-center gap-1.5 rounded-2xl p-2 cursor-pointer transition-all outline-none ${
               isSelected
-                ? 'bg-accent-primary/20 ring-1 ring-accent-primary/50 shadow-sm'
-                : 'hover:bg-surface-subtle/40 focus-visible:ring-1 focus-visible:ring-accent-primary/50'
+                ? 'bg-white/15 ring-1 ring-white/30 backdrop-blur-sm'
+                : 'hover:bg-white/10 focus-visible:ring-1 focus-visible:ring-white/40'
             }`}
           >
+            {/* Glassmorphic Icon Tile */}
             <div
-              className={`flex h-11 w-11 items-center justify-center rounded-2xl border border-border-subtle shadow-md backdrop-blur-md transition-transform group-hover:scale-105 ${
+              className={`flex h-12 w-12 items-center justify-center rounded-2xl border bg-gradient-to-br backdrop-blur-md transition-all duration-200 group-hover:scale-108 ${
+                item.colorClass ?? 'from-surface-panel/80 to-surface-panel/50 border-border-subtle text-content-primary'
+              } ${
                 isSelected
-                  ? 'bg-accent-primary text-white'
-                  : 'bg-surface-panel/70 text-content-primary'
+                  ? 'ring-2 ring-white/50 shadow-lg scale-105'
+                  : ''
               }`}
             >
-              <IconComponent className="h-5 w-5" />
+              <IconComponent className="h-6 w-6 transition-transform duration-200 group-hover:scale-105 drop-shadow-sm" />
             </div>
 
-            <span className="w-full truncate text-center font-mono text-[11px] font-medium text-content-primary drop-shadow-sm">
+            {/* Typography with clean drop-shadow */}
+            <span className="w-full truncate text-center font-sans text-[11px] font-medium tracking-tight text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] group-hover:text-white transition-colors">
               {item.name}
             </span>
           </div>
