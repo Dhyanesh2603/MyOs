@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'motion/react';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
@@ -27,25 +27,16 @@ export const Dock: React.FC<DockProps> = ({
     useWindowStore();
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
 
-  const [isHoveringBottom, setIsHoveringBottom] = useState(false);
-  const hoverTimerRef = useRef<number | null>(null);
   const hideTimerRef = useRef<number | null>(null);
   const dockRef = useRef<HTMLElement | null>(null);
 
-  // Auto-hide is engaged when in 'always' mode or when 'smart' and windows are active in current workspace
+  // Auto-hide active if mode is 'always', or if 'smart' and windows are open
   const hasOpenWindows = Object.values(windows).some(
     (w) => !w.isMinimized && (w.workspaceId ?? 1) === activeWorkspaceId
   );
   const isAutoHideActive =
     autoHideMode === 'always' || (autoHideMode === 'smart' && hasOpenWindows);
   const isVisible = !isAutoHideActive || isDockRevealed;
-
-  const clearHoverTimer = useCallback(() => {
-    if (hoverTimerRef.current !== null) {
-      window.clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-  }, []);
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current !== null) {
@@ -54,59 +45,44 @@ export const Dock: React.FC<DockProps> = ({
     }
   }, []);
 
-  // 2-Second Bottom Hover Intent Tracking:
-  // Starts a 2000ms timer whenever cursor enters the bottom 16px of the screen.
-  // Only reveals dock if cursor remains at the bottom edge for at least 2 full seconds.
+  // macOS-style Instant Bottom Hot-Edge Hit Detection:
+  // When cursor hits the bottom edge (within 8px of bottom), reveal dock immediately.
+  // When cursor moves away, hide dock smoothly after a 280ms grace period.
   useEffect(() => {
     if (!isAutoHideActive) {
-      clearHoverTimer();
       clearHideTimer();
-      setIsHoveringBottom(false);
       return;
     }
 
     const handlePointerMove = (e: PointerEvent) => {
-      const isAtBottomEdge = e.clientY >= window.innerHeight - 16;
+      const isAtBottomEdge = e.clientY >= window.innerHeight - 8;
       const isOverDock = dockRef.current?.contains(e.target as Node) ?? false;
 
-      if (isAtBottomEdge) {
+      if (isAtBottomEdge || isOverDock) {
         clearHideTimer();
-        if (!isDockRevealed && hoverTimerRef.current === null) {
-          setIsHoveringBottom(true);
-          hoverTimerRef.current = window.setTimeout(() => {
-            setIsDockRevealed(true);
-            setIsHoveringBottom(false);
-            hoverTimerRef.current = null;
-          }, 1000); // 1-second hover intent
+        if (!isDockRevealed) {
+          setIsDockRevealed(true);
         }
       } else {
-        // Pointer left bottom edge zone
-        if (hoverTimerRef.current !== null) {
-          clearHoverTimer();
-          setIsHoveringBottom(false);
-        }
-
-        // If dock is currently revealed and pointer moves away from dock area
-        if (isDockRevealed && !isOverDock && hideTimerRef.current === null) {
+        if (isDockRevealed && hideTimerRef.current === null) {
           hideTimerRef.current = window.setTimeout(() => {
             setIsDockRevealed(false);
             hideTimerRef.current = null;
-          }, 600); // 600ms grace period to prevent accidental flickering
+          }, 280);
         }
       }
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
-      clearHoverTimer();
       clearHideTimer();
     };
-  }, [isAutoHideActive, isDockRevealed, clearHoverTimer, clearHideTimer, setIsDockRevealed]);
+  }, [isAutoHideActive, isDockRevealed, clearHideTimer, setIsDockRevealed]);
 
   const handleDockMouseEnter = () => {
     clearHideTimer();
-    clearHoverTimer();
+    setIsDockRevealed(true);
   };
 
   const handleDockMouseLeave = () => {
@@ -114,15 +90,15 @@ export const Dock: React.FC<DockProps> = ({
       hideTimerRef.current = window.setTimeout(() => {
         setIsDockRevealed(false);
         hideTimerRef.current = null;
-      }, 600);
+      }, 280);
     }
   };
 
-  // Determine running apps that are not pinned, so they also appear dynamically
+  // Determine running apps that are not pinned, so they appear dynamically with running pip
   const unpinnedRunningAppIds = Object.values(processes)
     .map((p) => p.appId)
     .filter((id) => !pinnedAppIds.includes(id))
-    .filter((id, index, arr) => arr.indexOf(id) === index); // unique
+    .filter((id, index, arr) => arr.indexOf(id) === index);
 
   const activeWindow = activeWindowId ? windows[activeWindowId] : undefined;
 
@@ -132,7 +108,6 @@ export const Dock: React.FC<DockProps> = ({
     if (!isRunning) {
       launchApp(appId, undefined, viewportSize);
     } else {
-      // Find windows belonging to this app
       const appWindows = Object.values(windows).filter((w) => w.appId === appId);
       if (appWindows.length === 0) {
         launchApp(appId, undefined, viewportSize);
@@ -160,49 +135,16 @@ export const Dock: React.FC<DockProps> = ({
 
   return (
     <>
-      {/* Invisible Bottom Hover Trigger Strip spanning full screen width */}
+      {/* Invisible Bottom Hot-Edge Trigger Strip spanning full screen width */}
       {isAutoHideActive && (
         <div
           data-dock-trigger="true"
-          className="fixed bottom-0 left-0 right-0 h-4 z-[490] pointer-events-auto cursor-default"
+          className="fixed bottom-0 left-0 right-0 h-2.5 z-[490] pointer-events-auto cursor-default"
           onMouseEnter={() => {
             clearHideTimer();
-            if (!isDockRevealed && hoverTimerRef.current === null) {
-              setIsHoveringBottom(true);
-              hoverTimerRef.current = window.setTimeout(() => {
-                setIsDockRevealed(true);
-                setIsHoveringBottom(false);
-                hoverTimerRef.current = null;
-              }, 1000);
-            }
-          }}
-          onMouseLeave={() => {
-            clearHoverTimer();
-            setIsHoveringBottom(false);
+            setIsDockRevealed(true);
           }}
         />
-      )}
-
-      {/* Minimalist Bottom Indicator Pill: expands and glows over 1s to indicate hover intent */}
-      {isAutoHideActive && !isVisible && (
-        <div
-          data-dock-indicator="true"
-          onClick={() => setIsDockRevealed(true)}
-          className="fixed bottom-1 left-1/2 -translate-x-1/2 z-[495] flex items-center justify-center cursor-pointer select-none"
-          title="Hover at bottom edge for 1 second to reveal Dock"
-        >
-          <div
-            className={`h-1.5 rounded-full transition-all ${
-              isHoveringBottom
-                ? 'w-24 bg-accent-primary shadow-[0_0_12px_rgba(var(--accent-primary),0.8)]'
-                : 'w-12 bg-white/20 hover:bg-white/40'
-            }`}
-            style={{
-              transitionDuration: isHoveringBottom ? '1000ms' : '200ms',
-              transitionTimingFunction: isHoveringBottom ? 'linear' : 'ease-out',
-            }}
-          />
-        </div>
       )}
 
       {/* Fluid Magnetic Dock with Spring Physics Slide-up/down (Centered horizontally) */}
@@ -211,12 +153,14 @@ export const Dock: React.FC<DockProps> = ({
         aria-label="Application Dock"
         initial={{
           x: '-50%',
+          y: isVisible ? 0 : 90,
+          opacity: isVisible ? 1 : 0,
         }}
         animate={{
           x: '-50%',
-          y: isVisible ? 0 : 80,
+          y: isVisible ? 0 : 90,
           opacity: isVisible ? 1 : 0,
-          scale: isVisible ? 1 : 0.96,
+          scale: isVisible ? 1 : 0.94,
           pointerEvents: isVisible ? 'auto' : 'none',
         }}
         style={{
@@ -224,8 +168,9 @@ export const Dock: React.FC<DockProps> = ({
         }}
         transition={{
           type: 'spring',
-          stiffness: 380,
+          stiffness: 420,
           damping: 28,
+          mass: 0.7,
         }}
         onMouseMove={(e) => mouseX.set(e.clientX)}
         onMouseLeave={() => {
@@ -233,7 +178,7 @@ export const Dock: React.FC<DockProps> = ({
           handleDockMouseLeave();
         }}
         onMouseEnter={handleDockMouseEnter}
-        className="fixed bottom-4 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-2.5 py-1.5 shadow-dock backdrop-blur-dock"
+        className="fixed bottom-3 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-3 py-1.5 shadow-dock backdrop-blur-dock"
       >
         {/* Pinned Applications */}
         {pinnedAppIds.map((appId) => {
@@ -257,7 +202,7 @@ export const Dock: React.FC<DockProps> = ({
 
         {/* Separator if unpinned apps are running */}
         {unpinnedRunningAppIds.length > 0 && (
-          <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle" />
+          <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle/80" />
         )}
 
         {/* Dynamic Unpinned Running Apps */}

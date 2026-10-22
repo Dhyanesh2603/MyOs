@@ -212,27 +212,10 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         }
       }}
       style={wallpaper.style}
-      className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none"
+      className="relative h-screen w-screen overflow-hidden bg-surface-canvas text-content-primary select-none transition-[background] duration-500"
     >
       {/* Live Dynamic Generative Canvas Wallpaper Layer */}
       <DynamicWallpaperHost wallpaper={wallpaper} />
-
-      {/* Architectural Sub-pixel Dot Matrix Grid (Linear / Dieter Rams) */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgb(var(--content-primary)) 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-        }}
-      />
-
-      {/* Nothing OS Restrained Micro-Telemetry Stamp (Bottom Left Margin) */}
-      <div className="pointer-events-none absolute bottom-5 left-6 z-10 flex items-center gap-2 font-mono text-[10px] tracking-wider text-content-tertiary select-none opacity-40">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#d71921]" />
-        <span>FLOW_OS v0.2.0</span>
-        <span className="opacity-50">//</span>
-        <span>SYS_OK</span>
-      </div>
 
       {/* Marquee Drag-Selection Box */}
       <SelectionMarquee
@@ -240,10 +223,10 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         currentPos={selectionCurrent}
       />
 
-      {/* Desktop Icons Spatial Grid */}
+      {/* Desktop Icons Spatial Grid (renders only genuine user files in /home/user/Desktop) */}
       <DesktopIcons />
 
-      {/* Persistent Desktop HUD Widgets */}
+      {/* Persistent Desktop HUD Widgets (if user opts in) */}
       <DesktopWidgets />
 
       {/* Aero Snap Preview Overlay */}

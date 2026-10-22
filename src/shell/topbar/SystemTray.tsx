@@ -4,29 +4,19 @@ import {
   WifiOff,
   Battery,
   BatteryCharging,
-  Sun,
-  Moon,
   Bell,
-  Volume2,
-  VolumeX,
   Calendar as CalendarIcon,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
-  PenLine,
 } from 'lucide-react';
-import { useThemeStore } from '@core/theme/themeStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
-import { useSoundStore, soundEngine } from '@core/audio/soundEngine';
+import { soundEngine } from '@core/audio/soundEngine';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
-import { useScratchpadStore } from '@core/scratchpad/scratchpadStore';
-import { PomodoroWidget } from './PomodoroWidget';
 
 export const SystemTray: React.FC = () => {
-  const { themeId, setTheme } = useThemeStore();
   const { toggleCenter, notifications } = useNotificationStore();
-  const { isMuted, setMuted } = useSoundStore();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const [timeStr, setTimeStr] = useState('');
@@ -100,33 +90,12 @@ export const SystemTray: React.FC = () => {
     return () => window.removeEventListener('mousedown', handleOutside);
   }, [showCalendar]);
 
-  const toggleTheme = () => {
-    setTheme(themeId === 'dark' ? 'light' : 'dark');
-  };
-
   const now = new Date();
   const currentMonth = now.toLocaleString('default', { month: 'long', year: 'numeric' });
   const currentDay = now.getDate();
 
   return (
-    <div className="flex items-center gap-2 select-none">
-      {/* Sound Volume Control */}
-      <button
-        onClick={() => {
-          const nextMuted = !isMuted;
-          setMuted(nextMuted);
-          if (!nextMuted) soundEngine.playClick();
-        }}
-        title={isMuted ? 'Unmute System' : 'Mute System'}
-        className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
-      >
-        {isMuted ? (
-          <VolumeX className="h-3.5 w-3.5 text-rose-400" />
-        ) : (
-          <Volume2 className="h-3.5 w-3.5" />
-        )}
-      </button>
-
+    <div className="flex items-center gap-1.5 select-none">
       {/* Network Indicator (Wi-Fi) */}
       <button
         data-control-center-trigger
@@ -135,7 +104,7 @@ export const SystemTray: React.FC = () => {
           useControlCenterStore.getState().toggleControlCenter();
         }}
         title={isOnline ? 'Wi-Fi: Connected (Click for Control Center)' : 'Wi-Fi: Disconnected (Click for Control Center)'}
-        className="flex items-center rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
+        className="flex items-center rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
       >
         {isOnline ? (
           <Wifi className="h-3.5 w-3.5 text-content-secondary" />
@@ -152,7 +121,7 @@ export const SystemTray: React.FC = () => {
           useControlCenterStore.getState().toggleControlCenter();
         }}
         title={`Battery: ${batteryLevel ?? 100}% ${isCharging ? '(Charging)' : ''} (Click for Control Center)`}
-        className="flex items-center gap-1 rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
+        className="flex items-center gap-1 rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
       >
         {isCharging ? (
           <BatteryCharging className="h-3.5 w-3.5 text-emerald-400" />
@@ -164,79 +133,51 @@ export const SystemTray: React.FC = () => {
         </span>
       </button>
 
-      {/* Theme Quick Toggle */}
-      <button
-        onClick={toggleTheme}
-        title={`Switch to ${themeId === 'dark' ? 'Light' : 'Dark'} Mode`}
-        className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
-      >
-        {themeId === 'dark' ? (
-          <Sun className="h-3.5 w-3.5 text-amber-400" />
-        ) : (
-          <Moon className="h-3.5 w-3.5 text-indigo-400" />
-        )}
-      </button>
-
-      {/* Pomodoro Focus Timer Widget */}
-      <PomodoroWidget />
-
-      {/* Notification Center Trigger */}
-      <button
-        onClick={toggleCenter}
-        title="Notification Center"
-        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
-      >
-        <Bell className="h-3.5 w-3.5" />
-        {unreadCount > 0 && (
-          <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
-        )}
-      </button>
-
-      {/* AI Copilot Trigger */}
-      <button
-        onClick={() => {
-          soundEngine.playClick();
-          useCopilotStore.getState().toggleCopilot();
-        }}
-        title="FlowOS Copilot (Ctrl+J)"
-        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-accent-primary transition-colors"
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-      </button>
-
-      {/* Quick Scratchpad Trigger */}
-      <button
-        onClick={() => {
-          soundEngine.playClick();
-          useScratchpadStore.getState().toggleOpen();
-        }}
-        title="Quick Scratchpad (Ctrl+\)"
-        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
-      >
-        <PenLine className="h-3.5 w-3.5" />
-      </button>
-
-      {/* Control Center Trigger */}
+      {/* macOS Control Center Quick Hub */}
       <button
         data-control-center-trigger
         onClick={() => {
           soundEngine.playClick();
           useControlCenterStore.getState().toggleControlCenter();
         }}
-        title="Control Center"
-        className="relative rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+        title="Control Center (Brightness, Audio, Focus, Theme)"
+        className="rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
       >
         <SlidersHorizontal className="h-3.5 w-3.5" />
       </button>
 
+      {/* FlowOS AI Copilot */}
+      <button
+        onClick={() => {
+          soundEngine.playClick();
+          useCopilotStore.getState().toggleCopilot();
+        }}
+        title="FlowOS Copilot (Ctrl+J)"
+        className="rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-accent-primary transition-colors"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Notification Center Trigger */}
+      <button
+        onClick={toggleCenter}
+        title="Notifications"
+        className="relative rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+      >
+        <Bell className="h-3.5 w-3.5" />
+        {unreadCount > 0 && (
+          <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
+        )}
+      </button>
+
       {/* Live Date & Clock with Popover Calendar */}
-      <div ref={calendarRef} className="relative">
+      <div ref={calendarRef} className="relative ml-0.5">
         <button
           onClick={() => setShowCalendar(!showCalendar)}
-          className={`flex items-center gap-1.5 rounded px-2 py-0.5 font-mono text-xs transition-colors ${
+          className={`flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-xs transition-colors ${
             showCalendar
               ? 'bg-surface-subtle text-accent-primary font-medium'
-              : 'text-content-primary hover:bg-surface-subtle/50'
+              : 'text-content-primary hover:bg-surface-subtle/60'
           }`}
         >
           <span className="hidden md:inline text-content-tertiary">{dateStr}</span>

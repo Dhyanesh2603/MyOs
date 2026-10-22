@@ -71,12 +71,7 @@ export const DynamicActivityCapsule: React.FC = () => {
   };
 
   if (!hasActivity) {
-    return (
-      <div className="hidden lg:flex items-center gap-1 font-mono text-[10px] text-content-tertiary/70 select-none">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#d71921]" />
-        <span>Ready</span>
-      </div>
-    );
+    return null;
   }
 
   return (

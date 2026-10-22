@@ -5,19 +5,10 @@ import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { openVFSFile } from '@core/vfs/fileAssociations';
 import { downloadVFSToPC } from '@core/vfs/hostBridge';
 import {
-  Settings,
-  FileText,
-  Terminal,
   Folder,
   File,
-  Calculator,
   ExternalLink,
-  Globe,
-  Code2,
-  Activity,
   Download,
-  Palette,
-  Image as ImageIcon,
   Eye,
 } from 'lucide-react';
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
@@ -36,95 +27,10 @@ export const DesktopIcons: React.FC = () => {
   const openContextMenu = useContextMenuStore((state) => state.openMenu);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Default system shortcuts + desktop files
-  const shortcuts: DesktopShortcut[] = [
-    {
-      id: 'sc-browser',
-      name: 'Browser',
-      type: 'app',
-      target: 'browser',
-      icon: Globe,
-    },
-    {
-      id: 'sc-explorer',
-      name: 'Files',
-      type: 'app',
-      target: 'file-explorer',
-      icon: Folder,
-    },
-    {
-      id: 'sc-code',
-      name: 'Code',
-      type: 'app',
-      target: 'code-editor',
-      icon: Code2,
-    },
-    {
-      id: 'sc-notes',
-      name: 'Notes',
-      type: 'app',
-      target: 'notes',
-      icon: FileText,
-    },
-    {
-      id: 'sc-terminal',
-      name: 'Terminal',
-      type: 'app',
-      target: 'terminal',
-      icon: Terminal,
-    },
-    {
-      id: 'sc-activity',
-      name: 'Activity',
-      type: 'app',
-      target: 'task-manager',
-      icon: Activity,
-    },
-    {
-      id: 'sc-calculator',
-      name: 'Calculator',
-      type: 'app',
-      target: 'calculator',
-      icon: Calculator,
-    },
-    {
-      id: 'sc-paint',
-      name: 'Paint',
-      type: 'app',
-      target: 'paint',
-      icon: Palette,
-    },
-    {
-      id: 'sc-gallery',
-      name: 'Gallery',
-      type: 'app',
-      target: 'gallery',
-      icon: ImageIcon,
-    },
-    {
-      id: 'sc-settings',
-      name: 'Settings',
-      type: 'app',
-      target: 'system-settings',
-      icon: Settings,
-    },
-    {
-      id: 'sc-documents',
-      name: 'Documents',
-      type: 'folder',
-      target: '/home/user/Documents',
-      icon: Folder,
-    },
-    {
-      id: 'sc-welcome',
-      name: 'welcome.txt',
-      type: 'file',
-      target: '/home/user/welcome.txt',
-      icon: File,
-    },
-  ];
+  // Clean macOS desktop: Only show genuine files and folders in /home/user/Desktop
+  // No hardcoded app shortcuts cluttering the wallpaper
+  const shortcuts: DesktopShortcut[] = [];
 
-  // Also include files created inside /home/user/Desktop
   const desktopNodes = Object.values(nodes).filter(
     (n) => n.parentPath === '/home/user/Desktop'
   );
@@ -138,6 +44,11 @@ export const DesktopIcons: React.FC = () => {
       icon: node.type === 'directory' ? Folder : File,
     });
   });
+
+  // If desktop folder has no files, keep the homepage canvas 100% pristine and clean
+  if (shortcuts.length === 0) {
+    return null;
+  }
 
   const handleOpen = (item: DesktopShortcut) => {
     if (item.type === 'app') {
@@ -250,7 +161,7 @@ export const DesktopIcons: React.FC = () => {
               <IconComponent className="h-5 w-5" />
             </div>
 
-            <span className="w-full truncate text-center font-mono text-[11px] font-medium text-content-primary">
+            <span className="w-full truncate text-center font-mono text-[11px] font-medium text-content-primary drop-shadow-sm">
               {item.name}
             </span>
           </div>

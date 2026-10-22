@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type DockSize = 'compact' | 'regular' | 'large';
-export type DockAutoHideMode = 'smart' | 'always' | 'never';
+export type DockAutoHideMode = 'always' | 'smart' | 'never';
 
 export interface DockState {
   pinnedAppIds: string[];
@@ -25,19 +25,11 @@ export const useDockStore = create<DockState>((set) => ({
     'code-editor',
     'notes',
     'terminal',
-    'calculator',
-    'paint',
-    'gallery',
-    'task-manager',
     'music',
-    'synth',
-    'flowcam',
-    'flowtape',
-    'flowboard',
     'system-settings',
   ],
   dockSize: 'regular',
-  autoHideMode: 'smart',
+  autoHideMode: 'always',
   isDockRevealed: false,
 
   pinApp: (appId) => {
