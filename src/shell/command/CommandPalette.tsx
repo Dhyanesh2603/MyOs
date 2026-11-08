@@ -26,6 +26,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { soundEngine } from '@core/audio/soundEngine';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { usePersonalOsStore, PersonalOsTab } from '@core/personal-os/personalOsStore';
 import { evaluateSpotlightQuery } from '@core/spotlight/evaluator';
@@ -436,13 +437,19 @@ function tryEvaluateMath(raw: string): string | null {
                 >
                   <div className="flex items-center gap-2.5 overflow-hidden">
                     <div
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
-                        isSelected
-                          ? 'bg-accent-primary border-accent-primary text-white'
-                          : 'bg-surface-subtle/60 border-border-subtle text-content-tertiary'
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                        action.category === 'apps'
+                          ? 'overflow-hidden'
+                          : isSelected
+                          ? 'bg-accent-primary border-accent-primary text-white border'
+                          : 'bg-surface-subtle/60 border-border-subtle text-content-tertiary border'
                       }`}
                     >
-                      <IconComponent className="h-3.5 w-3.5" />
+                      {action.category === 'apps' ? (
+                        <IosAppIcon appId={action.id.replace('app-', '')} className="h-full w-full" />
+                      ) : (
+                        <IconComponent className="h-3.5 w-3.5" />
+                      )}
                     </div>
                     <div className="flex flex-col truncate">
                       <span className="text-xs font-medium tracking-tight text-content-primary truncate">

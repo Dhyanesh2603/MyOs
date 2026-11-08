@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { useProcessStore } from '@core/process/processStore';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 import { useWindowStore } from '@core/window/windowStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { appRegistry } from '@core/process/registry';
@@ -187,7 +188,6 @@ export const TaskManagerApp: React.FC<AppProps> = ({ processId }) => {
             {filteredProcs.map((proc) => {
               const isSelected = selectedPid === proc.id;
               const isSelf = proc.id === processId;
-              const Icon = proc.icon;
 
               return (
                 <tr
@@ -204,8 +204,8 @@ export const TaskManagerApp: React.FC<AppProps> = ({ processId }) => {
                 >
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-5 w-5 items-center justify-center rounded bg-surface-subtle border border-border-subtle">
-                        <Icon className="h-3 w-3 text-accent-primary" />
+                      <div className="h-5 w-5 shrink-0">
+                        <IosAppIcon appId={proc.appId} className="h-full w-full" />
                       </div>
                       <span className="font-sans font-medium text-content-primary">{proc.name}</span>
                       {isSelf && (

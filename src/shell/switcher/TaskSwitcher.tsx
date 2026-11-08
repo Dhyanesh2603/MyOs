@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useWindowStore } from '@core/window/windowStore';
-import { appRegistry } from '@core/process/registry';
-import { AppWindow } from 'lucide-react';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export const TaskSwitcher: React.FC = () => {
   const { windows, focusStack, focusWindow } = useWindowStore();
@@ -70,9 +69,7 @@ export const TaskSwitcher: React.FC = () => {
               const win = windows[winId];
               if (!win) return null;
 
-              const manifest = appRegistry.get(win.appId);
-              const IconComponent = manifest?.icon || AppWindow;
-              const isSelected = index === selectedIndex;
+                            const isSelected = index === selectedIndex;
 
               return (
                 <div
@@ -88,14 +85,8 @@ export const TaskSwitcher: React.FC = () => {
                   }`}
                 >
                   <div className="flex flex-1 items-center justify-center">
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                        isSelected
-                          ? 'bg-accent-primary text-white shadow-md'
-                          : 'bg-surface-subtle/80 text-content-secondary'
-                      }`}
-                    >
-                      <IconComponent className="h-6 w-6" />
+                    <div className="h-14 w-14 transition-transform group-hover:scale-105">
+                      <IosAppIcon appId={win.appId} className="h-full w-full" />
                     </div>
                   </div>
 

@@ -11,6 +11,7 @@ import {
   Grid,
 } from 'lucide-react';
 import { useProcessStore } from '@core/process/processStore';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 interface GameItem {
   id: string;
@@ -123,7 +124,6 @@ export const GamesMenu: React.FC = () => {
           {/* Game List */}
           <div className="space-y-0.5 max-h-[360px] overflow-y-auto">
             {FLOW_GAMES.map((game) => {
-              const Icon = game.icon;
               const running = isAppRunning(game.id);
               return (
                 <button
@@ -131,8 +131,8 @@ export const GamesMenu: React.FC = () => {
                   onClick={() => handleLaunch(game.id)}
                   className="group flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 text-left hover:bg-surface-subtle transition-all cursor-pointer"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-overlay border border-border-subtle group-hover:scale-105 group-hover:border-accent-primary/40 transition-all shadow-sm">
-                    <Icon className="h-4 w-4 text-accent-primary" />
+                  <div className="h-8 w-8 shrink-0 group-hover:scale-105 transition-transform">
+                    <IosAppIcon appId={game.id} className="h-full w-full" />
                   </div>
 
                   <div className="flex-1 min-w-0">

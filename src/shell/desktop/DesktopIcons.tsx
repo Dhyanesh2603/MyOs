@@ -17,6 +17,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
+import { IosAppIcon, IosFilesIcon } from '@shell/icons/IosAppIcon';
 
 interface DesktopShortcut {
   id: string;
@@ -176,7 +177,6 @@ export const DesktopIcons: React.FC = () => {
       className="absolute top-12 left-6 z-[20] flex max-h-[calc(100vh-140px)] flex-col flex-wrap gap-3.5 select-none pointer-events-auto"
     >
       {allShortcuts.map((item) => {
-        const IconComponent = item.icon;
         const isSelected = selectedId === item.id;
 
         return (
@@ -206,17 +206,21 @@ export const DesktopIcons: React.FC = () => {
                 : 'hover:bg-white/10 focus-visible:ring-1 focus-visible:ring-white/40'
             }`}
           >
-            {/* Glassmorphic Icon Tile */}
+            {/* iOS Style Squircle Icon Tile */}
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-2xl border bg-gradient-to-br backdrop-blur-md transition-all duration-200 group-hover:scale-108 ${
-                item.colorClass ?? 'from-surface-panel/80 to-surface-panel/50 border-border-subtle text-content-primary'
-              } ${
-                isSelected
-                  ? 'ring-2 ring-white/50 shadow-lg scale-105'
-                  : ''
+              className={`relative flex h-12 w-12 items-center justify-center transition-all duration-200 group-hover:scale-108 ${
+                isSelected ? 'ring-2 ring-white/70 rounded-[22.5%] scale-105' : ''
               }`}
             >
-              <IconComponent className="h-6 w-6 transition-transform duration-200 group-hover:scale-105 drop-shadow-sm" />
+              {item.type === 'app' ? (
+                <IosAppIcon appId={item.target} className="h-full w-full" />
+              ) : item.type === 'folder' ? (
+                <IosFilesIcon className="h-full w-full" />
+              ) : (
+                <div className="relative flex h-full w-full items-center justify-center rounded-[22.5%] border border-white/20 bg-gradient-to-b from-slate-700 to-slate-900 shadow-md">
+                  <File className="h-6 w-6 text-white" />
+                </div>
+              )}
             </div>
 
             {/* Typography with clean drop-shadow */}

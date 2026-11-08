@@ -8,6 +8,7 @@ import {
 import type { AppManifest } from '@contracts/app';
 import { useWindowStore } from '@core/window/windowStore';
 import { DockHoverPreview } from './DockHoverPreview';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export interface DockItemProps {
   manifest: AppManifest;
@@ -57,8 +58,6 @@ export const DockItem: React.FC<DockItemProps> = ({
     stiffness: 240,
     damping: 15,
   });
-
-  const IconComponent = manifest.icon;
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -128,17 +127,17 @@ export const DockItem: React.FC<DockItemProps> = ({
         whileTap={{ scale: 0.9 }}
         aria-label={`Open ${manifest.name}`}
         aria-haspopup="false"
-        className="relative flex items-center justify-center rounded-xl border border-border-subtle bg-surface-subtle/50 text-content-primary shadow-sm backdrop-blur-md transition-colors hover:border-border-strong hover:bg-surface-subtle/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+        className="relative flex items-center justify-center p-0.5 transition-transform hover:scale-105 focus-visible:outline-none"
       >
-        <IconComponent className="h-4.5 w-4.5 transition-transform duration-150" />
+        <IosAppIcon appId={manifest.id} className="w-full h-full" />
 
-        {/* Linear / Nothing OS Active Indicator Pip */}
+        {/* macOS Active Indicator Pip */}
         {isRunning && (
           <span
             className={`absolute -bottom-1 left-1/2 -translate-x-1/2 transition-all duration-200 ${
               isFocused
-                ? 'h-1 w-2.5 rounded-full bg-accent-primary'
-                : 'h-1 w-1 rounded-full bg-content-primary/40'
+                ? 'h-1 w-2.5 rounded-full bg-accent-primary shadow-[0_0_6px_rgba(var(--accent-primary),0.8)]'
+                : 'h-1 w-1 rounded-full bg-white/70'
             }`}
           />
         )}

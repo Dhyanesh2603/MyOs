@@ -50,7 +50,7 @@ export interface YouTubeVideoItem {
 }
 
 const DEFAULT_BOOKMARKS = [
-  { name: 'Google', url: 'https://www.google.com', mode: 'embed' as BrowserMode },
+  { name: 'Google', url: 'https://www.google.com/webhp?igu=1', mode: 'embed' as BrowserMode },
   { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/', mode: 'embed' as BrowserMode },
   { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system', mode: 'embed' as BrowserMode },
   { name: 'Hacker News', url: 'https://news.ycombinator.com', mode: 'embed' as BrowserMode },
@@ -569,11 +569,33 @@ export const BrowserApp: React.FC<AppProps> = () => {
         } else if (finalUrl.includes('.') && !finalUrl.includes(' ')) {
           finalUrl = `https://${finalUrl}`;
         } else {
-          // Search DuckDuckGo
-          finalUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(finalUrl)}`;
+          // Web search directly in Google with igu=1 (unrestricted iframe parameter)
+          finalUrl = `https://www.google.com/search?q=${encodeURIComponent(finalUrl)}&igu=1`;
         }
 
-        title = finalUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web';
+        // Ensure any Google home or search navigation always retains igu=1
+        try {
+          const parsed = new URL(finalUrl);
+          if (parsed.hostname.includes('google.')) {
+            if (parsed.pathname === '/' || parsed.pathname === '' || parsed.pathname === '/webhp') {
+              parsed.pathname = '/webhp';
+              parsed.searchParams.set('igu', '1');
+              finalUrl = parsed.toString();
+              title = 'Google';
+            } else if (parsed.pathname.startsWith('/search')) {
+              parsed.searchParams.set('igu', '1');
+              finalUrl = parsed.toString();
+              const q = parsed.searchParams.get('q');
+              title = q ? `${q} - Google Search` : 'Google Search';
+            }
+          }
+        } catch {
+          // Ignore parse errors
+        }
+
+        if (title === 'Web') {
+          title = finalUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web';
+        }
 
         // Check if forced into reader mode or explicitly requested
         if (mode === 'reader') {
@@ -1463,17 +1485,22 @@ export const BrowserApp: React.FC<AppProps> = () => {
             <iframe
               key={activeTab.refreshKey}
               src={
-                activeTab.url.startsWith('http') &&
-                !activeTab.url.includes('localhost:') &&
-                !activeTab.url.includes('youtube.com/embed/')
+                activeTab.url.includes('google.')
+                  ? activeTab.url.includes('igu=1')
+                    ? activeTab.url
+                    : `${activeTab.url}${activeTab.url.includes('?') ? '&' : '?'}igu=1`
+                  : activeTab.url.startsWith('http') &&
+                    !activeTab.url.includes('localhost:') &&
+                    !activeTab.url.includes('youtube.com/embed/')
                   ? `/api/proxy?url=${encodeURIComponent(activeTab.url)}`
                   : activeTab.url
               }
               title={activeTab.title}
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
+              referrerPolicy="no-referrer"
               allowFullScreen
-              className="h-full w-full border-none bg-black"
+              className="h-full w-full border-none bg-white"
             />
 
             {/* Smart Banner: Provides status and 1-click Reader Mode fallback */}

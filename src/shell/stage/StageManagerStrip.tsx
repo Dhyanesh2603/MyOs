@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AppWindow, Sparkles } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
-import { appRegistry } from '@core/process/registry';
 import { soundEngine } from '@core/audio/soundEngine';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export const StageManagerStrip: React.FC = () => {
   const isEnabled = useStageManagerStore((s) => s.isEnabled);
@@ -34,10 +34,7 @@ export const StageManagerStrip: React.FC = () => {
         className="fixed top-12 left-3 z-[8500] flex flex-col gap-3 select-none"
       >
         {stagedWindows.map((win) => {
-          const app = appRegistry.get(win.processId.split('-')[0] || '') ||
-            appRegistry.getAll().find((a) => win.title.toLowerCase().includes(a.name.toLowerCase()));
-          const IconComp = app?.icon || AppWindow;
-
+          
           return (
             <motion.div
               key={win.id}
@@ -51,8 +48,8 @@ export const StageManagerStrip: React.FC = () => {
               {/* Top micro bar */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-surface-subtle text-accent-primary">
-                    <IconComp className="h-3 w-3" />
+                  <div className="h-5 w-5 shrink-0">
+                    <IosAppIcon appId={win.appId} className="h-full w-full" />
                   </div>
                   <span className="truncate font-sans text-[10px] font-semibold text-content-primary">
                     {win.title}

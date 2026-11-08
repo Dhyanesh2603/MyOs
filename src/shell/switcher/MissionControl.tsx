@@ -3,15 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   Plus,
-  AppWindow,
   ArrowRightLeft,
   Layers,
   Sparkles,
 } from 'lucide-react';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useWindowStore } from '@core/window/windowStore';
-import { appRegistry } from '@core/process/registry';
 import { soundEngine } from '@core/audio/soundEngine';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export const MissionControl: React.FC = () => {
   const {
@@ -130,14 +129,12 @@ export const MissionControl: React.FC = () => {
                     ) : (
                       <div className="flex items-center gap-1">
                         {spaceWins.slice(0, 4).map((w) => {
-                          const m = appRegistry.get(w.appId);
-                          const Icon = m?.icon ?? AppWindow;
-                          return (
+                                                    return (
                             <div
                               key={w.id}
-                              className="flex h-6 w-6 items-center justify-center rounded bg-surface-panel border border-border-subtle text-accent shadow-xs"
+                              className="h-6 w-6 shrink-0"
                             >
-                              <Icon className="h-3.5 w-3.5" />
+                              <IosAppIcon appId={w.appId} className="h-full w-full" />
                             </div>
                           );
                         })}
@@ -185,9 +182,7 @@ export const MissionControl: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {currentSpaceWindows.map((win) => {
-                const manifest = appRegistry.get(win.appId);
-                const Icon = manifest?.icon ?? AppWindow;
-
+                
                 return (
                   <motion.div
                     key={win.id}
@@ -204,8 +199,8 @@ export const MissionControl: React.FC = () => {
                     {/* Window Card Titlebar */}
                     <div className="flex items-center justify-between border-b border-border-subtle bg-surface-subtle/60 px-3 py-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-surface-panel text-accent">
-                          <Icon className="h-3 w-3" />
+                        <div className="h-5 w-5 shrink-0">
+                          <IosAppIcon appId={win.appId} className="h-full w-full" />
                         </div>
                         <span className="truncate text-xs font-semibold text-content-primary">
                           {win.title}
@@ -227,7 +222,7 @@ export const MissionControl: React.FC = () => {
 
                     {/* Window Visual Body Preview */}
                     <div className="relative flex h-44 w-full flex-col items-center justify-center bg-surface-canvas/50 p-4">
-                      <Icon className="h-12 w-12 text-content-tertiary/40 group-hover:text-accent transition-colors" />
+                      <IosAppIcon appId={win.appId} className="h-14 w-14 group-hover:scale-105 transition-transform" />
                       <span className="mt-2 font-mono text-[10px] text-content-tertiary uppercase tracking-wider">
                         {win.appId} • {win.size.width}x{win.size.height}
                       </span>

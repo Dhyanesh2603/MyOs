@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { usePackageStore } from '@core/packages/packageStore';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 import { useProcessStore } from '@core/process/processStore';
 import { useCustomAppStore, WEB_APP_ICONS } from '@core/packages/customAppStore';
 import { soundEngine } from '@core/audio/soundEngine';
@@ -223,8 +224,6 @@ export const AppStoreApp: React.FC<AppProps> = () => {
         {/* Packages Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredPackages.map((pkg) => {
-            const Icon = pkg.manifest.icon;
-
             return (
               <div
                 key={pkg.id}
@@ -232,8 +231,8 @@ export const AppStoreApp: React.FC<AppProps> = () => {
               >
                 <div>
                   <div className="flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border-subtle bg-surface-panel text-accent shadow-sm">
-                      <Icon className="h-6 w-6" />
+                    <div className="h-12 w-12 shrink-0">
+                      <IosAppIcon appId={pkg.id} className="h-full w-full" />
                     </div>
 
                     <div className="flex items-center gap-1 font-mono text-xs text-amber-400 bg-surface-panel/80 px-2 py-0.5 rounded-lg border border-border-subtle">

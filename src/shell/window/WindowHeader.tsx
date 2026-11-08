@@ -3,9 +3,9 @@ import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
 import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
 import { useFancyZonesStore } from '@core/window/fancyZonesStore';
-import { appRegistry } from '@core/process/registry';
 import { soundEngine } from '@core/audio/soundEngine';
 import { Minus, Square, Copy, X } from 'lucide-react';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export interface WindowHeaderProps {
   windowState: WindowState;
@@ -30,9 +30,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
   const pendingPosRef = useRef<WindowPosition | null>(null);
   const activeSnapRef = useRef<SnapTarget>(null);
 
-  const manifest = appRegistry.get(windowState.appId);
-  const IconComponent = manifest?.icon;
-
+  
   // Global keyboard shortcuts for focused window (Aero Snap shortcuts)
   useEffect(() => {
     if (!windowState.isFocused) return;
@@ -201,15 +199,9 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     >
       {/* Title & App Metadata (Apple Pro Apps Restraint) */}
       <div className="flex items-center gap-2 overflow-hidden">
-        {IconComponent && (
-          <IconComponent
-            className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-              windowState.isFocused
-                ? 'text-accent-primary'
-                : 'text-content-tertiary'
-            }`}
-          />
-        )}
+        <div className="h-4 w-4 shrink-0">
+          <IosAppIcon appId={windowState.appId} className="h-full w-full" />
+        </div>
         <span
           className={`truncate text-xs font-medium tracking-tight transition-colors ${
             windowState.isFocused

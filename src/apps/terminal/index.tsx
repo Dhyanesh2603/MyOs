@@ -25,8 +25,9 @@ const COMMAND_SUGGESTIONS = [
   'help', 'pwd', 'ls', 'cd', 'cat', 'cp', 'mv', 'rm', 'touch', 'mkdir',
   'echo', 'tree', 'find', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq',
   'tr', 'which', 'whoami', 'hostname', 'uname', 'date', 'uptime', 'env',
-  'export', 'ping', 'curl', 'calc', 'df', 'free', 'device', 'mount', 'open',
-  'eval', 'run', 'node', 'ps', 'kill', 'pkg', 'clear',
+  'export', 'unset', 'ping', 'curl', 'calc', 'df', 'free', 'device', 'mount', 'open',
+  'eval', 'run', 'node', 'python', 'python3', 'git', 'npm', 'neofetch', 'fastfetch',
+  'history', 'man', 'code', 'nano', 'vim', 'ps', 'kill', 'pkg', 'clear', 'cls',
 ];
 
 const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
@@ -62,7 +63,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       const line = inputVal.trim();
       if (!line) return;
 
-      if (line === 'clear') {
+      if (line === 'clear' || line === 'cls') {
         setBlocks([]);
         setInputVal('');
         setCommandHistory((prev) => [...prev, line]);
@@ -71,7 +72,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       }
 
       const startTime = performance.now();
-      const res = await executeCommand(line, cwd);
+      const res = await executeCommand(line, cwd, [...commandHistory, line]);
       const durationMs = Math.max(1, Math.round(performance.now() - startTime));
 
       const newBlock: TerminalBlock = {

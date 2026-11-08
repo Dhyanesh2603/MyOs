@@ -4,6 +4,7 @@ import { X, AppWindow } from 'lucide-react';
 import type { AppManifest } from '@contracts/app';
 import type { WindowState } from '@contracts/window';
 import { soundEngine } from '@core/audio/soundEngine';
+import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export interface DockHoverPreviewProps {
   manifest: AppManifest;
@@ -51,7 +52,9 @@ export const DockHoverPreview: React.FC<DockHoverPreviewProps> = ({
             {/* Header with Title and Close Button */}
             <div className="flex items-center justify-between border-b border-border-subtle bg-surface-panel/60 px-2 py-1.5">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Icon className="h-3 w-3 shrink-0 text-accent" />
+                <div className="h-3.5 w-3.5 shrink-0">
+                  <IosAppIcon appId={manifest.id} className="h-full w-full" />
+                </div>
                 <span className="truncate font-mono text-[10px] font-medium text-content-primary">
                   {win.title}
                 </span>

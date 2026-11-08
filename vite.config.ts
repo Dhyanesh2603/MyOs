@@ -91,17 +91,13 @@ function flowOsBrowserProxyPlugin(): Plugin {
               return;
             }
 
-            // If the request is for Google Search (which returns 429 to server-side fetch),
-            // proxy the query through Bing or DuckDuckGo so search results always load
+            // Ensure Google requests always carry the official igu=1 iframe embed parameter
             let effectiveUrl = targetUrl;
             try {
               const parsedTarget = new URL(targetUrl);
-              if (
-                parsedTarget.hostname.includes('google.') &&
-                (parsedTarget.pathname === '/search' || parsedTarget.pathname.startsWith('/search'))
-              ) {
-                const query = parsedTarget.searchParams.get('q') || '';
-                effectiveUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+              if (parsedTarget.hostname.includes('google.')) {
+                parsedTarget.searchParams.set('igu', '1');
+                effectiveUrl = parsedTarget.toString();
               }
             } catch {
               // Ignore parse error
@@ -152,10 +148,10 @@ function flowOsBrowserProxyPlugin(): Plugin {
       if (targetObj.origin === window.location.origin && targetObj.pathname.startsWith('/api/proxy')) {
         return targetObj.href;
       }
-      // Rewriting Google search form submissions to Bing query
-      if (targetObj.hostname.includes('google.') && (targetObj.pathname === '/search' || targetObj.pathname.startsWith('/search'))) {
-        var q = targetObj.searchParams.get('q') || '';
-        return '/api/proxy?url=' + encodeURIComponent('https://www.bing.com/search?q=' + encodeURIComponent(q));
+      // Retain igu=1 for Google searches and links
+      if (targetObj.hostname.includes('google.')) {
+        targetObj.searchParams.set('igu', '1');
+        return targetObj.href;
       }
       // Rewriting YouTube video links
       if (targetObj.hostname.includes('youtube.com') && targetObj.searchParams.has('v')) {
@@ -213,8 +209,8 @@ function flowOsBrowserProxyPlugin(): Plugin {
       var finalUrl = actionObj.href;
 
       if (actionObj.hostname.includes('google.') && (actionObj.pathname === '/search' || actionObj.pathname.startsWith('/search') || rawAction.includes('search'))) {
-        var q = params.get('q') || '';
-        finalUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(q);
+        actionObj.searchParams.set('igu', '1');
+        finalUrl = actionObj.href;
       }
 
       try {
