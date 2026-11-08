@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'motion/react';
-import { LayoutGrid } from 'lucide-react';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
@@ -181,26 +180,36 @@ export const Dock: React.FC<DockProps> = ({
           handleDockMouseLeave();
         }}
         onMouseEnter={handleDockMouseEnter}
-        className="fixed bottom-3 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-3 py-1.5 shadow-dock backdrop-blur-dock"
+        className="fixed bottom-3 z-[500] flex items-end gap-1.5 rounded-2xl border border-white/20 bg-neutral-900/60 dark:bg-black/50 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-3xl saturate-150"
       >
-        {/* Mobile App Library Launchpad Trigger */}
+        {/* Apple-style Launchpad / App Library Trigger */}
         <button
           onClick={() => {
             soundEngine.playClick();
             useAppMenuStore.getState().toggleAppMenu();
           }}
-          className="relative flex flex-col items-center justify-center p-1 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group mb-1 shrink-0"
+          className="relative flex flex-col items-center justify-center p-0.5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group mb-1 shrink-0"
           title="App Library (All Apps)"
         >
-          <div className="h-11 w-11 rounded-[22.5%] bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] transition-all">
-            <LayoutGrid className="h-5 w-5 text-white drop-shadow" />
+          <div className="h-11 w-11 rounded-[22.5%] bg-gradient-to-b from-neutral-700 via-neutral-800 to-neutral-900 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+            <div className="grid grid-cols-3 gap-1 p-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-200" />
+            </div>
           </div>
-          <span className="text-[10px] font-semibold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 whitespace-nowrap bg-black/80 px-2 py-0.5 rounded-md pointer-events-none">
-            Apps
+          <span className="text-[10px] font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 whitespace-nowrap bg-black/75 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md shadow-lg pointer-events-none">
+            Launchpad
           </span>
         </button>
 
-        <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle/80 shrink-0" />
+        <div className="mx-1 h-8 w-[1px] self-center bg-white/15 shrink-0" />
 
         {/* Pinned Applications */}
         {pinnedAppIds.map((appId) => {

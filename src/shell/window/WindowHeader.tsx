@@ -1,10 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
 import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
 import { useFancyZonesStore } from '@core/window/fancyZonesStore';
 import { soundEngine } from '@core/audio/soundEngine';
-import { Minus, Square, Copy, X } from 'lucide-react';
 import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export interface WindowHeaderProps {
@@ -30,7 +29,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
   const pendingPosRef = useRef<WindowPosition | null>(null);
   const activeSnapRef = useRef<SnapTarget>(null);
 
-  
+  const [showTrafficGlyphs, setShowTrafficGlyphs] = useState(false);
+
   // Global keyboard shortcuts for focused window (Aero Snap shortcuts)
   useEffect(() => {
     if (!windowState.isFocused) return;
@@ -110,7 +110,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       useFancyZonesStore.getState().showOverlay(windowState.id);
     }
 
-    // Detect snap edge proximity
+    // Detect Aero Snap edge proximity
     let detectedSnap: SnapTarget = null;
     if (e.clientX <= 24) {
       detectedSnap = 'left';
@@ -123,8 +123,12 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     if (activeSnapRef.current !== detectedSnap) {
       activeSnapRef.current = detectedSnap;
       setSnapPreview(detectedSnap);
+      if (detectedSnap) {
+        soundEngine.playSnap();
+      }
     }
 
+    // Schedule RAF update for silky smooth drag
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(() => {
         if (pendingPosRef.current) {
@@ -172,12 +176,12 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
-      // Handled if pointer already released
+      // ignore
     }
   };
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) return;
+  const handleDoubleClick = () => {
+    soundEngine.playClick();
     toggleMaximize(windowState.id, {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -191,76 +195,95 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onDoubleClick={handleDoubleClick}
-      className={`no-select relative flex h-9 select-none items-center justify-between border-b px-3 transition-colors ${
+      className={`no-select relative flex h-10 select-none items-center justify-between border-b px-3.5 transition-colors ${
         windowState.isFocused
-          ? 'border-border-subtle bg-surface-overlay/95'
-          : 'border-border-subtle bg-surface-panel/80'
+          ? 'border-white/10 bg-white/[0.06] backdrop-blur-2xl'
+          : 'border-white/5 bg-white/[0.02] backdrop-blur-xl'
       } ${windowState.isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
-      {/* Title & App Metadata (Apple Pro Apps Restraint) */}
-      <div className="flex items-center gap-2 overflow-hidden">
-        <div className="h-4 w-4 shrink-0">
-          <IosAppIcon appId={windowState.appId} className="h-full w-full" />
-        </div>
-        <span
-          className={`truncate text-xs font-medium tracking-tight transition-colors ${
-            windowState.isFocused
-              ? 'text-content-primary'
-              : 'text-content-secondary'
-          }`}
-        >
-          {windowState.title}
-        </span>
-        <span className="hidden font-mono text-[9px] text-content-tertiary bg-surface-subtle/60 px-1 py-0.2 rounded sm:inline-block">
-          {windowState.processId.slice(-4)}
-        </span>
-      </div>
-
-      {/* Bespoke Restrained Window Control Rail */}
-      <div className="flex items-center gap-0.5">
-        {/* Minimize Button */}
+      {/* Authentic macOS Traffic Lights (Top-Left) */}
+      <div
+        className="flex items-center gap-2 pl-0.5 z-10"
+        onMouseEnter={() => setShowTrafficGlyphs(true)}
+        onMouseLeave={() => setShowTrafficGlyphs(false)}
+      >
+        {/* Close: #ff5f56 */}
         <button
           onClick={(e) => {
             e.stopPropagation();
+            soundEngine.playClick();
+            closeWindow(windowState.id);
+          }}
+          aria-label="Close Window"
+          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#ff5f56] border border-[#e0443e] hover:brightness-90 transition-all cursor-pointer shadow-sm"
+        >
+          {showTrafficGlyphs && (
+            <svg className="h-1.5 w-1.5 text-[#4a0002] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
+        </button>
+
+        {/* Minimize: #ffbd2e */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            soundEngine.playClick();
             minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#ffbd2e] border border-[#dea123] hover:brightness-90 transition-all cursor-pointer shadow-sm"
         >
-          <Minus className="h-3 w-3" />
+          {showTrafficGlyphs && (
+            <svg className="h-1.5 w-1.5 text-[#543b00] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          )}
         </button>
 
-        {/* Maximize / Restore Button */}
+        {/* Maximize / Zoom: #27c93f */}
         <button
           onClick={(e) => {
             e.stopPropagation();
+            soundEngine.playClick();
             toggleMaximize(windowState.id, {
               width: window.innerWidth,
               height: window.innerHeight,
             });
           }}
-          aria-label={windowState.isMaximized ? 'Restore Window' : 'Maximize Window'}
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-surface-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-primary"
+          aria-label="Zoom Window"
+          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#27c93f] border border-[#1aab29] hover:brightness-90 transition-all cursor-pointer shadow-sm"
         >
-          {windowState.isMaximized ? (
-            <Copy className="h-2.5 w-2.5" />
-          ) : (
-            <Square className="h-2.5 w-2.5" />
+          {showTrafficGlyphs && (
+            <svg className="h-1.5 w-1.5 text-[#004207] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+              <polyline points="15 3 21 3 21 9" />
+              <polyline points="9 21 3 21 3 15" />
+              <line x1="21" y1="3" x2="14" y2="10" />
+              <line x1="3" y1="21" x2="10" y2="14" />
+            </svg>
           )}
         </button>
-
-        {/* Close Button with subtle crimson dissipation */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            closeWindow(windowState.id);
-          }}
-          aria-label="Close Window"
-          className="flex h-5 w-5 items-center justify-center rounded text-content-tertiary transition-colors hover:bg-rose-500/15 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500"
-        >
-          <X className="h-3 w-3" />
-        </button>
       </div>
+
+      {/* Centered Window Title with Authentic Apple App Icon */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none max-w-[55%] truncate">
+        <div className="h-3.5 w-3.5 shrink-0">
+          <IosAppIcon appId={windowState.appId} className="h-full w-full" />
+        </div>
+        <span
+          className={`truncate text-[12px] font-medium tracking-tight ${
+            windowState.isFocused
+              ? 'text-white/90 drop-shadow-sm'
+              : 'text-white/50'
+          }`}
+        >
+          {windowState.title}
+        </span>
+      </div>
+
+      {/* Right spacer for balance */}
+      <div className="w-14" />
     </header>
   );
 };

@@ -101,19 +101,14 @@ export const MissionsView: React.FC = () => {
         status: mStatus,
       });
     }
+
     setIsMissionModalOpen(false);
   };
 
   const handleDeleteMission = () => {
     if (!activeMission) return;
-    if (confirm(`Are you sure you want to delete campaign "${activeMission.title}"?`)) {
-      soundEngine.playClick();
-      deleteMission(activeMission.id);
-      const remaining = missions.filter((m) => m.id !== activeMission.id);
-      if (remaining[0]) {
-        setSelectedMissionId(remaining[0].id);
-      }
-    }
+    soundEngine.playClick();
+    deleteMission(activeMission.id);
   };
 
   const handleAddObjective = (e: React.FormEvent) => {
@@ -125,48 +120,47 @@ export const MissionsView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans text-white bg-[#060913] min-h-full">
+    <div className="flex flex-col gap-8 p-8 font-sans text-neutral-100 bg-[#0a0b10] min-h-full">
       {/* ─── Top Control Header ────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-indigo-900/60 pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-400 to-indigo-600 text-black shadow-[0_0_25px_rgba(6,182,212,0.4)]">
-            <Compass className="h-6 w-6 stroke-[2.5]" />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.08] pb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase font-semibold text-neutral-400">
+              Strategic Campaigns
+            </span>
+            <span className="h-1 w-1 rounded-full bg-neutral-600" />
+            <span className="font-mono text-[10px] tracking-wider text-emerald-400 font-medium">
+              Active Rail
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-black tracking-tight text-white">
-                Engineering Missions & Strategic Campaigns
-              </h2>
-              <span className="rounded-full bg-cyan-500/20 border border-cyan-400/50 px-2.5 py-0.5 font-mono text-[10px] font-bold text-cyan-300 uppercase tracking-widest">
-                Active Rail
-              </span>
-            </div>
-            <p className="text-xs font-medium text-cyan-200/80 mt-0.5">
-              High-leverage engineering campaigns that organize projects, skills, and concrete milestones.
-            </p>
-          </div>
+          <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
+            Engineering Missions
+          </h1>
+          <p className="text-sm text-neutral-400 mt-1 max-w-xl font-normal leading-relaxed">
+            High-leverage engineering campaigns that organize projects, skills, and concrete milestones.
+          </p>
         </div>
 
         {/* Global Campaign Stats & Add Mission Button */}
         <div className="flex items-center gap-3">
           <button
             onClick={handleOpenAddMission}
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-emerald-400 px-5 py-2.5 text-xs font-black text-black shadow-[0_0_20px_rgba(6,182,212,0.5)] hover:scale-105 active:scale-95 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-white text-black hover:bg-neutral-200 px-4 py-2 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
           >
-            <Plus className="h-4 w-4 stroke-[3]" />
-            <span>+ New Campaign</span>
+            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <span>New Campaign</span>
           </button>
 
-          <div className="rounded-2xl border-2 border-indigo-800/80 bg-[#0d1428] px-4 py-2 text-right font-mono shadow-md">
-            <div className="text-[10px] font-bold uppercase text-slate-400">Objectives Cleared</div>
-            <div className="text-sm font-black text-white">
+          <div className="rounded-xl border border-white/[0.08] bg-[#10121a] px-3.5 py-2 text-right font-mono">
+            <div className="text-[10px] uppercase text-neutral-500">Objectives Cleared</div>
+            <div className="text-sm font-semibold text-white">
               {completedObjectives} / {totalObjectives}
             </div>
           </div>
 
-          <div className="rounded-2xl border-2 border-indigo-800/80 bg-[#0d1428] px-4 py-2 text-right font-mono shadow-md">
-            <div className="text-[10px] font-bold uppercase text-slate-400">Active Campaigns</div>
-            <div className="text-sm font-black text-cyan-300">
+          <div className="rounded-xl border border-white/[0.08] bg-[#10121a] px-3.5 py-2 text-right font-mono">
+            <div className="text-[10px] uppercase text-neutral-500">Active Campaigns</div>
+            <div className="text-sm font-semibold text-emerald-400">
               {missions.filter((m) => m.status === 'active').length} Active
             </div>
           </div>
@@ -174,7 +168,7 @@ export const MissionsView: React.FC = () => {
       </div>
 
       {/* ─── Status Filter Tabs ──────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 border-b-2 border-indigo-950/60 pb-3 font-mono text-xs">
+      <div className="flex items-center gap-1.5 border-b border-white/[0.06] pb-3 font-mono text-xs">
         {(['all', 'active', 'queued', 'completed'] as const).map((status) => (
           <button
             key={status}
@@ -182,10 +176,10 @@ export const MissionsView: React.FC = () => {
               soundEngine.playClick();
               setFilterStatus(status);
             }}
-            className={`rounded-xl px-4 py-1.5 font-bold capitalize transition-all ${
+            className={`rounded-lg px-3 py-1.5 capitalize transition-colors ${
               filterStatus === status
-                ? 'bg-gradient-to-r from-cyan-400 to-indigo-500 text-black font-black shadow-[0_0_15px_rgba(6,182,212,0.4)] border border-cyan-300'
-                : 'border border-indigo-900/60 bg-[#090e1c] text-slate-300 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-black font-semibold shadow-sm'
+                : 'text-neutral-400 hover:text-white hover:bg-white/[0.05]'
             }`}
           >
             {status}
@@ -195,26 +189,26 @@ export const MissionsView: React.FC = () => {
 
       {/* ─── Asymmetrical Master-Detail Layout ─────────────────────────────────── */}
       {missions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-14 rounded-3xl border-2 border-dashed border-indigo-800/80 bg-[#0c1224] text-center my-6">
-          <Compass className="h-12 w-12 text-cyan-400 mb-3" />
-          <h3 className="text-base font-bold text-white">No Campaigns Defined Yet</h3>
-          <p className="text-xs font-medium text-slate-300 mt-1 max-w-sm">
+        <div className="flex flex-col items-center justify-center p-14 rounded-2xl border border-dashed border-white/10 bg-[#10121a] text-center my-6">
+          <Compass className="h-10 w-10 text-neutral-500 mb-3" />
+          <h3 className="text-sm font-semibold text-white">No Campaigns Defined Yet</h3>
+          <p className="text-xs text-neutral-400 mt-1 max-w-sm">
             Define high-leverage engineering missions to align your projects, skills, and daily execution towards concrete milestones.
           </p>
           <button
             onClick={handleOpenAddMission}
-            className="mt-4 flex items-center gap-2 rounded-2xl bg-cyan-400 px-5 py-2 text-xs font-black text-black shadow-lg"
+            className="mt-4 flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-neutral-200 transition-colors"
           >
-            <Plus className="h-4 w-4 stroke-[3]" />
-            <span>Launch Your First Campaign</span>
+            <Plus className="h-3.5 w-3.5" />
+            <span>Launch First Campaign</span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Campaign List (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-3.5">
             {filteredMissions.length === 0 ? (
-              <div className="p-8 text-center text-xs font-mono text-slate-400 border-2 border-dashed border-indigo-800/80 rounded-2xl">
+              <div className="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/10 rounded-xl">
                 No campaigns matching status "{filterStatus}".
               </div>
             ) : null}
@@ -230,52 +224,52 @@ export const MissionsView: React.FC = () => {
                     soundEngine.playClick();
                     setSelectedMissionId(mission.id);
                   }}
-                  className={`flex flex-col rounded-3xl border-2 p-5 transition-all cursor-pointer ${
+                  className={`flex flex-col rounded-2xl border p-5 transition-colors cursor-pointer ${
                     isSelected
-                      ? 'border-cyan-400 bg-gradient-to-br from-[#0c1836] to-[#070e1e] shadow-[0_0_30px_rgba(6,182,212,0.3)] ring-1 ring-cyan-400/50'
-                      : 'border-indigo-900/80 bg-[#0c1328] hover:border-cyan-400/60 hover:bg-[#0e172e]'
+                      ? 'border-white/30 bg-[#141622] shadow-sm'
+                      : 'border-white/[0.06] bg-[#10121a] hover:border-white/20'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="rounded-lg bg-indigo-950/80 border border-indigo-700/80 px-2.5 py-0.5 font-mono text-[10px] font-black uppercase tracking-wider text-cyan-300">
+                    <span className="rounded border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
                       {mission.category}
                     </span>
                     <span
-                      className={`rounded-lg px-2 py-0.5 font-mono text-[10px] font-black uppercase ${
+                      className={`rounded px-1.5 py-0.5 font-mono text-[9px] uppercase ${
                         mission.priority === 'critical'
-                          ? 'bg-rose-500 text-white shadow-[0_0_8px_#f43f5e]'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                           : mission.priority === 'high'
-                          ? 'bg-amber-400 text-black shadow-[0_0_8px_#f59e0b]'
-                          : 'bg-cyan-400 text-black shadow-[0_0_8px_#22d3ee]'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       }`}
                     >
                       {mission.priority}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold tracking-tight text-white mb-1">
+                  <h3 className="text-base font-semibold tracking-tight text-white mb-1">
                     {mission.title}
                   </h3>
-                  <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed">
                     {mission.tagline}
                   </p>
 
                   {/* Progress bar */}
                   <div className="mt-4">
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-slate-300 mb-1">
+                    <div className="flex items-center justify-between text-xs font-mono text-neutral-400 mb-1.5">
                       <span>Velocity</span>
-                      <span className="text-cyan-300">{mission.progress}%</span>
+                      <span className="text-white font-medium">{mission.progress}%</span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-black/60 overflow-hidden">
+                    <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-300 rounded-full"
+                        className="h-full bg-white transition-all duration-300 rounded-full"
                         style={{ width: `${mission.progress}%` }}
                       />
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-indigo-900/60 flex items-center justify-between text-xs font-mono text-slate-400">
-                    <span className="text-emerald-300 font-bold">{completedCount} / {mission.objectives.length} Objectives</span>
+                  <div className="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-neutral-500">
+                    <span className="text-emerald-400">{completedCount} / {mission.objectives.length} Objectives</span>
                     <span>{mission.estimatedCompletion}</span>
                   </div>
                 </div>
@@ -285,22 +279,22 @@ export const MissionsView: React.FC = () => {
 
           {/* Right: Selected Mission Detail View (7 cols) */}
           {activeMission && (
-            <div className="lg:col-span-7 flex flex-col rounded-3xl border-2 border-indigo-800/80 bg-gradient-to-br from-[#0c142a] to-[#070b16] p-6 shadow-xl">
+            <div className="lg:col-span-7 flex flex-col rounded-2xl border border-white/[0.08] bg-[#10121a] p-7">
               {/* Header info */}
-              <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b-2 border-indigo-900/60">
+              <div className="flex flex-wrap items-start justify-between gap-3 pb-5 border-b border-white/[0.06]">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-lg bg-cyan-400/20 border border-cyan-400/50 px-2.5 py-0.5 font-mono text-[10px] font-black uppercase tracking-wider text-cyan-300">
+                    <span className="rounded border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
                       {activeMission.category}
                     </span>
-                    <span className="font-mono text-[10px] uppercase font-bold text-slate-400">
+                    <span className="font-mono text-[10px] text-neutral-500">
                       ID: {activeMission.id}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-black tracking-tight text-white mt-2">
+                  <h2 className="text-2xl font-semibold tracking-tight text-white mt-2">
                     {activeMission.title}
                   </h2>
-                  <p className="text-xs font-medium text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
                     {activeMission.tagline}
                   </p>
                 </div>
@@ -313,7 +307,7 @@ export const MissionsView: React.FC = () => {
                       soundEngine.playClick();
                       updateMissionStatus(activeMission.id, e.target.value as MissionStatus);
                     }}
-                    className="rounded-xl border-2 border-indigo-800 bg-[#070b16] px-3 py-1.5 text-xs font-bold font-mono text-white outline-none cursor-pointer focus:border-cyan-400"
+                    className="rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs font-mono text-white outline-none cursor-pointer focus:border-white/30 capitalize"
                   >
                     <option value="active">Active</option>
                     <option value="queued">Queued</option>
@@ -323,7 +317,7 @@ export const MissionsView: React.FC = () => {
 
                   <button
                     onClick={handleOpenEditMission}
-                    className="flex items-center gap-1.5 rounded-xl border border-indigo-700 bg-indigo-950/60 px-3 py-1.5 text-xs font-mono font-bold text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs font-mono text-neutral-300 hover:text-white hover:bg-white/[0.06] transition-colors"
                   >
                     <Pencil className="h-3 w-3" />
                     <span>Edit</span>
@@ -331,7 +325,7 @@ export const MissionsView: React.FC = () => {
 
                   <button
                     onClick={handleDeleteMission}
-                    className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-2 text-rose-400 hover:bg-rose-500/25 transition-colors"
+                    className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-1.5 text-rose-400 hover:bg-rose-500/20 transition-colors"
                     title="Delete Campaign"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -340,34 +334,34 @@ export const MissionsView: React.FC = () => {
               </div>
 
               {/* Campaign Metrics Bar */}
-              <div className="grid grid-cols-3 gap-3 py-4 border-b-2 border-indigo-900/60 text-xs font-mono">
-                <div className="rounded-2xl border border-indigo-800/80 bg-[#080d1c] p-3.5">
-                  <div className="flex items-center gap-1.5 text-cyan-300 text-[10px] font-bold uppercase">
+              <div className="grid grid-cols-3 gap-3 py-4 border-b border-white/[0.06] text-xs font-mono">
+                <div className="rounded-xl border border-white/[0.06] bg-black/20 p-3.5">
+                  <div className="flex items-center gap-1.5 text-neutral-400 text-[10px] uppercase">
                     <Calendar className="h-3 w-3" />
                     <span>Target Deadline</span>
                   </div>
-                  <div className="text-white font-black text-sm mt-1">{activeMission.deadline}</div>
+                  <div className="text-white font-medium text-sm mt-1">{activeMission.deadline}</div>
                 </div>
-                <div className="rounded-2xl border border-indigo-800/80 bg-[#080d1c] p-3.5">
-                  <div className="flex items-center gap-1.5 text-cyan-300 text-[10px] font-bold uppercase">
+                <div className="rounded-xl border border-white/[0.06] bg-black/20 p-3.5">
+                  <div className="flex items-center gap-1.5 text-neutral-400 text-[10px] uppercase">
                     <Clock className="h-3 w-3" />
                     <span>Remaining</span>
                   </div>
-                  <div className="text-white font-black text-sm mt-1">{activeMission.estimatedCompletion}</div>
+                  <div className="text-white font-medium text-sm mt-1">{activeMission.estimatedCompletion}</div>
                 </div>
-                <div className="rounded-2xl border border-indigo-800/80 bg-[#080d1c] p-3.5">
-                  <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-bold uppercase">
+                <div className="rounded-xl border border-white/[0.06] bg-black/20 p-3.5">
+                  <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] uppercase">
                     <Layers className="h-3 w-3" />
                     <span>Completion</span>
                   </div>
-                  <div className="text-emerald-300 font-black text-sm mt-1">{activeMission.progress}%</div>
+                  <div className="text-emerald-400 font-medium text-sm mt-1">{activeMission.progress}%</div>
                 </div>
               </div>
 
               {/* Objectives Checklist */}
-              <div className="py-4 border-b-2 border-indigo-900/60">
+              <div className="py-4 border-b border-white/[0.06]">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-white font-mono">
+                  <h4 className="text-xs uppercase tracking-wider text-neutral-400 font-mono">
                     Milestone Objectives ({activeMission.objectives.filter((o) => o.completed).length}/
                     {activeMission.objectives.length})
                   </h4>
@@ -380,20 +374,20 @@ export const MissionsView: React.FC = () => {
                     placeholder="Add actionable campaign milestone objective..."
                     value={newObjectiveText}
                     onChange={(e) => setNewObjectiveText(e.target.value)}
-                    className="flex-1 rounded-2xl border-2 border-indigo-800 bg-[#070b16] px-4 py-2 text-xs font-bold text-white placeholder-slate-500 outline-none focus:border-cyan-400 font-mono"
+                    className="flex-1 rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-sans"
                   />
                   <button
                     type="submit"
-                    className="flex items-center gap-1.5 rounded-2xl bg-cyan-400 px-4 py-2 text-xs font-black font-mono text-black shadow-md hover:scale-105 active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-white text-black hover:bg-neutral-200 px-4 py-2 text-xs font-semibold transition-colors cursor-pointer"
                   >
-                    <Plus className="h-3.5 w-3.5 stroke-[3]" />
+                    <Plus className="h-3.5 w-3.5" />
                     <span>Add</span>
                   </button>
                 </form>
 
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                   {activeMission.objectives.length === 0 ? (
-                    <div className="p-4 text-center text-xs font-mono text-slate-400 border-2 border-dashed border-indigo-800/80 rounded-2xl">
+                    <div className="p-4 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/10 rounded-xl">
                       No objectives defined yet. Add key milestones above.
                     </div>
                   ) : (
@@ -404,22 +398,22 @@ export const MissionsView: React.FC = () => {
                           soundEngine.playClick();
                           toggleMissionObjective(activeMission.id, obj.id);
                         }}
-                        className={`group flex items-start justify-between gap-3 rounded-2xl border-2 p-3.5 transition-all cursor-pointer ${
+                        className={`group flex items-start justify-between gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
                           obj.completed
-                            ? 'border-emerald-500/30 bg-emerald-950/20 text-slate-400 line-through'
-                            : 'border-indigo-800/80 bg-[#070c18] text-white hover:border-cyan-400 hover:bg-[#0c1428]'
+                            ? 'border-emerald-500/20 bg-emerald-500/[0.03] text-neutral-500 line-through'
+                            : 'border-white/[0.06] bg-black/20 hover:border-white/20 text-neutral-200'
                         }`}
                       >
                         <div className="flex items-start gap-3 min-w-0 flex-1">
                           {obj.completed ? (
-                            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400 mt-0.5" />
+                            <CheckCircle2 className="h-4.5 w-4.5 shrink-0 text-emerald-400 mt-0.5" />
                           ) : (
-                            <Circle className="h-5 w-5 shrink-0 text-cyan-400 mt-0.5" />
+                            <Circle className="h-4.5 w-4.5 shrink-0 text-neutral-600 group-hover:text-neutral-400 mt-0.5" />
                           )}
                           <div className="flex-1 min-w-0">
-                            <span className="text-xs font-bold leading-relaxed">{obj.text}</span>
+                            <span className="text-xs font-medium leading-relaxed">{obj.text}</span>
                             {obj.dueDate && (
-                              <div className="text-[10px] font-mono text-slate-400 mt-0.5">
+                              <div className="text-[10px] font-mono text-neutral-500 mt-0.5">
                                 Target: {obj.dueDate}
                               </div>
                             )}
@@ -432,7 +426,7 @@ export const MissionsView: React.FC = () => {
                             soundEngine.playClick();
                             deleteMissionObjective(activeMission.id, obj.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-400 transition-opacity"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-rose-400 transition-opacity"
                           title="Delete Objective"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -444,15 +438,15 @@ export const MissionsView: React.FC = () => {
               </div>
 
               {/* Connected Projects & Skills Grid */}
-              <div className="py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h5 className="text-xs font-mono uppercase tracking-wider text-cyan-300 font-bold mb-2 flex items-center gap-1.5">
+                  <h5 className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-medium mb-2 flex items-center gap-1.5">
                     <FolderGit2 className="h-3.5 w-3.5" />
                     <span>Connected Projects</span>
                   </h5>
                   <div className="flex flex-wrap gap-1.5">
                     {activeMission.projectIds.length === 0 ? (
-                      <span className="text-xs text-slate-400 font-mono">None linked</span>
+                      <span className="text-xs text-neutral-500 font-mono">None linked</span>
                     ) : (
                       activeMission.projectIds.map((pid) => {
                         const proj = projects.find((p) => p.id === pid);
@@ -463,7 +457,7 @@ export const MissionsView: React.FC = () => {
                               soundEngine.playClick();
                               setActiveTab('projects');
                             }}
-                            className="flex items-center gap-1 rounded-xl bg-indigo-950/80 border border-indigo-700/80 px-2.5 py-1 text-xs font-mono text-cyan-300 hover:border-cyan-400 font-bold"
+                            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20"
                           >
                             <span>{proj?.name || pid}</span>
                             <ExternalLink className="h-2.5 w-2.5" />
@@ -475,13 +469,13 @@ export const MissionsView: React.FC = () => {
                 </div>
 
                 <div>
-                  <h5 className="text-xs font-mono uppercase tracking-wider text-cyan-300 font-bold mb-2 flex items-center gap-1.5">
+                  <h5 className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-medium mb-2 flex items-center gap-1.5">
                     <Code2 className="h-3.5 w-3.5" />
                     <span>Target Competencies</span>
                   </h5>
                   <div className="flex flex-wrap gap-1.5">
                     {activeMission.skillIds.length === 0 ? (
-                      <span className="text-xs text-slate-400 font-mono">None linked</span>
+                      <span className="text-xs text-neutral-500 font-mono">None linked</span>
                     ) : (
                       activeMission.skillIds.map((sid) => {
                         const sk = skills.find((s) => s.id === sid);
@@ -492,7 +486,7 @@ export const MissionsView: React.FC = () => {
                               soundEngine.playClick();
                               setActiveTab('learning');
                             }}
-                            className="flex items-center gap-1 rounded-xl bg-emerald-950/80 border border-emerald-700/80 px-2.5 py-1 text-xs font-mono text-emerald-300 hover:border-emerald-400 font-bold"
+                            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-mono text-neutral-300 hover:text-white hover:border-white/20"
                           >
                             <span>{sk?.name || sid}</span>
                             <ExternalLink className="h-2.5 w-2.5" />
@@ -510,55 +504,55 @@ export const MissionsView: React.FC = () => {
 
       {/* ─── Add / Edit Mission Modal ─────────────────────────────────────────── */}
       {isMissionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-lg rounded-3xl border-2 border-cyan-400 bg-[#0d1428] shadow-[0_0_50px_rgba(6,182,212,0.3)] overflow-hidden">
-            <div className="flex items-center justify-between border-b-2 border-indigo-900/80 bg-[#070b16] px-6 py-4 select-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-lg rounded-2xl border border-white/15 bg-[#12141e] shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 select-none">
               <div className="flex items-center gap-2.5">
-                <Compass className="h-5 w-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">
+                <Compass className="h-4 w-4 text-white" />
+                <h3 className="text-sm font-semibold text-white">
                   {missionModalMode === 'add' ? 'Launch New Campaign' : 'Edit Campaign'}
                 </h3>
               </div>
               <button
                 onClick={() => setIsMissionModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-neutral-400 hover:text-white"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             <form onSubmit={handleSaveMission} className="p-6 flex flex-col gap-4 text-xs font-mono">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-300">Campaign Title</label>
+                <label className="text-xs text-neutral-300 font-sans font-medium">Campaign Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Master Distributed Systems & Raft"
                   value={mTitle}
                   onChange={(e) => setMTitle(e.target.value)}
-                  className="rounded-2xl border-2 border-indigo-800 bg-[#070a14] px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-cyan-400"
+                  className="rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 text-xs text-white outline-none focus:border-white/30"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-300">Tagline / Mission Vision</label>
+                <label className="text-xs text-neutral-300 font-sans font-medium">Tagline / Mission Vision</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Build an in-memory replicated log from scratch in Rust"
                   value={mTagline}
                   onChange={(e) => setMTagline(e.target.value)}
-                  className="rounded-2xl border-2 border-indigo-800 bg-[#070a14] px-4 py-2.5 text-xs font-bold text-white outline-none focus:border-cyan-400"
+                  className="rounded-xl border border-white/10 bg-black/40 px-3.5 py-2 text-xs text-white outline-none focus:border-white/30"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-300">Priority</label>
+                  <label className="text-xs text-neutral-300 font-sans font-medium">Priority</label>
                   <select
                     value={mPriority}
                     onChange={(e) => setMPriority(e.target.value as MissionPriority)}
-                    className="rounded-2xl border-2 border-indigo-800 bg-[#070a14] px-3 py-2.5 text-xs font-bold text-white outline-none focus:border-cyan-400"
+                    className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-white/30 capitalize"
                   >
                     <option value="critical">Critical</option>
                     <option value="high">High</option>
@@ -568,29 +562,29 @@ export const MissionsView: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-300">Target Deadline</label>
+                  <label className="text-xs text-neutral-300 font-sans font-medium">Target Deadline</label>
                   <input
                     type="date"
                     value={mDeadline}
                     onChange={(e) => setMDeadline(e.target.value)}
-                    className="rounded-2xl border-2 border-indigo-800 bg-[#070a14] px-3 py-2 text-xs font-bold text-white outline-none focus:border-cyan-400"
+                    className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-white/30"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-indigo-900/60">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsMissionModalOpen(false)}
-                  className="rounded-2xl px-4 py-2 text-xs font-bold text-slate-300 hover:text-white"
+                  className="rounded-xl px-4 py-2 text-xs text-neutral-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-emerald-400 px-6 py-2.5 text-xs font-black text-black shadow-lg hover:scale-105 transition-all"
+                  className="flex items-center gap-2 rounded-xl bg-white text-black px-5 py-2 text-xs font-semibold hover:bg-neutral-200 transition-colors"
                 >
-                  <Save className="h-4 w-4" />
+                  <Save className="h-3.5 w-3.5" />
                   <span>{missionModalMode === 'add' ? 'Launch Campaign' : 'Update Campaign'}</span>
                 </button>
               </div>

@@ -134,8 +134,8 @@ export const AppMenu: React.FC = () => {
             className="w-full max-w-2xl flex flex-col items-center gap-3.5 z-10"
           >
             {/* Search Input Bar */}
-            <div className="relative flex w-full items-center rounded-2xl border-2 border-white/20 bg-white/10 px-4 py-2.5 shadow-2xl backdrop-blur-xl focus-within:border-cyan-400 focus-within:bg-white/15 focus-within:shadow-[0_0_30px_rgba(6,182,212,0.35)] transition-all">
-              <Search className="h-5 w-5 text-cyan-400 shrink-0 mr-3" />
+            <div className="relative flex w-full items-center rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 shadow-xl backdrop-blur-xl focus-within:border-white/50 focus-within:bg-white/15 transition-all">
+              <Search className="h-5 w-5 text-neutral-300 shrink-0 mr-3" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -157,7 +157,7 @@ export const AppMenu: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile Category Chips */}
+            {/* Category Chips */}
             <div className="flex w-full items-center justify-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
@@ -172,7 +172,7 @@ export const AppMenu: React.FC = () => {
                     }}
                     className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
                       isSelected
-                        ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)] border border-cyan-300/40 scale-105'
+                        ? 'bg-white text-black font-semibold shadow-sm scale-105'
                         : 'border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white'
                     }`}
                   >
@@ -265,7 +265,7 @@ export const AppMenu: React.FC = () => {
             className="w-full max-w-2xl flex items-center justify-between rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-mono backdrop-blur-xl text-white/70"
           >
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-cyan-400" />
+              <span className="h-2 w-2 rounded-full bg-white/60" />
               <span>App Library</span>
               <span className="text-white/40">•</span>
               <span className="text-white font-semibold">{allApps.length} Apps Installed</span>
@@ -284,7 +284,7 @@ export const AppMenu: React.FC = () => {
                   closeAppMenu();
                   launchApp('app-store');
                 }}
-                className="flex items-center gap-1 text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+                className="flex items-center gap-1 text-[11px] font-semibold text-white/80 hover:text-white transition-colors"
               >
                 <Sparkles className="h-3 w-3" />
                 <span>Get Apps</span>

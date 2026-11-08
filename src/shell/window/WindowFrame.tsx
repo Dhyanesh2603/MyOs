@@ -62,12 +62,14 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
     <AnimatePresence>
       <motion.div
         key={windowState.id}
-        initial={{ scale: 0.96, opacity: 0 }}
+        initial={{ scale: 0.92, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
+        exit={{ scale: 0.92, opacity: 0 }}
         transition={{
-          scale: { type: 'spring', stiffness: 400, damping: 30 },
-          opacity: { duration: 0.15 },
+          type: 'spring',
+          mass: 0.65,
+          stiffness: 300,
+          damping: 24,
         }}
         onPointerDown={() => focusWindow(windowState.id)}
         style={{
@@ -84,15 +86,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
           transition: 'opacity 0.2s ease, filter 0.2s ease',
         }}
         className={`group flex flex-col overflow-hidden ${
-          windowState.isMaximized ? 'rounded-none border-0' : 'rounded-window border'
-        } transition-colors duration-150 ${
-          isPeekTarget
-            ? 'border-accent shadow-[0_0_30px_rgba(var(--accent-rgb),0.5)] ring-2 ring-accent'
-            : windowState.isMaximized
+          windowState.isMaximized ? 'rounded-none border-0' : 'rounded-[14px] border border-white/[0.14]'
+        } transition-shadow duration-200 ${
+          windowState.isMaximized
             ? 'shadow-none'
             : windowState.isFocused
-            ? 'border-border-strong shadow-window'
-            : 'border-border-subtle shadow-lg opacity-[0.99]'
+            ? 'shadow-[0_24px_70px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
+            : 'shadow-[0_12px_36px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
         } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
       >
         {/* 8-Axis Resize Frame */}

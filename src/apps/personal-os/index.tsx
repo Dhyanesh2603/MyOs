@@ -37,23 +37,23 @@ export const PersonalOsApp: React.FC<AppProps> = () => {
   const { activeTab, setActiveTab, startFocusMode } = usePersonalOsStore();
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#060913] text-white select-none overflow-hidden font-sans">
-      {/* Top Engineering App Bar (High-Contrast Redesign) */}
-      <div className="z-20 flex h-14 items-center justify-between border-b-2 border-indigo-900/80 bg-[#090f20]/95 px-4 backdrop-blur-2xl shrink-0 shadow-lg">
+    <div className="flex h-full w-full flex-col bg-[#0a0b10] text-neutral-100 select-none overflow-hidden font-sans">
+      {/* Top Artisanal App Bar (Opus 5.5 High-Contrast Minimalist) */}
+      <div className="z-20 flex h-13 items-center justify-between border-b border-white/[0.08] bg-[#11131c]/90 px-5 backdrop-blur-xl shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-600 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-            <Compass className="h-4.5 w-4.5 stroke-[2.5]" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 border border-white/15 text-white">
+            <Compass className="h-4 w-4" />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-black tracking-tight text-white drop-shadow">Flow Personal OS</span>
-            <span className="rounded-full bg-cyan-500/20 border border-cyan-400/50 px-2 py-0.2 font-mono text-[9px] font-black uppercase tracking-wider text-cyan-300">
-              v2.5 High-Contrast
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-semibold tracking-tight text-white">Personal OS</span>
+            <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] font-medium tracking-widest text-neutral-400 uppercase">
+              Executive
             </span>
           </div>
         </div>
 
-        {/* Global Tab Navigation (Vibrant contrast pills) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
+        {/* Global Segmented Tab Navigation */}
+        <div className="flex items-center gap-1 rounded-xl bg-white/[0.04] border border-white/[0.06] p-1 overflow-x-auto scrollbar-none">
           {NAV_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -65,28 +65,28 @@ export const PersonalOsApp: React.FC<AppProps> = () => {
                   soundEngine.playClick();
                   setActiveTab(tab.id);
                 }}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 text-black font-black shadow-[0_0_20px_rgba(6,182,212,0.5)] scale-102'
-                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-black font-semibold shadow-sm'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/[0.06]'
                 }`}
               >
-                <Icon className="h-3.5 w-3.5 stroke-[2.5]" />
+                <Icon className="h-3.5 w-3.5" />
                 <span>{tab.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Quick Focus Button (Vivid glowing amber) */}
+        {/* Quick Focus Action */}
         <button
           onClick={() => {
             soundEngine.playClick();
             startFocusMode('Deep Engineering Focus Block', 25);
           }}
-          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-black text-black shadow-[0_0_20px_rgba(245,158,11,0.5)] hover:scale-105 active:scale-95 transition-all"
+          className="flex items-center gap-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-neutral-950 px-3.5 py-1.5 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
         >
-          <Zap className="h-3.5 w-3.5 fill-black stroke-black" />
+          <Zap className="h-3.5 w-3.5 fill-current" />
           <span>Focus Mode</span>
         </button>
       </div>

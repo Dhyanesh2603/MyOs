@@ -45,19 +45,27 @@ export const DockItem: React.FC<DockItemProps> = ({
     return val - (bounds.x + bounds.width / 2);
   });
 
-  // Calculate target dimension using a smooth proximity curve
-  const widthSync = useTransform(
-    distance,
-    [-PROXIMITY_RADIUS, 0, PROXIMITY_RADIUS],
-    [BASE_SIZE, PEAK_SIZE, BASE_SIZE]
-  );
-
-  // Apply responsive spring damping to the calculated dimension
-  const size = useSpring(widthSync, {
-    mass: 0.1,
-    stiffness: 240,
-    damping: 15,
+  // Calculate target dimension using macOS parabolic cosine bell curve
+  const widthSync = useTransform(distance, (d: number) => {
+    if (Math.abs(d) > PROXIMITY_RADIUS) return BASE_SIZE;
+    const cosineScale = Math.cos((d / PROXIMITY_RADIUS) * (Math.PI / 2)) ** 2;
+    return BASE_SIZE + (PEAK_SIZE - BASE_SIZE) * cosineScale;
   });
+
+  // Apply responsive spring damping with authentic Apple fluid curve
+  const size = useSpring(widthSync, {
+    mass: 0.12,
+    stiffness: 280,
+    damping: 18,
+  });
+
+  const [isBouncing, setIsBouncing] = useState(false);
+
+  const handleClick = () => {
+    setIsBouncing(true);
+    setTimeout(() => setIsBouncing(false), 550);
+    onClick();
+  };
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -117,17 +125,19 @@ export const DockItem: React.FC<DockItemProps> = ({
         </div>
       )}
 
-      {/* Kinetic Magnetic Icon Button */}
+      {/* Kinetic Magnetic Icon Button with macOS Bounce Physics */}
       <motion.button
         ref={itemRef}
         style={{ width: size, height: size }}
-        onClick={onClick}
+        onClick={handleClick}
+        animate={isBouncing ? { y: [0, -16, 0, -8, 0] } : { y: 0 }}
+        transition={isBouncing ? { duration: 0.55, ease: [0.16, 1, 0.3, 1] } : undefined}
         onFocus={() => setIsHovered(true)}
         onBlur={() => setIsHovered(false)}
         whileTap={{ scale: 0.9 }}
         aria-label={`Open ${manifest.name}`}
         aria-haspopup="false"
-        className="relative flex items-center justify-center p-0.5 transition-transform hover:scale-105 focus-visible:outline-none"
+        className="relative flex items-center justify-center p-0.5 focus-visible:outline-none"
       >
         <IosAppIcon appId={manifest.id} className="w-full h-full" />
 
