@@ -1,9 +1,12 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'motion/react';
+import { LayoutGrid } from 'lucide-react';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
+import { soundEngine } from '@core/audio/soundEngine';
+import { useAppMenuStore } from '@shell/menu/appMenuStore';
 import { useDockStore } from './dockStore';
 import { DockItem } from './DockItem';
 import type { WindowSize } from '@contracts/window';
@@ -180,6 +183,25 @@ export const Dock: React.FC<DockProps> = ({
         onMouseEnter={handleDockMouseEnter}
         className="fixed bottom-3 z-[500] flex items-end gap-2 rounded-dock border border-border-subtle bg-surface-panel/90 px-3 py-1.5 shadow-dock backdrop-blur-dock"
       >
+        {/* Mobile App Library Launchpad Trigger */}
+        <button
+          onClick={() => {
+            soundEngine.playClick();
+            useAppMenuStore.getState().toggleAppMenu();
+          }}
+          className="relative flex flex-col items-center justify-center p-1 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group mb-1 shrink-0"
+          title="App Library (All Apps)"
+        >
+          <div className="h-11 w-11 rounded-[22.5%] bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] transition-all">
+            <LayoutGrid className="h-5 w-5 text-white drop-shadow" />
+          </div>
+          <span className="text-[10px] font-semibold text-white/80 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 whitespace-nowrap bg-black/80 px-2 py-0.5 rounded-md pointer-events-none">
+            Apps
+          </span>
+        </button>
+
+        <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle/80 shrink-0" />
+
         {/* Pinned Applications */}
         {pinnedAppIds.map((appId) => {
           const manifest = appRegistry.get(appId);

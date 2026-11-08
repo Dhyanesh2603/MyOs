@@ -27,6 +27,8 @@ import { SplitScreenDivider } from '@shell/window/SplitScreenDivider';
 import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
+import { AppMenu } from '@shell/menu/AppMenu';
+import { useAppMenuStore } from '@shell/menu/appMenuStore';
 import { useSessionStore } from '@core/session/sessionStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
@@ -138,6 +140,14 @@ export const App: React.FC = () => {
         useSplitScreenStore.getState().toggleSplitTopWindows();
         return;
       }
+
+      // App Library / Mobile App Drawer: Alt+A or Ctrl+Alt+A
+      if ((e.altKey && e.key.toLowerCase() === 'a') || ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'a')) {
+        e.preventDefault();
+        soundEngine.playClick();
+        useAppMenuStore.getState().toggleAppMenu();
+        return;
+      }
     };
     window.addEventListener('keydown', handleShortcuts);
 
@@ -185,6 +195,9 @@ export const App: React.FC = () => {
 
       {/* Global Spotlight / Command Palette */}
       <CommandPalette />
+
+      {/* Mobile App Menu (All Apps Drawer) */}
+      <AppMenu />
 
       {/* Notifications & System Shade */}
       <NotificationToaster />
