@@ -90,8 +90,7 @@ export const CopilotDrawer: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-1.5 font-semibold text-xs text-content-primary">
                     <span>FlowOS Copilot</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#d71921]" />
-                  </div>
+                    </div>
                   <div className="font-mono text-[10px] text-content-tertiary">
                     Raycast Intelligence sidecar
                   </div>

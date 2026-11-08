@@ -430,7 +430,7 @@ export const FlowCamApp: React.FC<AppProps> = () => {
             disabled={countdown !== null}
             className="group relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/40 bg-neutral-900 p-1 shadow-2xl hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
           >
-            <div className="h-full w-full rounded-full bg-[#d71921] shadow-[0_0_12px_rgba(215,25,33,0.6)] group-hover:bg-[#ff242d] transition-colors flex items-center justify-center">
+            <div className="h-full w-full rounded-full bg-[#d71921] group-hover:bg-[#ff242d] transition-colors flex items-center justify-center">
               <Zap className="h-4 w-4 text-white fill-current" />
             </div>
           </button>

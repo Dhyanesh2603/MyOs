@@ -91,9 +91,8 @@ export const ScreenSaver: React.FC = () => {
             </span>
           </div>
 
-          {/* Date & Nothing OS Red Dot */}
+          {/* Date */}
           <div className="flex items-center gap-3 font-mono text-sm sm:text-base tracking-widest uppercase text-white/70">
-            <span className="h-2 w-2 rounded-full bg-[#d71921] animate-ping" />
             <span>{dateStr}</span>
           </div>
 

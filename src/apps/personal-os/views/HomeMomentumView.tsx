@@ -101,8 +101,7 @@ export const HomeMomentumView: React.FC = () => {
         <div className="lg:col-span-8 relative overflow-hidden rounded-3xl border-2 border-cyan-400/80 bg-gradient-to-br from-[#0c1836] via-[#09152b] to-[#060c18] p-7 shadow-[0_0_40px_rgba(6,182,212,0.22)] flex flex-col justify-between">
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b-2 border-indigo-900/60">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee] animate-ping" />
+              <div className="flex items-center gap-2">
                 <span className="font-mono text-xs font-black tracking-widest uppercase text-cyan-300">
                   Momentum Engine • Optimal Next Action
                 </span>

@@ -452,7 +452,7 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
             </button>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
             <span className="text-[10px]">Open another window to play in real-time</span>
           </div>
         </div>
@@ -463,7 +463,7 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
         {/* Scoreboard & Turn Indicator */}
         <div className="flex items-center gap-8 mb-4 select-none">
           <div className="flex items-center gap-2.5">
-            <div className="h-4 w-4 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.6)]" />
+            <div className="h-4 w-4 rounded-full bg-rose-500 " />
             <div>
               <div className="text-[11px] font-bold text-rose-400">Player 1 (Red)</div>
               <div className="text-[10px] text-content-tertiary font-mono">{winsP1} Wins</div>
@@ -491,7 +491,7 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
               </div>
               <div className="text-[10px] text-content-tertiary font-mono">{winsP2} Wins</div>
             </div>
-            <div className="h-4 w-4 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+            <div className="h-4 w-4 rounded-full bg-amber-400 " />
           </div>
         </div>
 

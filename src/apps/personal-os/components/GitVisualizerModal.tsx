@@ -274,7 +274,7 @@ export const GitVisualizerModal: React.FC<GitVisualizerModalProps> = ({
                   {project.name}
                 </span>
                 <span className="flex items-center gap-1 rounded bg-emerald-500/15 px-2 py-0.5 font-mono text-[10px] text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   synced
                 </span>
               </div>

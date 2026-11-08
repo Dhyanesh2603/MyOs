@@ -543,7 +543,7 @@ export const CyberPongApp: React.FC<AppProps> = () => {
           <div className="flex items-center gap-1.5">
             <span
               className={`h-2 w-2 rounded-full ${
-                p2pConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                p2pConnected ? 'bg-emerald-400' : 'bg-amber-400'
               }`}
             />
             <span className="text-[10px]">

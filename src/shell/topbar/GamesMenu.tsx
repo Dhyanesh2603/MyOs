@@ -154,7 +154,7 @@ export const GamesMenu: React.FC = () => {
                   {running && (
                     <span
                       title="Running"
-                      className="h-1.5 w-1.5 rounded-full bg-emerald-400 self-center shrink-0 animate-pulse"
+                      className="h-1.5 w-1.5 rounded-full bg-emerald-400 self-center shrink-0"
                     />
                   )}
                 </button>

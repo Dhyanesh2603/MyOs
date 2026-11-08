@@ -384,7 +384,6 @@ export const LearningDsaView: React.FC = () => {
             <div className="lg:col-span-5 relative overflow-hidden rounded-3xl border-2 border-emerald-500/60 bg-gradient-to-br from-[#061e18] via-[#091820] to-[#050e18] p-6 shadow-[0_0_40px_rgba(16,185,129,0.22)] flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse" />
                   <span className="font-mono text-xs font-black uppercase tracking-widest text-emerald-300">
                     Mastery Repertoire
                   </span>

@@ -180,7 +180,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
           <span className="text-content-primary font-medium">flowsh</span>
           <span className="opacity-40">//</span>
           <span className="flex items-center gap-1 text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             zsh-mode
           </span>
         </div>

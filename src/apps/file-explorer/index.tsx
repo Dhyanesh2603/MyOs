@@ -243,7 +243,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                 Device Storage
               </span>
               {isMounting && (
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               )}
             </div>
 

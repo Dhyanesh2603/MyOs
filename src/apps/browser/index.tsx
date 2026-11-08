@@ -1126,7 +1126,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                     </span>
                   </div>
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-400/20">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     {mountedFolders.length > 0 ? `${mountedFolders.length} Folders Connected` : 'Ready to Connect'}
                   </span>
                 </div>

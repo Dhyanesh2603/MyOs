@@ -590,7 +590,7 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
             </button>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
             <span className="text-[10px]">Open another window to play in real-time</span>
           </div>
         </div>

@@ -230,15 +230,12 @@ export const AppMenu: React.FC = () => {
                       <div className="relative h-16 w-16 shrink-0 shadow-2xl group-hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)] transition-shadow">
                         <IosAppIcon appId={app.id} className="h-full w-full" />
 
-                        {/* Active running pip (glowing emerald dot) */}
+                        {/* Active running pip (solid clean dot, no glow) */}
                         {running && (
                           <span
                             title="Application running"
-                            className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center"
-                          >
-                            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-black" />
-                          </span>
+                            className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-black"
+                          />
                         )}
                       </div>
 
@@ -268,8 +265,8 @@ export const AppMenu: React.FC = () => {
             className="w-full max-w-2xl flex items-center justify-between rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-mono backdrop-blur-xl text-white/70"
           >
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-              <span>FlowOS App Library</span>
+              <span className="h-2 w-2 rounded-full bg-cyan-400" />
+              <span>App Library</span>
               <span className="text-white/40">•</span>
               <span className="text-white font-semibold">{allApps.length} Apps Installed</span>
             </div>

@@ -69,7 +69,7 @@ export const PomodoroWidget: React.FC = () => {
         <Timer className={`h-3 w-3 ${isRunning ? 'animate-pulse text-emerald-400' : 'text-accent-primary'}`} />
         <span className="hidden sm:inline text-[10px] text-content-tertiary">[{modeLabels[mode]}]</span>
         <span className="tracking-tight">{formattedTime}</span>
-        {isRunning && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />}
+        {isRunning && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
       </button>
 
       {/* Popover Card */}

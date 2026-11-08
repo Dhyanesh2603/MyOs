@@ -218,7 +218,7 @@ export const TaskManagerApp: React.FC<AppProps> = ({ processId }) => {
                   <td className="px-3 py-2 text-content-tertiary">{proc.id.slice(-8)}</td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       <span className="text-[11px] text-emerald-400 capitalize">{proc.state}</span>
                     </div>
                   </td>

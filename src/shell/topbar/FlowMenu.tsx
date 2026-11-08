@@ -52,7 +52,6 @@ export const FlowMenu: React.FC = () => {
             : 'text-content-primary hover:bg-surface-subtle/60'
         }`}
       >
-        <span className="h-2 w-2 rounded-full bg-[#d71921] shadow-[0_0_8px_rgba(215,25,33,0.6)]" />
         <span>FlowOS</span>
       </button>
 

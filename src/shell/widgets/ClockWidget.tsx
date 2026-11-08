@@ -23,9 +23,7 @@ export const ClockWidget: React.FC = () => {
   return (
     <div className="flex w-60 flex-col rounded-xl border border-border-subtle bg-surface-panel/85 p-3.5 shadow-lg backdrop-blur-md text-content-primary select-none transition-all hover:border-border-strong">
       <div className="flex items-center justify-between">
-        {/* Nothing OS Solitary Red Accent Dot */}
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#d71921] animate-pulse" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-content-secondary">
             FLOW TIME
           </span>

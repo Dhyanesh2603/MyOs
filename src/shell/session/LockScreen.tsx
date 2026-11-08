@@ -91,7 +91,6 @@ export const LockScreen: React.FC = () => {
         {/* Top Telemetry & Status Stamp */}
         <div className="flex w-full items-center justify-between text-xs font-mono text-white/50">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#d71921] shadow-[0_0_8px_#d71921]" />
             <span>FLOW_OS // SECURE_ENCLAVE</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -135,7 +134,7 @@ export const LockScreen: React.FC = () => {
                   key={idx}
                   className={`h-3 w-3 rounded-full border transition-all duration-200 ${
                     isFilled
-                      ? 'border-accent-primary bg-accent-primary shadow-[0_0_10px_rgba(var(--accent-primary),0.8)] scale-110'
+                      ? 'border-accent-primary bg-accent-primary scale-110'
                       : hasError
                       ? 'border-rose-500 bg-rose-500/20'
                       : 'border-white/30 bg-transparent'

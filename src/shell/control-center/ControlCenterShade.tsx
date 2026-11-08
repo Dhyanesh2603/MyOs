@@ -415,7 +415,7 @@ export const ControlCenterShade: React.FC = () => {
               <span>Lo-Fi Ambient Noise</span>
             </div>
             {ambientTrack !== 'none' && (
-              <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full border border-emerald-400/20 animate-pulse">
+              <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-full border border-emerald-400/20">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 <span>Playing</span>
               </span>

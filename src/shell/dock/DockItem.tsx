@@ -131,13 +131,13 @@ export const DockItem: React.FC<DockItemProps> = ({
       >
         <IosAppIcon appId={manifest.id} className="w-full h-full" />
 
-        {/* macOS Active Indicator Pip */}
+        {/* macOS Active Indicator Pip (No glow) */}
         {isRunning && (
           <span
             className={`absolute -bottom-1 left-1/2 -translate-x-1/2 transition-all duration-200 ${
               isFocused
-                ? 'h-1 w-2.5 rounded-full bg-accent-primary shadow-[0_0_6px_rgba(var(--accent-primary),0.8)]'
-                : 'h-1 w-1 rounded-full bg-white/70'
+                ? 'h-1 w-2.5 rounded-full bg-white'
+                : 'h-1 w-1 rounded-full bg-white/60'
             }`}
           />
         )}

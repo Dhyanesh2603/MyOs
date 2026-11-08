@@ -166,7 +166,7 @@ export const SystemTray: React.FC = () => {
       >
         <Bell className="h-3.5 w-3.5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
+          <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-accent-primary" />
         )}
       </button>
 
