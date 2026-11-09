@@ -62,16 +62,18 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
     <AnimatePresence>
       <motion.div
         key={windowState.id}
-        initial={{ scale: 0.92, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.92, opacity: 0 }}
+        exit={{ scale: 0.96, opacity: 0 }}
         transition={{
-          type: 'spring',
-          mass: 0.65,
-          stiffness: 300,
-          damping: 24,
+          duration: 0.16,
+          ease: [0.16, 1, 0.3, 1],
         }}
-        onPointerDown={() => focusWindow(windowState.id)}
+        onPointerDown={() => {
+          if (!windowState.isFocused) {
+            focusWindow(windowState.id);
+          }
+        }}
         style={{
           position: 'absolute',
           left: `${windowState.position.x}px`,
@@ -83,16 +85,15 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
           pointerEvents: isGhosted ? 'none' : 'auto',
           filter: isGhosted ? 'blur(1px)' : 'none',
           willChange: isInteracting ? 'left, top, width, height' : 'auto',
-          transition: 'opacity 0.2s ease, filter 0.2s ease',
         }}
         className={`group flex flex-col overflow-hidden ${
           windowState.isMaximized ? 'rounded-none border-0' : 'rounded-[14px] border border-white/[0.14]'
-        } transition-shadow duration-200 ${
+        } ${isInteracting ? 'transition-none shadow-xl' : 'transition-shadow duration-150'} ${
           windowState.isMaximized
             ? 'shadow-none'
             : windowState.isFocused
-            ? 'shadow-[0_24px_70px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
-            : 'shadow-[0_12px_36px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
+            ? 'shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
+            : 'shadow-[0_10px_30px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
         } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
       >
         {/* 8-Axis Resize Frame */}

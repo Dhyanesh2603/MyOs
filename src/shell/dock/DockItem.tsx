@@ -6,6 +6,7 @@ import {
   type MotionValue,
 } from 'motion/react';
 import type { AppManifest } from '@contracts/app';
+import type { WindowState } from '@contracts/window';
 import { useWindowStore } from '@core/window/windowStore';
 import { DockHoverPreview } from './DockHoverPreview';
 import { IosAppIcon } from '@shell/icons/IosAppIcon';
@@ -21,6 +22,7 @@ export interface DockItemProps {
 const BASE_SIZE = 44;
 const PEAK_SIZE = 62;
 const PROXIMITY_RADIUS = 130;
+const EMPTY_WINDOWS: WindowState[] = [];
 
 export const DockItem: React.FC<DockItemProps> = ({
   manifest,
@@ -35,8 +37,15 @@ export const DockItem: React.FC<DockItemProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  const { windows, focusWindow, closeWindow, restoreWindow, setPeekWindowId } = useWindowStore();
-  const appWindows = Object.values(windows).filter((w) => w.appId === manifest.id);
+  // Optimized selective subscriptions: boolean primitive avoids React getSnapshot infinite loops
+  const hasWindows = useWindowStore((state) =>
+    Object.values(state.windows).some((w) => w.appId === manifest.id)
+  );
+
+  // Read app windows only when hover preview is actually displayed
+  const appWindows = showPreview
+    ? Object.values(useWindowStore.getState().windows).filter((w) => w.appId === manifest.id)
+    : EMPTY_WINDOWS;
 
   // Compute horizontal distance from mouse cursor to center of this dock item
   const distance = useTransform(mouseX, (val: number) => {
@@ -83,17 +92,18 @@ export const DockItem: React.FC<DockItemProps> = ({
       hoverTimerRef.current = null;
     }
     setShowPreview(false);
-    setPeekWindowId(null);
+    useWindowStore.getState().setPeekWindowId(null);
   };
 
   const handleFocusWindow = (winId: string) => {
-    const target = windows[winId];
+    const store = useWindowStore.getState();
+    const target = store.windows[winId];
     if (target?.isMinimized) {
-      restoreWindow(winId);
+      store.restoreWindow(winId);
     }
-    focusWindow(winId);
+    store.focusWindow(winId);
     setShowPreview(false);
-    setPeekWindowId(null);
+    store.setPeekWindowId(null);
   };
 
   return (
@@ -103,14 +113,14 @@ export const DockItem: React.FC<DockItemProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       {/* Live Miniature Hover Preview or Simple Tooltip */}
-      {appWindows.length > 0 ? (
+      {hasWindows ? (
         <DockHoverPreview
           manifest={manifest}
           windows={appWindows}
           isOpen={showPreview}
           onFocusWindow={handleFocusWindow}
-          onCloseWindow={(id) => closeWindow(id)}
-          onPeekWindow={(id) => setPeekWindowId(id)}
+          onCloseWindow={(id) => useWindowStore.getState().closeWindow(id)}
+          onPeekWindow={(id) => useWindowStore.getState().setPeekWindowId(id)}
         />
       ) : (
         <div

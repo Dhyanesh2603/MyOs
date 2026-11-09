@@ -21,7 +21,13 @@ import { useAmbientSoundStore } from '@core/audio/ambientSoundStore';
 import type { AmbientTrack } from '@core/audio/ambientSoundEngine';
 import { soundEngine } from '@core/audio/soundEngine';
 
-export const DynamicActivityCapsule: React.FC = () => {
+export interface DynamicActivityCapsuleProps {
+  placement?: 'top' | 'bottom';
+}
+
+export const DynamicActivityCapsule: React.FC<DynamicActivityCapsuleProps> = ({
+  placement = 'bottom',
+}) => {
   const { isPlaying, tracks, currentTrackIndex, togglePlay, nextTrack } = useMediaStore();
   const { isRunning: isPomoRunning, timeLeft, mode: pomoMode, toggle: togglePomo, reset: resetPomo } = usePomodoroStore();
   const currentTrack = tracks[currentTrackIndex] ?? tracks[0];
@@ -130,7 +136,9 @@ export const DynamicActivityCapsule: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 4 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ type: 'spring', damping: 24, stiffness: 350 }}
-            className="absolute left-1/2 -translate-x-1/2 top-8 z-[9500] w-76 rounded-2xl border border-white/15 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-2xl"
+            className={`absolute left-1/2 -translate-x-1/2 ${
+              placement === 'bottom' ? 'bottom-12' : 'top-8'
+            } z-[9500] w-76 rounded-2xl border border-white/15 bg-black/95 p-3.5 text-white shadow-2xl backdrop-blur-2xl`}
           >
             {/* Now Playing section */}
             {isPlaying && currentTrack && (

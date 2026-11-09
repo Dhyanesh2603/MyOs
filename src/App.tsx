@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { initializeApplications } from '@core/process/initApps';
-import { useWindowStore } from '@core/window/windowStore';
 import { Dock } from '@shell/dock/Dock';
-import { WindowFrame } from '@shell/window/WindowFrame';
+import { WindowsLayer } from '@shell/window/WindowsLayer';
 import { DesktopSurface } from '@shell/desktop/DesktopSurface';
 import { ContextMenu } from '@shell/context-menu/ContextMenu';
 import { CommandPalette } from '@shell/command/CommandPalette';
@@ -24,7 +23,6 @@ import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
 import { FocusModeOverlay } from '@shell/focus/FocusModeOverlay';
 import { ScratchpadDrawer } from '@shell/scratchpad/ScratchpadDrawer';
 import { SplitScreenDivider } from '@shell/window/SplitScreenDivider';
-import { TopMenuBar } from '@shell/topbar/TopMenuBar';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { AppMenu } from '@shell/menu/AppMenu';
@@ -58,8 +56,11 @@ export const App: React.FC = () => {
     }, 600);
 
     const handleShortcuts = (e: KeyboardEvent) => {
-      // Acoustic Keyboard Soundscapes
-      if (!['Control', 'Shift', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
+      const target = e.target as HTMLElement | null;
+      const isTextInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      // Acoustic Keyboard Soundscapes (only when not typing in text fields to prevent input lag)
+      if (!isTextInput && !['Control', 'Shift', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
         soundEngine.playKeypress(e.key);
       }
 
@@ -157,8 +158,6 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const windows = useWindowStore((state) => state.windows);
-  const windowList = Object.values(windows);
   const { brightness, isNightShift } = useControlCenterStore();
 
   return (
@@ -176,13 +175,8 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Unified Global Top Menu Bar */}
-      <TopMenuBar />
-
-      {/* Interactive Rendered Windows */}
-      {windowList.map((win) => (
-        <WindowFrame key={win.id} windowState={win} />
-      ))}
+      {/* Interactive Rendered Windows (Decoupled & Isolated with WindowsLayer) */}
+      <WindowsLayer />
 
       {/* Interactive 2-Up Split Screen Divider */}
       <SplitScreenDivider />

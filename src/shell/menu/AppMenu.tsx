@@ -22,8 +22,8 @@ const CATEGORIES: { id: AppMenuCategory; label: string; icon: React.ComponentTyp
   { id: 'all', label: 'All Apps', icon: Layers },
   { id: 'productivity', label: 'Productivity', icon: FolderGit2 },
   { id: 'development', label: 'Developer', icon: Code2 },
-  { id: 'media', label: 'Media & Creation', icon: PlayCircle },
-  { id: 'games', label: 'Arcade & Games', icon: Gamepad2 },
+  { id: 'media', label: 'Media', icon: PlayCircle },
+  { id: 'games', label: 'Games', icon: Gamepad2 },
   { id: 'utilities', label: 'Utilities', icon: Wrench },
   { id: 'system', label: 'System', icon: SlidersHorizontal },
 ];
@@ -120,21 +120,21 @@ export const AppMenu: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.12, ease: 'easeOut' }}
           onClick={closeAppMenu}
-          className="fixed inset-0 z-[9600] flex flex-col items-center justify-between bg-black/75 backdrop-blur-2xl select-none px-4 pt-10 pb-6 overflow-hidden"
+          className="fixed inset-0 z-[9600] flex flex-col items-center justify-between bg-black/80 backdrop-blur-xl select-none px-4 pt-10 pb-6 overflow-hidden"
         >
           {/* Top Search & Filter Control Bar */}
           <motion.div
-            initial={{ y: -30, opacity: 0 }}
+            initial={{ y: -16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            exit={{ y: -10, opacity: 0 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl flex flex-col items-center gap-3.5 z-10"
+            className="w-full max-w-4xl flex flex-col items-center gap-3 z-10"
           >
             {/* Search Input Bar */}
-            <div className="relative flex w-full items-center rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 shadow-xl backdrop-blur-xl focus-within:border-white/50 focus-within:bg-white/15 transition-all">
+            <div className="relative flex w-full max-w-xl items-center rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 shadow-xl backdrop-blur-xl focus-within:border-white/50 focus-within:bg-white/15 transition-all">
               <Search className="h-5 w-5 text-neutral-300 shrink-0 mr-3" />
               <input
                 ref={searchInputRef}
@@ -158,38 +158,43 @@ export const AppMenu: React.FC = () => {
             </div>
 
             {/* Category Chips Bar (Safe Flex Scroll with No-Clipped Start) */}
-            <div className="flex w-full max-w-full items-center justify-start sm:justify-center gap-1.5 overflow-x-auto px-4 py-1 scrollbar-none no-scrollbar">
-              {CATEGORIES.map((cat) => {
-                const Icon = cat.icon;
-                const isSelected = selectedCategory === cat.id;
+            <div className="w-full overflow-x-auto scrollbar-none no-scrollbar py-1">
+              <div
+                className="flex w-max min-w-full items-center justify-start sm:justify-center gap-2 px-6"
+                style={{ justifyContent: 'safe center' }}
+              >
+                {CATEGORIES.map((cat) => {
+                  const Icon = cat.icon;
+                  const isSelected = selectedCategory === cat.id;
 
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      soundEngine.playClick();
-                      setSelectedCategory(cat.id);
-                    }}
-                    className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
-                      isSelected
-                        ? 'bg-white text-black font-semibold shadow-sm'
-                        : 'border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/15 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        soundEngine.playClick();
+                        setSelectedCategory(cat.id);
+                      }}
+                      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
+                        isSelected
+                          ? 'bg-white text-black font-semibold shadow-sm'
+                          : 'border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/15 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
 
           {/* Main App Grid (Mobile App Library layout) */}
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300, delay: 0.05 }}
+            exit={{ scale: 0.98, opacity: 0 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
             className="flex-1 w-full max-w-4xl my-auto overflow-y-auto px-4 py-6 scrollbar-none no-scrollbar"
           >
@@ -218,13 +223,10 @@ export const AppMenu: React.FC = () => {
                   const running = isAppRunning(app.id);
 
                   return (
-                    <motion.button
+                    <button
                       key={app.id}
-                      whileHover={{ scale: 1.1, y: -4 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: 'spring', damping: 15, stiffness: 350 }}
                       onClick={() => handleLaunch(app.id)}
-                      className="group flex flex-col items-center w-24 p-1.5 rounded-2xl hover:bg-white/10 transition-colors cursor-pointer relative"
+                      className="group flex flex-col items-center w-24 p-1.5 rounded-2xl hover:bg-white/10 transition-all duration-150 ease-out hover:scale-105 active:scale-95 cursor-pointer relative"
                     >
                       {/* App Icon Container */}
                       <div className="relative h-16 w-16 shrink-0 shadow-2xl group-hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)] transition-shadow">
@@ -248,7 +250,7 @@ export const AppMenu: React.FC = () => {
                       <span className="text-[9px] font-mono uppercase tracking-wider text-white/50 text-center opacity-0 group-hover:opacity-100 transition-opacity">
                         {app.category}
                       </span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>

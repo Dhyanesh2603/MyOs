@@ -29,7 +29,6 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
 
   const { currentWallpaperId, wallpapers, setWallpaper } = useWallpaperStore();
   const wallpaper = wallpapers.find((w) => w.id === currentWallpaperId) ?? wallpapers[0]!;
-  const { windows, activeWindowId, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
   const { launchApp } = useProcessStore();
   const openMenu = useContextMenuStore((state) => state.openMenu);
 
@@ -141,7 +140,8 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             label: 'Minimize All Windows',
             icon: Minus,
             action: () => {
-              Object.keys(windows).forEach((id) => minimizeWindow(id));
+              const store = useWindowStore.getState();
+              Object.keys(store.windows).forEach((id) => store.minimizeWindow(id));
             },
           },
         },
@@ -153,7 +153,8 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             icon: X,
             danger: true,
             action: () => {
-              Object.keys(windows).forEach((id) => closeWindow(id));
+              const store = useWindowStore.getState();
+              Object.keys(store.windows).forEach((id) => store.closeWindow(id));
             },
           },
         },
@@ -177,8 +178,9 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
     if (e.button !== 0 || e.target !== e.currentTarget) return;
 
     // Defocus any currently active window if user clicked the empty desktop
-    if (activeWindowId) {
-      focusWindow('');
+    const winStore = useWindowStore.getState();
+    if (winStore.activeWindowId) {
+      winStore.focusWindow('');
     }
 
     try {

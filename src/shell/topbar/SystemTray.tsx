@@ -15,7 +15,11 @@ import { soundEngine } from '@core/audio/soundEngine';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
 import { useCopilotStore } from '@core/copilot/copilotStore';
 
-export const SystemTray: React.FC = () => {
+export interface SystemTrayProps {
+  direction?: 'up' | 'down';
+}
+
+export const SystemTray: React.FC<SystemTrayProps> = ({ direction = 'up' }) => {
   const { toggleCenter, notifications } = useNotificationStore();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -185,7 +189,9 @@ export const SystemTray: React.FC = () => {
         </button>
 
         {showCalendar && (
-          <div className="absolute right-0 top-8 z-[9500] w-64 rounded-2xl border border-border-subtle bg-surface-panel/95 p-4 text-xs text-content-primary shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+          <div className={`absolute right-0 ${
+            direction === 'up' ? 'bottom-10' : 'top-8'
+          } z-[9500] w-64 rounded-2xl border border-border-subtle bg-surface-panel/95 p-4 text-xs text-content-primary shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95`}>
             <div className="flex items-center justify-between border-b border-border-subtle pb-2 mb-3">
               <div className="flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4 text-accent-primary" />

@@ -8,6 +8,9 @@ import { soundEngine } from '@core/audio/soundEngine';
 import { useAppMenuStore } from '@shell/menu/appMenuStore';
 import { useDockStore } from './dockStore';
 import { DockItem } from './DockItem';
+import { DynamicActivityCapsule } from '@shell/topbar/DynamicActivityCapsule';
+import { SystemTray } from '@shell/topbar/SystemTray';
+import { WorkspaceSwitcher } from '@shell/topbar/WorkspaceSwitcher';
 import type { WindowSize } from '@contracts/window';
 
 export interface DockProps {
@@ -25,16 +28,19 @@ export const Dock: React.FC<DockProps> = ({
   const setIsDockRevealed = useDockStore((state) => state.setIsDockRevealed);
 
   const { processes, launchApp, isAppRunning } = useProcessStore();
-  const { windows, activeWindowId, focusWindow, minimizeWindow, restoreWindow } =
-    useWindowStore();
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
 
   const hideTimerRef = useRef<number | null>(null);
   const dockRef = useRef<HTMLElement | null>(null);
 
   // Auto-hide active if mode is 'always', or if 'smart' and windows are open
-  const hasOpenWindows = Object.values(windows).some(
-    (w) => !w.isMinimized && (w.workspaceId ?? 1) === activeWorkspaceId
+  const hasOpenWindows = useWindowStore((state) =>
+    Object.values(state.windows).some(
+      (w) => !w.isMinimized && (w.workspaceId ?? 1) === activeWorkspaceId
+    )
+  );
+  const activeAppId = useWindowStore((state) =>
+    state.activeWindowId ? state.windows[state.activeWindowId]?.appId : null
   );
   const isAutoHideActive =
     autoHideMode === 'always' || (autoHideMode === 'smart' && hasOpenWindows);
@@ -102,26 +108,25 @@ export const Dock: React.FC<DockProps> = ({
     .filter((id) => !pinnedAppIds.includes(id))
     .filter((id, index, arr) => arr.indexOf(id) === index);
 
-  const activeWindow = activeWindowId ? windows[activeWindowId] : undefined;
-
   const handleAppClick = (appId: string) => {
     const isRunning = isAppRunning(appId);
 
     if (!isRunning) {
       launchApp(appId, undefined, viewportSize);
     } else {
-      const appWindows = Object.values(windows).filter((w) => w.appId === appId);
+      const winStore = useWindowStore.getState();
+      const appWindows = Object.values(winStore.windows).filter((w) => w.appId === appId);
       if (appWindows.length === 0) {
         launchApp(appId, undefined, viewportSize);
       } else {
         const primaryWin = appWindows[0];
         if (primaryWin) {
           if (primaryWin.isMinimized) {
-            restoreWindow(primaryWin.id);
+            winStore.restoreWindow(primaryWin.id);
           } else if (primaryWin.isFocused) {
-            minimizeWindow(primaryWin.id);
+            winStore.minimizeWindow(primaryWin.id);
           } else {
-            focusWindow(primaryWin.id);
+            winStore.focusWindow(primaryWin.id);
           }
         }
       }
@@ -217,7 +222,7 @@ export const Dock: React.FC<DockProps> = ({
           if (!manifest) return null;
 
           const isRunning = isAppRunning(appId);
-          const isFocused = isRunning && activeWindow?.appId === appId;
+          const isFocused = isRunning && activeAppId === appId;
 
           return (
             <DockItem
@@ -241,7 +246,7 @@ export const Dock: React.FC<DockProps> = ({
           const manifest = appRegistry.get(appId);
           if (!manifest) return null;
 
-          const isFocused = activeWindow?.appId === appId;
+          const isFocused = activeAppId === appId;
 
           return (
             <DockItem
@@ -254,6 +259,18 @@ export const Dock: React.FC<DockProps> = ({
             />
           );
         })}
+
+        {/* Right Status Capsule: Integrated Activity & System Controls */}
+        <div className="mx-1 h-8 w-[1px] self-center bg-white/15 shrink-0" />
+
+        <div className="flex items-center gap-1.5 shrink-0 mb-1">
+          <DynamicActivityCapsule placement="bottom" />
+          <div className="flex items-center gap-1 rounded-xl bg-white/[0.08] border border-white/10 px-2 py-0.5 text-white shadow-sm backdrop-blur-md">
+            <WorkspaceSwitcher />
+            <div className="h-3 w-[1px] bg-white/20 mx-0.5" />
+            <SystemTray direction="up" />
+          </div>
+        </div>
       </motion.nav>
     </>
   );
