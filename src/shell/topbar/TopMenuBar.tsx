@@ -1,6 +1,4 @@
 import React from 'react';
-import { GamesMenu } from './GamesMenu';
-import { ActiveAppMenu } from './ActiveAppMenu';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { DynamicActivityCapsule } from './DynamicActivityCapsule';
 import { SystemTray } from './SystemTray';
@@ -11,42 +9,38 @@ export const TopMenuBar: React.FC = () => {
   const toggleAppMenu = useAppMenuStore((s) => s.toggleAppMenu);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9000] flex h-7 items-center justify-between border-b border-white/[0.08] bg-black/40 px-3 text-xs text-white/90 shadow-sm backdrop-blur-2xl select-none transition-colors">
-      {/* Left side: System App Library launcher, Games menu, Active App title & menus */}
-      <div className="flex items-center gap-1.5">
-        {/* Modern Minimalist App Library Launcher */}
+    <div className="fixed top-2.5 left-4 right-4 z-[9000] flex items-center justify-between pointer-events-none select-none text-xs text-white/90">
+      {/* Left: Floating App Launcher Capsule */}
+      <div className="flex items-center gap-1.5 pointer-events-auto">
         <button
           onClick={() => {
             soundEngine.playClick();
             toggleAppMenu();
           }}
-          className="flex h-5 w-6 items-center justify-center rounded px-1 text-white/90 hover:bg-white/15 transition-all cursor-pointer"
-          title="App Library & Applications"
+          className="flex h-7 items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-1 shadow-lg backdrop-blur-2xl hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group"
+          title="App Library (All installed apps)"
         >
-          <div className="grid grid-cols-2 gap-0.5 p-0.5">
-            <span className="h-1.5 w-1.5 rounded-sm bg-white/90" />
-            <span className="h-1.5 w-1.5 rounded-sm bg-white/90" />
-            <span className="h-1.5 w-1.5 rounded-sm bg-white/90" />
-            <span className="h-1.5 w-1.5 rounded-sm bg-white/90" />
+          <div className="grid grid-cols-2 gap-0.5">
+            <span className="h-1 w-1 rounded-sm bg-white/90" />
+            <span className="h-1 w-1 rounded-sm bg-white/90" />
+            <span className="h-1 w-1 rounded-sm bg-white/90" />
+            <span className="h-1 w-1 rounded-sm bg-white/90" />
           </div>
+          <span className="text-[11px] font-medium tracking-tight text-white/90">Apps</span>
         </button>
-
-        <div className="h-3 w-[1px] bg-white/10" />
-        <GamesMenu />
-        <div className="h-3 w-[1px] bg-white/10" />
-        <ActiveAppMenu />
       </div>
 
       {/* Center: Dynamic Island Activity Capsule */}
-      <div className="flex items-center gap-2">
+      <div className="pointer-events-auto">
         <DynamicActivityCapsule />
       </div>
 
-      {/* Right side: Workspace Switcher and System Tray */}
-      <div className="flex items-center gap-2">
+      {/* Right: Floating Glass Status Capsule */}
+      <div className="flex items-center gap-2 pointer-events-auto rounded-full border border-white/15 bg-black/60 px-3 py-0.5 shadow-lg backdrop-blur-2xl">
         <WorkspaceSwitcher />
+        <div className="h-3 w-[1px] bg-white/15" />
         <SystemTray />
       </div>
-    </header>
+    </div>
   );
 };

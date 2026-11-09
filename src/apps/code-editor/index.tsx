@@ -180,32 +180,32 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const fileName = filePath.split('/').pop() || 'Untitled';
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none text-xs font-mono">
+    <div className="flex h-full w-full flex-col bg-[#090a0f] text-neutral-100 select-none text-xs font-mono">
       {/* Editor Action Header */}
-      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3 py-1.5 text-xs">
-        <div className="flex items-center gap-2">
-          <FileCode className="h-3.5 w-3.5 text-accent" />
-          <span className="font-sans font-medium text-content-primary">{fileName}</span>
-          <span className={`rounded border px-1.5 py-0.2 font-mono text-[9px] font-medium ${badge.color}`}>
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0f1118] px-3.5 py-2 text-xs">
+        <div className="flex items-center gap-2.5">
+          <FileCode className="h-4 w-4 text-neutral-300" />
+          <span className="font-sans font-semibold text-white">{fileName}</span>
+          <span className={`rounded-md border px-2 py-0.5 font-mono text-[9px] font-semibold ${badge.color}`}>
             {badge.label}
           </span>
-          <span className="text-[10px] text-content-tertiary truncate max-w-[140px] sm:max-w-xs">
+          <span className="text-[10px] text-neutral-500 truncate max-w-[140px] sm:max-w-xs font-mono">
             {filePath}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {/* Run Code Button */}
           <button
             onClick={handleRunCode}
             disabled={isRunning}
             title="Run Code (Alt+R or Ctrl+Enter)"
-            className="flex items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-500/25 hover:border-emerald-500/60 active:scale-95 transition-all shadow-xs"
+            className="flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black px-3 py-1.5 text-[11px] font-bold active:scale-95 transition-all shadow-md cursor-pointer disabled:opacity-50"
           >
             {isRunning ? (
-              <RotateCw className="h-3 w-3 animate-spin" />
+              <RotateCw className="h-3 w-3 animate-spin text-black" />
             ) : (
-              <Play className="h-3 w-3 fill-current" />
+              <Play className="h-3 w-3 fill-black text-black" />
             )}
             <span>{isRunning ? 'Running...' : 'Run'}</span>
           </button>
@@ -214,10 +214,10 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
           <button
             onClick={() => setShowConsole(!showConsole)}
             title="Toggle Console Drawer"
-            className={`flex items-center gap-1 rounded border border-border-subtle px-2 py-1 text-[10px] transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px] transition-colors cursor-pointer ${
               showConsole
-                ? 'bg-surface-panel text-accent border-accent/40'
-                : 'bg-surface-subtle/50 text-content-secondary hover:bg-surface-subtle hover:text-content-primary'
+                ? 'bg-white/15 text-white border-white/20 font-semibold'
+                : 'bg-white/[0.04] text-neutral-400 border-white/10 hover:bg-white/[0.08] hover:text-white'
             }`}
           >
             <TerminalIcon className="h-3 w-3" />
@@ -228,7 +228,7 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
           <button
             onClick={handleOpenFile}
             title="Open File"
-            className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[10px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer"
           >
             <FolderOpen className="h-3 w-3" />
             <span className="hidden sm:inline">Open</span>
@@ -237,7 +237,7 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
           <button
             onClick={handleNewFile}
             title="New File"
-            className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-[10px] text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[10px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer"
           >
             <FilePlus className="h-3 w-3" />
             <span className="hidden sm:inline">New</span>
@@ -246,30 +246,30 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
           <button
             onClick={handleSave}
             title="Save (Ctrl+S)"
-            className={`flex items-center gap-1 rounded border px-2.5 py-1 text-[10px] font-medium transition-all shadow-sm ${
+            className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[10px] font-semibold transition-all cursor-pointer ${
               isSaved
-                ? 'border-border-subtle bg-surface-subtle text-emerald-400'
-                : 'border-accent bg-accent text-accent-fg hover:opacity-90 active:scale-95'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                : 'border-white bg-white text-black hover:bg-neutral-200 active:scale-95 shadow'
             }`}
           >
-            {isSaved ? <Check className="h-3 w-3" /> : <Save className="h-3 w-3" />}
+            {isSaved ? <Check className="h-3 w-3 text-emerald-400" /> : <Save className="h-3 w-3 text-black" />}
             <span>{isSaved ? 'Saved' : 'Save'}</span>
           </button>
         </div>
       </div>
 
       {/* Main Code Editing Canvas with Line Numbers Gutter */}
-      <div className="relative flex flex-1 overflow-hidden bg-surface-panel">
+      <div className="relative flex flex-1 overflow-hidden bg-[#090a0f]">
         {/* Line Numbers Gutter */}
         <div
           ref={lineNumbersRef}
-          className="w-12 select-none overflow-hidden border-r border-border-subtle bg-surface-overlay/50 py-3 pr-2 text-right font-mono text-xs text-content-tertiary"
+          className="w-12 select-none overflow-hidden border-r border-white/[0.08] bg-[#0c0d14] py-3 pr-2 text-right font-mono text-xs text-neutral-500 scrollbar-none no-scrollbar"
         >
           {Array.from({ length: lineCount }).map((_, i) => (
             <div
               key={i}
               className={`h-5 leading-5 ${
-                cursorPos.line === i + 1 ? 'font-bold text-accent' : 'opacity-40'
+                cursorPos.line === i + 1 ? 'font-bold text-white' : 'opacity-40'
               }`}
             >
               {i + 1}
@@ -289,22 +289,22 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
           onKeyUp={handleCursorMove}
           onClick={handleCursorMove}
           spellCheck={false}
-          className="h-full flex-1 resize-none bg-transparent p-3 font-mono text-xs leading-5 text-content-primary focus:outline-none selection:bg-accent/20 whitespace-pre"
+          className="h-full flex-1 resize-none bg-transparent p-3 font-mono text-xs leading-5 text-neutral-100 focus:outline-none selection:bg-white/20 whitespace-pre caret-white scrollbar-none no-scrollbar"
         />
 
         {/* Slide-Up Execution Output Console Drawer */}
         {showConsole && (
-          <div className="absolute bottom-0 left-0 right-0 z-30 flex max-h-[48%] min-h-[160px] flex-col border-t border-border-subtle bg-surface-panel/95 shadow-2xl backdrop-blur-xl transition-all">
+          <div className="absolute bottom-0 left-0 right-0 z-30 flex max-h-[48%] min-h-[160px] flex-col border-t border-white/[0.12] bg-[#0f1118]/95 shadow-2xl backdrop-blur-xl transition-all">
             {/* Console Header */}
-            <div className="flex items-center justify-between border-b border-border-subtle bg-surface-subtle/70 px-3 py-1.5">
+            <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#141622] px-3.5 py-2">
               <div className="flex items-center gap-2">
-                <TerminalIcon className="h-3.5 w-3.5 text-accent" />
-                <span className="font-sans font-semibold text-[11px] text-content-primary">
+                <TerminalIcon className="h-3.5 w-3.5 text-neutral-300" />
+                <span className="font-sans font-semibold text-[11px] text-white">
                   Execution Output
                 </span>
                 {executionResult && (
                   <span
-                    className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[9px] font-mono ${
+                    className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[9px] font-mono ${
                       executionResult.success
                         ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                         : 'bg-red-500/15 text-red-400 border border-red-500/30'
@@ -324,13 +324,13 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
                 <button
                   onClick={() => setExecutionResult(null)}
                   title="Clear Console Output"
-                  className="rounded p-1 text-content-tertiary hover:bg-surface-hover hover:text-content-primary transition-colors"
+                  className="rounded-lg p-1 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setShowConsole(false)}
-                  className="rounded p-1 text-content-tertiary hover:bg-surface-hover hover:text-content-primary transition-colors"
+                  className="rounded-lg p-1 text-neutral-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                 >
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
@@ -338,15 +338,15 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
             </div>
 
             {/* Console Log Body */}
-            <div className="flex-1 overflow-y-auto p-3 font-mono text-[11px] space-y-1 select-text">
+            <div className="flex-1 overflow-y-auto p-3 font-mono text-[11px] space-y-1 select-text scrollbar-none no-scrollbar">
               {!executionResult && !isRunning && (
-                <div className="text-content-tertiary">
+                <div className="text-neutral-500">
                   Ready. Click &quot;Run&quot; or press Alt+R to execute code.
                 </div>
               )}
 
               {isRunning && (
-                <div className="flex items-center gap-2 text-accent animate-pulse">
+                <div className="flex items-center gap-2 text-white animate-pulse">
                   <RotateCw className="h-3.5 w-3.5 animate-spin" />
                   <span>Executing script inside isolated worker sandbox...</span>
                 </div>
@@ -360,7 +360,7 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
                       ? 'text-red-400'
                       : log.level === 'warn'
                       ? 'text-amber-300'
-                      : 'text-content-primary'
+                      : 'text-neutral-200'
                   }`}
                 >
                   <span className="opacity-40 text-[9px]">
@@ -377,13 +377,13 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
               ))}
 
               {executionResult?.error && (
-                <div className="rounded border border-red-500/30 bg-red-500/10 p-2 text-red-400 whitespace-pre-wrap">
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-2.5 text-red-400 whitespace-pre-wrap">
                   {executionResult.error}
                 </div>
               )}
 
               {executionResult?.returnValue !== undefined && (
-                <div className="mt-2 flex items-start gap-2 rounded border border-emerald-500/30 bg-emerald-500/10 p-2 text-emerald-300">
+                <div className="mt-2 flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-emerald-300">
                   <span className="font-bold opacity-75">=&gt; Return:</span>
                   <span className="whitespace-pre-wrap">{executionResult.returnValue}</span>
                 </div>
@@ -394,7 +394,7 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
       </div>
 
       {/* Editor Status Bar */}
-      <div className="flex items-center justify-between border-t border-border-subtle bg-surface-overlay/80 px-3 py-1 font-mono text-[10px] text-content-tertiary select-none">
+      <div className="flex items-center justify-between border-t border-white/[0.08] bg-[#0c0d14] px-3.5 py-1.5 font-mono text-[10px] text-neutral-400 select-none">
         <div className="flex items-center gap-3">
           <span>Ln {cursorPos.line}, Col {cursorPos.col}</span>
           <span>{lineCount} lines</span>
@@ -402,8 +402,8 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
         </div>
         <div className="flex items-center gap-3">
           <span>UTF-8</span>
-          <span>{badge.label}</span>
-          <span>Alt+R to run • Ctrl+S to save</span>
+          <span className="text-white font-medium">{badge.label}</span>
+          <span className="text-neutral-500">Alt+R to run • Ctrl+S to save</span>
         </div>
       </div>
     </div>

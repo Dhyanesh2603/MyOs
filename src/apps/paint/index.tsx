@@ -200,18 +200,18 @@ export const PaintApp: React.FC<AppProps> = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none text-xs">
+    <div className="flex h-full w-full flex-col bg-[#0a0b10] text-neutral-100 select-none text-xs">
       {/* Paint Toolbar */}
-      <div className="flex flex-wrap items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3 py-1.5 gap-2">
+      <div className="flex flex-wrap items-center justify-between border-b border-white/[0.08] bg-[#0f1118] px-3.5 py-2 gap-2">
         {/* Tool Mode Selectors */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => { setTool('pen'); soundEngine.playClick(); }}
             title="Pen Tool"
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
               tool === 'pen'
-                ? 'bg-accent-primary text-white font-medium shadow-sm'
-                : 'text-content-secondary hover:bg-surface-subtle'
+                ? 'bg-white text-black font-semibold shadow-sm'
+                : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white'
             }`}
           >
             <Pen className="h-3.5 w-3.5" />
@@ -221,10 +221,10 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={() => { setTool('brush'); soundEngine.playClick(); }}
             title="Brush Tool"
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
               tool === 'brush'
-                ? 'bg-accent-primary text-white font-medium shadow-sm'
-                : 'text-content-secondary hover:bg-surface-subtle'
+                ? 'bg-white text-black font-semibold shadow-sm'
+                : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white'
             }`}
           >
             <Brush className="h-3.5 w-3.5" />
@@ -234,10 +234,10 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={() => { setTool('highlighter'); soundEngine.playClick(); }}
             title="Highlighter"
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
               tool === 'highlighter'
-                ? 'bg-accent-primary text-white font-medium shadow-sm'
-                : 'text-content-secondary hover:bg-surface-subtle'
+                ? 'bg-white text-black font-semibold shadow-sm'
+                : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white'
             }`}
           >
             <Highlighter className="h-3.5 w-3.5" />
@@ -247,28 +247,28 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={() => { setTool('eraser'); soundEngine.playClick(); }}
             title="Eraser Tool"
-            className={`flex items-center gap-1 rounded-md px-2 py-1 transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
               tool === 'eraser'
-                ? 'bg-accent-primary text-white font-medium shadow-sm'
-                : 'text-content-secondary hover:bg-surface-subtle'
+                ? 'bg-white text-black font-semibold shadow-sm'
+                : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white'
             }`}
           >
             <Eraser className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Eraser</span>
           </button>
 
-          <div className="h-4 w-px bg-border-subtle/80 mx-1" />
+          <div className="h-4 w-px bg-white/10 mx-1" />
 
           {/* Stroke Width Slider */}
-          <div className="flex items-center gap-1 text-content-tertiary">
-            <span className="font-mono text-[10px]">{lineWidth}px</span>
+          <div className="flex items-center gap-1.5 text-neutral-400">
+            <span className="font-mono text-[10px] w-6">{lineWidth}px</span>
             <input
               type="range"
               min={1}
               max={24}
               value={lineWidth}
               onChange={(e) => setLineWidth(parseInt(e.target.value))}
-              className="h-1 w-16 accent-accent-primary"
+              className="h-1 w-16 accent-white cursor-pointer"
             />
           </div>
         </div>
@@ -280,10 +280,10 @@ export const PaintApp: React.FC<AppProps> = () => {
               key={swatch}
               onClick={() => { setColor(swatch); soundEngine.playClick(); }}
               style={{ backgroundColor: swatch }}
-              className={`h-4 w-4 rounded-full border transition-all ${
+              className={`h-4.5 w-4.5 rounded-full border transition-all cursor-pointer ${
                 color === swatch
-                  ? 'border-accent-primary scale-125 shadow-[0_0_8px_rgba(var(--accent-primary),0.8)] ring-1 ring-white'
-                  : 'border-black/30 hover:scale-110'
+                  ? 'border-white scale-125 ring-2 ring-white/40'
+                  : 'border-white/20 hover:scale-110'
               }`}
             />
           ))}
@@ -301,7 +301,7 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={handleUndo}
             title="Undo"
-            className="rounded p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
           >
             <Undo2 className="h-3.5 w-3.5" />
           </button>
@@ -309,7 +309,7 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={handleClear}
             title="Clear Canvas"
-            className="rounded p-1 text-content-tertiary hover:bg-rose-500/15 hover:text-rose-500 transition-colors"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -317,7 +317,7 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={handleDownloadPC}
             title="Download PNG to PC"
-            className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle px-2 py-1 font-mono text-[10px] text-content-secondary hover:bg-surface-panel hover:text-content-primary transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer"
           >
             <Download className="h-3 w-3" />
             <span className="hidden md:inline">PC</span>
@@ -326,20 +326,20 @@ export const PaintApp: React.FC<AppProps> = () => {
           <button
             onClick={handleSaveToVFS}
             title="Save to FlowOS Pictures"
-            className={`flex items-center gap-1 rounded border px-2.5 py-1 font-mono text-[10px] font-medium transition-all shadow-sm ${
+            className={`flex items-center gap-1 rounded-lg border px-3 py-1 font-mono text-[10px] font-semibold transition-all shadow-sm cursor-pointer ${
               isSaved
-                ? 'border-border-subtle bg-surface-subtle text-emerald-400'
-                : 'border-accent-primary bg-accent-primary text-white hover:bg-accent-hover active:scale-95'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                : 'border-white bg-white text-black hover:bg-neutral-200 active:scale-95'
             }`}
           >
-            {isSaved ? <Check className="h-3 w-3" /> : <Save className="h-3 w-3" />}
+            {isSaved ? <Check className="h-3 w-3 text-emerald-400" /> : <Save className="h-3 w-3 text-black" />}
             <span>{isSaved ? 'Saved' : 'Save'}</span>
           </button>
         </div>
       </div>
 
       {/* Drawing Canvas Viewport */}
-      <div className="relative flex-1 overflow-hidden bg-surface-subtle/30 p-2 flex items-center justify-center">
+      <div className="relative flex-1 overflow-hidden bg-[#07080b] p-3 flex items-center justify-center">
         <canvas
           ref={canvasRef}
           width={1024}

@@ -171,58 +171,58 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
   return (
     <div
       onClick={() => inputRef.current?.focus()}
-      className="flex h-full w-full flex-col bg-surface-canvas text-content-primary select-text"
+      className="flex h-full w-full flex-col bg-[#08090d] text-neutral-100 select-text"
     >
-      {/* Warp Top Session Bar */}
-      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3.5 py-1.5 font-mono text-[10px] text-content-tertiary select-none">
+      {/* Ghostty/Warp Top Session Bar */}
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0e1017] px-3.5 py-2 font-mono text-[10px] text-neutral-400 select-none">
         <div className="flex items-center gap-2">
-          <TerminalIcon className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="text-content-primary font-medium">flowsh</span>
-          <span className="opacity-40">//</span>
-          <span className="flex items-center gap-1 text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <TerminalIcon className="h-3.5 w-3.5 text-white" />
+          <span className="text-white font-semibold">flowsh</span>
+          <span className="text-white/20">//</span>
+          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             zsh-mode
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1 text-content-secondary">
-            <GitBranch className="h-3 w-3 text-accent-primary" />
+          <span className="flex items-center gap-1.5 text-neutral-300 font-medium bg-white/[0.05] border border-white/10 px-2 py-0.5 rounded-md">
+            <GitBranch className="h-3 w-3 text-neutral-400" />
             main
           </span>
-          <span>win: {windowId.slice(-4)}</span>
+          <span className="text-neutral-500 font-mono">win:{windowId.slice(-4)}</span>
         </div>
       </div>
 
       {/* Warp Block Command Execution Feed */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-3 space-y-3 font-mono text-xs"
+        className="flex-1 overflow-y-auto p-3.5 space-y-3 font-mono text-xs scrollbar-none no-scrollbar"
       >
         {blocks.map((block) => (
           <div
             key={block.id}
-            className="group relative rounded-lg border border-border-subtle bg-surface-panel/90 shadow-sm transition-all hover:border-border-strong"
+            className="group relative rounded-xl border border-white/[0.10] bg-[#11131c] shadow-md transition-all hover:border-white/20"
           >
             {/* Warp Block Header Bar */}
-            <div className="flex items-center justify-between border-b border-border-subtle/60 bg-surface-subtle/30 px-3 py-1.5 text-[10px] text-content-tertiary select-none">
-              <div className="flex items-center gap-2 truncate">
+            <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#161824] px-3.5 py-2 text-[10px] text-neutral-400 select-none rounded-t-xl">
+              <div className="flex items-center gap-2.5 truncate">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span className="flex items-center gap-1 text-content-secondary">
-                  <Folder className="h-2.5 w-2.5 text-accent-primary" />
+                <span className="flex items-center gap-1.5 text-neutral-300 font-medium">
+                  <Folder className="h-3 w-3 text-neutral-400" />
                   {block.cwd.replace('/home/user', '~')}
                 </span>
-                <span className="text-content-primary font-semibold truncate">
+                <span className="text-white font-semibold truncate">
                   {block.command}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="flex items-center gap-1 opacity-75">
+              <div className="flex items-center gap-2.5 shrink-0">
+                <span className="flex items-center gap-1 text-neutral-400">
                   <Clock className="h-2.5 w-2.5" />
                   {block.durationMs}ms
                 </span>
-                <span className="text-[9px] opacity-40">{block.timestamp}</span>
+                <span className="text-[9px] text-neutral-500">{block.timestamp}</span>
 
                 {/* Warp Copy Action on Hover */}
                 <button
@@ -231,7 +231,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
                     handleCopyOutput(block);
                   }}
                   title="Copy Block Output"
-                  className="ml-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded bg-surface-subtle border border-border-subtle px-1.5 py-0.5 text-[9px] text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-all"
+                  className="ml-1 opacity-0 group-hover:opacity-100 flex items-center gap-1 rounded-md bg-white/[0.08] border border-white/10 px-2 py-0.5 text-[9px] text-neutral-200 hover:bg-white/15 hover:text-white transition-all cursor-pointer"
                 >
                   {copiedBlockId === block.id ? (
                     <>
@@ -248,8 +248,8 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
 
             {/* Block Output Body */}
             {block.output && (
-              <div className="p-3">
-                <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-content-secondary">
+              <div className="p-3.5 bg-[#0c0e15] rounded-b-xl">
+                <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-neutral-200">
                   {block.output}
                 </pre>
               </div>
@@ -259,17 +259,17 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       </div>
 
       {/* Warp Prompt Bar (Modern Developer Input) */}
-      <div className="border-t border-border-subtle bg-surface-overlay/90 p-2.5">
-        <div className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-panel px-3 py-2 shadow-inner focus-within:border-accent-primary/60 focus-within:ring-1 focus-within:ring-accent-primary/30 transition-all">
+      <div className="border-t border-white/[0.08] bg-[#0e1017] p-3">
+        <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-[#12141c] px-3.5 py-2.5 shadow-lg focus-within:border-white/30 focus-within:bg-[#161824] transition-all">
           {/* Path Badge */}
-          <div className="flex items-center gap-1 rounded bg-surface-subtle border border-border-subtle px-2 py-0.5 font-mono text-[10px] text-content-secondary select-none shrink-0">
-            <Folder className="h-3 w-3 text-accent-primary" />
+          <div className="flex items-center gap-1.5 rounded-lg bg-white/[0.06] border border-white/10 px-2 py-1 font-mono text-[10px] text-neutral-200 select-none shrink-0 font-medium">
+            <Folder className="h-3 w-3 text-neutral-400" />
             <span>{cwd.replace('/home/user', '~')}</span>
           </div>
 
           {/* Git Branch Badge */}
-          <div className="flex items-center gap-1 rounded bg-accent-primary/15 px-1.5 py-0.5 font-mono text-[10px] text-accent-hover select-none shrink-0">
-            <GitBranch className="h-2.5 w-2.5" />
+          <div className="flex items-center gap-1 rounded-lg bg-white/[0.05] border border-white/10 px-2 py-1 font-mono text-[10px] text-neutral-300 select-none shrink-0 font-medium">
+            <GitBranch className="h-2.5 w-2.5 text-neutral-400" />
             <span>main</span>
           </div>
 
@@ -284,7 +284,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
             onKeyDown={handleKeyDown}
             placeholder="Type command (try 'ls', 'ps', 'help')..."
             autoFocus
-            className="flex-1 bg-transparent font-mono text-xs text-content-primary placeholder:text-content-tertiary outline-none caret-accent-primary"
+            className="flex-1 bg-transparent font-mono text-xs text-white placeholder:text-neutral-500 outline-none caret-white"
           />
         </div>
       </div>

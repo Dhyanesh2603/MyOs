@@ -46,16 +46,16 @@ export const AppStoreApp: React.FC<AppProps> = () => {
   const featured = packages[0];
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none overflow-y-auto">
+    <div className="flex h-full w-full flex-col bg-[#08090d] text-neutral-100 select-none overflow-y-auto scrollbar-none no-scrollbar">
       {/* App Store Header & Search */}
-      <div className="flex flex-wrap items-center justify-between border-b border-border-subtle bg-surface-overlay/80 p-4 gap-3 sticky top-0 z-10 backdrop-blur-md">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-accent-fg shadow-sm">
+      <div className="flex flex-wrap items-center justify-between border-b border-white/[0.08] bg-[#0e1017]/95 p-4 gap-3 sticky top-0 z-10 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.08] border border-white/10 text-white shadow-sm">
             <ShoppingBag className="h-4 w-4" />
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-tight">Flow App Store</h1>
-            <p className="text-[10px] text-content-tertiary">
+            <h1 className="text-sm font-bold tracking-tight text-white">Flow App Store</h1>
+            <p className="text-[10px] text-neutral-400">
               Discover and install verified community apps and plugins
             </p>
           </div>
@@ -64,13 +64,13 @@ export const AppStoreApp: React.FC<AppProps> = () => {
         {/* Search Bar & Package Web App Button */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative flex items-center w-full sm:w-60">
-            <Search className="absolute left-3 h-3.5 w-3.5 text-content-tertiary" />
+            <Search className="absolute left-3 h-3.5 w-3.5 text-neutral-400" />
             <input
               type="text"
               placeholder="Search applications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-border-subtle bg-surface-subtle/60 py-1.5 pl-9 pr-3 text-xs text-content-primary placeholder-content-tertiary outline-none focus:border-accent transition-all"
+              className="w-full rounded-xl border border-white/10 bg-[#161824] py-1.5 pl-9 pr-3 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-white/30 transition-all"
             />
           </div>
           <button
@@ -78,9 +78,9 @@ export const AppStoreApp: React.FC<AppProps> = () => {
               soundEngine.playClick();
               openCreateModal();
             }}
-            className="flex items-center gap-1.5 rounded-xl bg-accent-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+            className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-1.5 text-xs font-bold text-black shadow-md hover:bg-neutral-200 active:scale-95 transition-all whitespace-nowrap cursor-pointer"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5 text-black" />
             <span>Package Web App</span>
           </button>
         </div>
@@ -89,37 +89,37 @@ export const AppStoreApp: React.FC<AppProps> = () => {
       <div className="p-6 space-y-6">
         {/* Featured Hero Banner */}
         {featured && !searchQuery && selectedCategory === 'all' && (
-          <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/20 via-surface-subtle to-surface-panel p-6 shadow-xl">
-            <div className="relative z-10 max-w-md space-y-2">
-              <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-accent font-semibold">
+          <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-white/[0.08] via-white/[0.03] to-transparent p-6 shadow-xl">
+            <div className="relative z-10 max-w-md space-y-2.5">
+              <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-emerald-400 font-bold">
                 <Sparkles className="h-3.5 w-3.5" />
                 <span>Featured Application</span>
               </div>
-              <h2 className="text-xl font-bold tracking-tight text-content-primary">
+              <h2 className="text-xl font-bold tracking-tight text-white">
                 {featured.name}
               </h2>
-              <p className="text-xs text-content-secondary leading-relaxed">
+              <p className="text-xs text-neutral-300 leading-relaxed">
                 {featured.description}
               </p>
               <div className="pt-2 flex items-center gap-3">
                 {featured.installed ? (
                   <button
                     onClick={() => launchApp(featured.id)}
-                    className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-fg shadow-sm hover:scale-105 active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-bold text-black shadow hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
                   >
-                    <Play className="h-3.5 w-3.5 fill-current" />
+                    <Play className="h-3.5 w-3.5 fill-black" />
                     <span>Launch</span>
                   </button>
                 ) : (
                   <button
                     onClick={() => installPackage(featured.id)}
-                    className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-fg shadow-sm hover:scale-105 active:scale-95 transition-all"
+                    className="flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-bold text-black shadow hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
                   >
-                    <Download className="h-3.5 w-3.5" />
+                    <Download className="h-3.5 w-3.5 text-black" />
                     <span>Get ({featured.sizeKb} KB)</span>
                   </button>
                 )}
-                <div className="flex items-center gap-1 font-mono text-xs text-amber-400">
+                <div className="flex items-center gap-1 font-mono text-xs text-amber-400 bg-black/40 px-2 py-1 rounded-lg border border-white/10">
                   <Star className="h-3.5 w-3.5 fill-current" />
                   <span>{featured.rating}</span>
                 </div>
@@ -129,7 +129,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
         )}
 
         {/* Category Selector Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-border-subtle pb-3 overflow-x-auto text-xs font-medium">
+        <div className="flex items-center gap-1.5 border-b border-white/[0.08] pb-3 overflow-x-auto text-xs font-medium scrollbar-none no-scrollbar">
           {[
             { id: 'all', label: 'All Packages' },
             { id: 'developer', label: 'Developer' },
@@ -140,10 +140,10 @@ export const AppStoreApp: React.FC<AppProps> = () => {
             <button
               key={tab.id}
               onClick={() => setSelectedCategory(tab.id)}
-              className={`rounded-lg px-3 py-1.5 transition-all ${
+              className={`rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
                 selectedCategory === tab.id
-                  ? 'bg-surface-subtle text-accent border border-border-subtle font-semibold shadow-xs'
-                  : 'text-content-tertiary hover:bg-surface-hover hover:text-content-primary'
+                  ? 'bg-white text-black font-bold shadow-md'
+                  : 'text-neutral-400 hover:bg-white/[0.05] hover:text-white border border-transparent'
               }`}
             >
               {tab.label}
@@ -156,8 +156,8 @@ export const AppStoreApp: React.FC<AppProps> = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-accent" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-content-secondary">
+                <Globe className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-300">
                   Custom Web Apps ({customApps.length})
                 </h3>
               </div>
@@ -169,7 +169,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                 return (
                   <div
                     key={app.id}
-                    className="flex flex-col justify-between rounded-2xl border border-border-subtle bg-surface-card p-4 shadow-sm hover:border-accent/40 transition-all"
+                    className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#12141c] p-4 shadow-sm hover:border-white/20 transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <div
@@ -180,27 +180,27 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
-                          <h4 className="truncate text-xs font-bold text-content-primary">
+                          <h4 className="truncate text-xs font-bold text-white">
                             {app.name}
                           </h4>
-                          <span className="rounded bg-surface-subtle px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-content-tertiary">
+                          <span className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
                             {app.category}
                           </span>
                         </div>
-                        <p className="mt-1 line-clamp-1 font-mono text-[10px] text-content-tertiary">
+                        <p className="mt-1 line-clamp-1 font-mono text-[10px] text-neutral-400">
                           {app.url}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between border-t border-border-subtle/60 pt-2.5">
-                      <span className="font-mono text-[10px] text-emerald-400">
+                    <div className="mt-3.5 flex items-center justify-between border-t border-white/[0.08] pt-2.5">
+                      <span className="font-mono text-[10px] text-emerald-400 font-medium">
                         ● Installed
                       </span>
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => launchApp(app.id)}
-                          className="flex items-center gap-1 rounded-lg bg-surface-panel border border-border-subtle px-2.5 py-1 text-xs font-semibold text-content-primary hover:bg-accent hover:text-accent-fg transition-all"
+                          className="flex items-center gap-1 rounded-lg bg-white/[0.06] border border-white/10 px-2.5 py-1 text-xs font-semibold text-white hover:bg-white/15 transition-all cursor-pointer"
                         >
                           <Play className="h-3 w-3 fill-current" />
                           <span>Open</span>
@@ -208,7 +208,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                         <button
                           onClick={() => deleteWebApp(app.id)}
                           title="Uninstall"
-                          className="rounded-lg p-1 text-content-tertiary hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                          className="rounded-lg p-1 text-neutral-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -227,7 +227,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
             return (
               <div
                 key={pkg.id}
-                className="flex flex-col justify-between rounded-2xl border border-border-subtle bg-surface-subtle/30 p-4 hover:border-border-strong hover:bg-surface-subtle/60 transition-all shadow-sm"
+                className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#12141c] p-4 hover:border-white/20 hover:bg-[#161824] transition-all shadow-sm"
               >
                 <div>
                   <div className="flex items-start justify-between">
@@ -235,27 +235,27 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                       <IosAppIcon appId={pkg.id} className="h-full w-full" />
                     </div>
 
-                    <div className="flex items-center gap-1 font-mono text-xs text-amber-400 bg-surface-panel/80 px-2 py-0.5 rounded-lg border border-border-subtle">
+                    <div className="flex items-center gap-1 font-mono text-xs text-amber-400 bg-black/40 px-2 py-0.5 rounded-lg border border-white/10">
                       <Star className="h-3 w-3 fill-current" />
                       <span>{pkg.rating}</span>
                     </div>
                   </div>
 
                   <div className="mt-3">
-                    <h3 className="text-sm font-semibold text-content-primary">
+                    <h3 className="text-sm font-bold text-white">
                       {pkg.name}
                     </h3>
-                    <p className="font-mono text-[10px] text-content-tertiary">
+                    <p className="font-mono text-[10px] text-neutral-400">
                       by {pkg.author} • v{pkg.version}
                     </p>
-                    <p className="mt-2 text-xs leading-relaxed text-content-secondary line-clamp-2">
+                    <p className="mt-2 text-xs leading-relaxed text-neutral-300 line-clamp-2">
                       {pkg.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-border-subtle/60 pt-3">
-                  <span className="font-mono text-[10px] text-content-tertiary">
+                <div className="mt-4 flex items-center justify-between border-t border-white/[0.08] pt-3">
+                  <span className="font-mono text-[10px] text-neutral-400">
                     {pkg.sizeKb} KB
                   </span>
 
@@ -264,7 +264,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                       <>
                         <button
                           onClick={() => launchApp(pkg.id)}
-                          className="flex items-center gap-1 rounded-lg bg-surface-panel border border-border-subtle px-3 py-1.5 text-xs font-semibold text-content-primary hover:bg-accent hover:text-accent-fg hover:border-accent transition-all active:scale-95"
+                          className="flex items-center gap-1 rounded-lg bg-white/[0.06] border border-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/15 transition-all active:scale-95 cursor-pointer"
                         >
                           <Play className="h-3 w-3 fill-current" />
                           <span>Open</span>
@@ -272,7 +272,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                         <button
                           onClick={() => uninstallPackage(pkg.id)}
                           title="Uninstall"
-                          className="rounded-lg p-1.5 text-content-tertiary hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                          className="rounded-lg p-1.5 text-neutral-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -280,9 +280,9 @@ export const AppStoreApp: React.FC<AppProps> = () => {
                     ) : (
                       <button
                         onClick={() => installPackage(pkg.id)}
-                        className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-fg shadow-xs hover:opacity-90 active:scale-95 transition-all"
+                        className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-black shadow-sm hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
                       >
-                        <Download className="h-3 w-3" />
+                        <Download className="h-3 w-3 text-black" />
                         <span>Install</span>
                       </button>
                     )}

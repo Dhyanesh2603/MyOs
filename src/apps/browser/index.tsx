@@ -842,7 +842,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
   );
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none text-xs">
+    <div className="flex h-full w-full flex-col bg-[#0a0b10] text-neutral-100 select-none text-xs">
       {/* Hidden file input for opening host PC files */}
       <input
         ref={fileInputRef}
@@ -851,8 +851,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
         className="hidden"
       />
 
-      {/* Browser Tab Bar */}
-      <div className="flex h-9 items-center border-b border-border-subtle bg-surface-overlay/90 px-2 gap-1 overflow-x-auto">
+      {/* Modern Browser Tab Bar */}
+      <div className="flex h-10 items-center border-b border-white/[0.08] bg-[#0f1118] px-2.5 gap-1.5 overflow-x-auto scrollbar-none no-scrollbar">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
           const isYouTubeTab =
@@ -863,13 +863,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
             <div
               key={tab.id}
               onClick={() => handleSelectTab(tab)}
-              className={`group flex h-7 max-w-[190px] min-w-[110px] items-center justify-between rounded-md px-2.5 transition-colors cursor-pointer border ${
+              className={`group flex h-7.5 max-w-[200px] min-w-[120px] items-center justify-between rounded-lg px-3 transition-colors cursor-pointer border ${
                 isActive
-                  ? 'border-border-subtle bg-surface-panel text-content-primary shadow-sm font-medium'
-                  : 'border-transparent text-content-tertiary hover:bg-surface-subtle/50 hover:text-content-secondary'
+                  ? 'border-white/15 bg-[#171924] text-white shadow-sm font-medium'
+                  : 'border-transparent text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200'
               }`}
             >
-              <div className="flex items-center gap-1.5 truncate">
+              <div className="flex items-center gap-2 truncate">
                 {isYouTubeTab ? (
                   <Play className="h-3 w-3 shrink-0 text-red-500 fill-red-500" />
                 ) : tab.mode === 'reader' ? (
@@ -877,13 +877,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
                 ) : tab.mode === 'vfs' || tab.mode === 'local' ? (
                   <Laptop className="h-3 w-3 shrink-0 text-emerald-400" />
                 ) : (
-                  <Globe className="h-3 w-3 shrink-0 text-accent-primary" />
+                  <Globe className="h-3 w-3 shrink-0 text-white/80" />
                 )}
                 <span className="truncate text-[11px]">{tab.title}</span>
               </div>
               <button
                 onClick={(e) => handleCloseTab(tab.id, e)}
-                className="rounded p-0.5 opacity-0 group-hover:opacity-100 hover:bg-surface-subtle hover:text-content-primary transition-all"
+                className="rounded p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/10 text-neutral-400 hover:text-white transition-all ml-1.5"
                 title="Close Tab"
               >
                 <X className="h-3 w-3" />
@@ -895,19 +895,19 @@ export const BrowserApp: React.FC<AppProps> = () => {
         <button
           onClick={handleNewTab}
           title="New Tab"
-          className="flex h-6 w-6 items-center justify-center rounded text-content-tertiary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
         </button>
       </div>
 
       {/* Navigation & Address Bar */}
-      <div className="flex items-center gap-1.5 border-b border-border-subtle bg-surface-overlay/50 px-2.5 py-1.5">
-        <div className="flex items-center gap-0.5 text-content-tertiary">
+      <div className="flex items-center gap-2 border-b border-white/[0.08] bg-[#12141c] px-3 py-2">
+        <div className="flex items-center gap-0.5 text-neutral-400">
           <button
             onClick={() => handleNavigate('flow://start')}
             title="Start Page"
-            className="rounded p-1 hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             <Home className="h-3.5 w-3.5" />
           </button>
@@ -915,10 +915,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
             onClick={handleBack}
             disabled={activeTab.historyIdx <= 0}
             title="Back"
-            className={`rounded p-1 transition-colors ${
+            className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
               activeTab.historyIdx > 0
-                ? 'hover:bg-surface-subtle hover:text-content-primary'
-                : 'opacity-40 cursor-not-allowed'
+                ? 'hover:bg-white/[0.06] hover:text-white cursor-pointer'
+                : 'opacity-30 cursor-not-allowed'
             }`}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -927,10 +927,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
             onClick={handleForward}
             disabled={activeTab.historyIdx >= activeTab.history.length - 1}
             title="Forward"
-            className={`rounded p-1 transition-colors ${
+            className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
               activeTab.historyIdx < activeTab.history.length - 1
-                ? 'hover:bg-surface-subtle hover:text-content-primary'
-                : 'opacity-40 cursor-not-allowed'
+                ? 'hover:bg-white/[0.06] hover:text-white cursor-pointer'
+                : 'opacity-30 cursor-not-allowed'
             }`}
           >
             <ArrowRight className="h-3.5 w-3.5" />
@@ -938,8 +938,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
           <button
             onClick={handleReload}
             title="Reload"
-            className={`rounded p-1 hover:bg-surface-subtle hover:text-content-primary transition-colors ${
-              activeTab.isLoading ? 'animate-spin text-accent-primary' : ''
+            className={`flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer ${
+              activeTab.isLoading ? 'animate-spin text-white' : ''
             }`}
           >
             <RotateCw className="h-3.5 w-3.5" />
@@ -952,15 +952,15 @@ export const BrowserApp: React.FC<AppProps> = () => {
             e.preventDefault();
             handleNavigate(inputUrl);
           }}
-          className="flex flex-1 items-center rounded-md border border-border-subtle bg-surface-panel px-2.5 py-1 transition-colors focus-within:border-accent-primary"
+          className="flex flex-1 items-center rounded-full border border-white/10 bg-black/40 px-3.5 py-1.5 transition-colors focus-within:border-white/30 focus-within:bg-black/60 shadow-inner"
         >
-          <div className="flex items-center gap-1.5 text-content-tertiary mr-1.5">
+          <div className="flex items-center gap-1.5 text-neutral-400 mr-2">
             {inputUrl.startsWith('https://') ? (
               <Lock className="h-3 w-3 text-emerald-400" />
             ) : inputUrl.startsWith('flow://youtube') || inputUrl.includes('youtube') ? (
               <Play className="h-3 w-3 text-red-500 fill-red-500" />
             ) : inputUrl.startsWith('flow://') ? (
-              <ShieldCheck className="h-3 w-3 text-accent-primary" />
+              <ShieldCheck className="h-3 w-3 text-white/80" />
             ) : inputUrl.startsWith('file:///') || inputUrl.startsWith('/device/') ? (
               <Laptop className="h-3 w-3 text-emerald-400" />
             ) : (
@@ -971,8 +971,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            placeholder="Enter web address, YouTube URL, search query, or file path (/device/...)..."
-            className="w-full bg-transparent font-mono text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+            placeholder="Search the web, enter URL, YouTube link, or host file path..."
+            className="w-full bg-transparent font-sans text-xs text-white placeholder:text-neutral-500 focus:outline-none"
           />
 
           {/* Mode Switcher inside Omnibox */}
@@ -987,10 +987,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
                     ? 'Switch to Direct Iframe Embed'
                     : 'Switch to Reader Engine (Bypasses iframe blockers)'
                 }
-                className={`ml-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                className={`ml-1.5 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${
                   activeTab.mode === 'reader'
                     ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                    : 'bg-surface-subtle text-content-secondary hover:text-content-primary hover:bg-surface-subtle/80'
+                    : 'border border-white/10 bg-white/[0.04] text-neutral-400 hover:text-white'
                 }`}
               >
                 <Zap className="h-2.5 w-2.5" />
@@ -1003,10 +1003,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
         <button
           onClick={() => fileInputRef.current?.click()}
           title="Open Local File from PC"
-          className="flex items-center gap-1 rounded border border-border-subtle bg-surface-subtle/50 px-2 py-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.02] px-2.5 py-1.5 text-neutral-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
         >
-          <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="hidden sm:inline text-[11px]">Open File</span>
+          <FolderOpen className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline text-[11px] font-medium">Open File</span>
         </button>
 
         {/* External Window Link */}
@@ -1016,7 +1016,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
             target="_blank"
             rel="noopener noreferrer"
             title="Open in native browser tab"
-            className="flex items-center rounded p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="flex items-center rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
@@ -1024,13 +1024,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
       </div>
 
       {/* Bookmarks Bar */}
-      <div className="flex items-center gap-1.5 border-b border-border-subtle bg-surface-overlay/30 px-3 py-1 text-[11px] text-content-tertiary overflow-x-auto">
-        <Bookmark className="h-3 w-3 shrink-0 opacity-60 mr-1" />
+      <div className="flex items-center gap-1.5 border-b border-white/[0.06] bg-[#0f1118]/60 px-3 py-1 text-[11px] text-neutral-400 overflow-x-auto scrollbar-none no-scrollbar">
+        <Bookmark className="h-3 w-3 shrink-0 opacity-50 mr-1" />
         {DEFAULT_BOOKMARKS.map((bm) => (
           <button
             key={bm.name}
             onClick={() => handleNavigate(bm.url, bm.mode)}
-            className="flex items-center gap-1 rounded px-2 py-0.5 hover:bg-surface-subtle hover:text-content-primary transition-colors font-medium whitespace-nowrap"
+            className="flex items-center gap-1 rounded-md px-2 py-0.5 hover:bg-white/[0.05] hover:text-white transition-colors font-medium whitespace-nowrap cursor-pointer"
           >
             {bm.name === 'YouTube' ? (
               <Play className="h-2.5 w-2.5 fill-red-500 text-red-500" />
@@ -1041,7 +1041,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 
         {/* Mounted Device Shortcut in Bookmarks */}
         {mountedFolders.length > 0 && (
-          <div className="flex items-center gap-1 ml-auto pl-2 border-l border-border-subtle">
+          <div className="flex items-center gap-1 ml-auto pl-2 border-l border-white/10">
             <Laptop className="h-3 w-3 text-emerald-400" />
             <span className="text-[10px] text-emerald-400 font-medium truncate max-w-[120px]">
               {mountedFolders[0]?.name}
@@ -1051,19 +1051,19 @@ export const BrowserApp: React.FC<AppProps> = () => {
       </div>
 
       {/* Browser Viewport */}
-      <div className="relative flex-1 overflow-hidden bg-surface-panel">
+      <div className="relative flex-1 overflow-hidden bg-[#0a0b10]">
         {activeTab.url === 'flow://start' ? (
-          /* FlowOS Start Page */
-          <div className="flex h-full w-full flex-col items-center justify-start p-6 overflow-y-auto">
+          /* Start Page */
+          <div className="flex h-full w-full flex-col items-center justify-start p-6 overflow-y-auto scrollbar-none no-scrollbar">
             <div className="flex flex-col items-center text-center max-w-xl w-full my-auto py-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-accent-primary/20 bg-accent-primary/10 text-accent-primary mb-3 shadow-sm">
-                <Globe className="h-6 w-6" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white mb-3 shadow-lg">
+                <Globe className="h-6 w-6 text-white" />
               </div>
-              <h2 className="font-sans text-xl font-bold tracking-tight text-content-primary">
-                FlowOS Web & Device Browser
+              <h2 className="font-sans text-xl font-bold tracking-tight text-white">
+                Flow Web & Files
               </h2>
-              <p className="mt-1 text-xs text-content-tertiary">
-                Direct Iframe Web Embed, Bypass Reader Engine, Universal YouTube Client, and Real Host File Access.
+              <p className="mt-1 text-xs text-neutral-400">
+                Direct sandboxed web embed, bypass reader engine, live YouTube client, and local storage.
               </p>
 
               {/* Start Page Search Omnibox */}
@@ -1072,42 +1072,42 @@ export const BrowserApp: React.FC<AppProps> = () => {
                   e.preventDefault();
                   handleNavigate(inputUrl);
                 }}
-                className="mt-5 flex w-full items-center rounded-xl border border-border-subtle bg-surface-subtle/50 px-3.5 py-2 shadow-sm transition-all focus-within:border-accent-primary focus-within:bg-surface-panel"
+                className="mt-6 flex w-full items-center rounded-xl border border-white/15 bg-[#12141c] px-4 py-2.5 shadow-xl transition-all focus-within:border-white/30 focus-within:bg-[#171924]"
               >
-                <Search className="h-4 w-4 text-content-tertiary mr-2.5" />
+                <Search className="h-4 w-4 text-neutral-400 mr-2.5 shrink-0" />
                 <input
                   type="text"
                   value={inputUrl === 'flow://start' ? '' : inputUrl}
                   onChange={(e) => setInputUrl(e.target.value)}
-                  placeholder="Search the web with DuckDuckGo or enter URL / file path..."
-                  className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+                  placeholder="Search DuckDuckGo or enter URL / file path..."
+                  className="w-full bg-transparent text-xs text-white placeholder:text-neutral-500 focus:outline-none"
                 />
               </form>
 
               {/* Quick Bookmarks */}
-              <div className="mt-6 w-full">
-                <div className="text-[11px] font-medium text-content-secondary text-left mb-2 px-1">
-                  Featured Web Destinations
+              <div className="mt-7 w-full">
+                <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider text-left mb-2.5 px-1">
+                  Speed Dial
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full">
                   {DEFAULT_BOOKMARKS.map((bm) => (
                     <button
                       key={bm.name}
                       onClick={() => handleNavigate(bm.url, bm.mode)}
-                      className="flex items-center gap-2.5 rounded-lg border border-border-subtle bg-surface-subtle/30 p-2.5 hover:border-accent-primary/40 hover:bg-surface-subtle transition-all text-left group"
+                      className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-[#12141c] p-3 hover:border-white/20 hover:bg-[#181a24] transition-all text-left group cursor-pointer"
                     >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-surface-panel border border-border-subtle text-accent-primary group-hover:scale-105 transition-transform">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] border border-white/10 text-white group-hover:scale-105 transition-transform">
                         {bm.name === 'YouTube' ? (
                           <Play className="h-3.5 w-3.5 fill-red-500 text-red-500" />
                         ) : bm.mode === 'reader' ? (
                           <Zap className="h-3.5 w-3.5 text-amber-400" />
                         ) : (
-                          <Globe className="h-3.5 w-3.5" />
+                          <Globe className="h-3.5 w-3.5 text-white/90" />
                         )}
                       </div>
                       <div className="truncate">
-                        <div className="font-medium text-xs text-content-primary truncate">{bm.name}</div>
-                        <div className="text-[10px] text-content-tertiary truncate">
+                        <div className="font-medium text-xs text-white truncate">{bm.name}</div>
+                        <div className="text-[10px] text-neutral-400 truncate">
                           {bm.url === 'flow://youtube' ? 'Video Player & Search' : bm.url.replace(/^https?:\/\//, '')}
                         </div>
                       </div>
@@ -1117,29 +1117,29 @@ export const BrowserApp: React.FC<AppProps> = () => {
               </div>
 
               {/* Host Device Storage Section */}
-              <div className="mt-6 w-full rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-left">
+              <div className="mt-6 w-full rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4 text-left">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Laptop className="h-4 w-4 text-emerald-400" />
-                    <span className="font-semibold text-xs text-content-primary">
+                    <span className="font-semibold text-xs text-emerald-100">
                       Host Device Files & Storage
                     </span>
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-400/20">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-400/25">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     {mountedFolders.length > 0 ? `${mountedFolders.length} Folders Connected` : 'Ready to Connect'}
                   </span>
                 </div>
 
-                <p className="text-[11px] text-content-tertiary mb-3">
-                  Connect physical directories from your computer or pick individual HTML/SVG/text files to render directly inside the browser.
+                <p className="text-[11px] text-neutral-400 mb-3">
+                  Connect physical directories from your computer or open local HTML, SVG, and media files directly.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => mountDirectoryPicker()}
                     disabled={isMounting}
-                    className="flex items-center gap-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 text-xs font-medium transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
                   >
                     <FolderSync className={`h-3.5 w-3.5 ${isMounting ? 'animate-spin' : ''}`} />
                     <span>{isMounting ? 'Connecting...' : 'Mount Host PC Folder'}</span>
@@ -1147,28 +1147,28 @@ export const BrowserApp: React.FC<AppProps> = () => {
 
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-1.5 rounded-lg bg-surface-subtle hover:bg-surface-panel text-content-primary border border-border-subtle px-3 py-1.5 text-xs font-medium transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/10 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
                   >
-                    <FolderOpen className="h-3.5 w-3.5 text-accent-primary" />
+                    <FolderOpen className="h-3.5 w-3.5" />
                     <span>Open File from PC</span>
                   </button>
                 </div>
 
                 {/* Show list of real files if mounted */}
                 {deviceFiles.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-emerald-500/15">
-                    <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-400/80 mb-2">
+                  <div className="mt-3 pt-3 border-t border-emerald-500/20">
+                    <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-400 mb-2">
                       Mounted Device Files ({deviceFiles.length}):
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-36 overflow-y-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-36 overflow-y-auto scrollbar-none no-scrollbar">
                       {deviceFiles.slice(0, 8).map((df) => (
                         <button
                           key={df.path}
                           onClick={() => handleNavigate(df.path)}
-                          className="flex items-center gap-2 rounded px-2 py-1 bg-surface-panel/60 hover:bg-surface-panel border border-border-subtle text-left text-[11px] truncate transition-colors"
+                          className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 bg-black/40 hover:bg-black/60 border border-white/10 text-left text-[11px] truncate transition-colors cursor-pointer"
                         >
-                          <FileCode className="h-3 w-3 text-accent-primary shrink-0" />
-                          <span className="truncate text-content-primary font-mono">{df.name}</span>
+                          <FileCode className="h-3 w-3 text-emerald-400 shrink-0" />
+                          <span className="truncate text-neutral-200 font-mono">{df.name}</span>
                         </button>
                       ))}
                     </div>
@@ -1177,44 +1177,44 @@ export const BrowserApp: React.FC<AppProps> = () => {
               </div>
 
               {/* Engine Capabilities Footer */}
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[10px] text-content-tertiary">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[10px] text-neutral-500">
                 <div className="flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-accent-primary" />
-                  <span>Full Iframe Sandbox</span>
+                  <ShieldCheck className="h-3.5 w-3.5 text-neutral-400" />
+                  <span>Iframe Sandbox</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Play className="h-3.5 w-3.5 text-red-500 fill-red-500" />
-                  <span>Live Universal YouTube</span>
+                  <span>YouTube Catalog</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Zap className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Jina Reader Engine</span>
+                  <span>Reader Engine</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Laptop className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>W3C File System Access</span>
+                  <span>File System Access</span>
                 </div>
               </div>
             </div>
           </div>
         ) : activeTab.url === 'flow://youtube' ? (
           /* FlowTube - Universal Live YouTube Client */
-          <div className="flex h-full w-full flex-col bg-surface-panel p-4 overflow-y-auto">
+          <div className="flex h-full w-full flex-col bg-[#0a0b10] p-4 overflow-y-auto scrollbar-none no-scrollbar">
             <div className="max-w-6xl w-full mx-auto flex flex-col gap-4">
               {/* Header / YouTube Bar */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-border-subtle pb-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-md">
                     <Play className="h-4 w-4 fill-white ml-0.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h2 className="font-bold text-sm tracking-tight text-content-primary">FlowTube</h2>
-                      <span className="rounded bg-red-600/10 border border-red-600/30 px-1.5 py-0.2 text-[9px] font-bold text-red-400 uppercase tracking-wider">
+                      <h2 className="font-bold text-sm tracking-tight text-white">FlowTube</h2>
+                      <span className="rounded bg-red-600/20 border border-red-500/30 px-1.5 py-0.5 text-[9px] font-bold text-red-400 uppercase tracking-wider">
                         Universal
                       </span>
                     </div>
-                    <p className="text-[11px] text-content-tertiary">
+                    <p className="text-[11px] text-neutral-400">
                       Search, browse, and watch any video in the entire YouTube catalog
                     </p>
                   </div>
@@ -1230,20 +1230,20 @@ export const BrowserApp: React.FC<AppProps> = () => {
                   }}
                   className="flex flex-1 sm:max-w-md items-center gap-1.5"
                 >
-                  <div className="flex flex-1 items-center rounded-lg border border-border-subtle bg-surface-subtle/50 px-3 py-1.5 focus-within:border-red-500 focus-within:bg-surface-panel transition-all">
-                    <Search className="h-3.5 w-3.5 text-content-tertiary mr-2 shrink-0" />
+                  <div className="flex flex-1 items-center rounded-lg border border-white/10 bg-[#12141c] px-3 py-1.5 focus-within:border-red-500 focus-within:bg-[#161822] transition-all">
+                    <Search className="h-3.5 w-3.5 text-neutral-400 mr-2 shrink-0" />
                     <input
                       type="text"
                       value={ytQuery}
                       onChange={(e) => setYtQuery(e.target.value)}
                       placeholder="Search any video, topic, or paste YouTube link..."
-                      className="w-full bg-transparent text-xs text-content-primary placeholder:text-content-tertiary focus:outline-none"
+                      className="w-full bg-transparent text-xs text-white placeholder:text-neutral-500 focus:outline-none"
                     />
                     {ytQuery && (
                       <button
                         type="button"
                         onClick={() => setYtQuery('')}
-                        className="text-content-tertiary hover:text-content-primary"
+                        className="text-neutral-400 hover:text-white"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -1268,7 +1268,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                   href="https://www.youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden md:flex items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-subtle px-3 py-1.5 text-[11px] font-medium text-content-secondary hover:bg-surface-overlay hover:text-content-primary transition-colors shrink-0"
+                  className="hidden md:flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors shrink-0"
                 >
                   <span>Native Tab</span>
                   <ExternalLink className="h-3 w-3" />
@@ -1276,7 +1276,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
               </div>
 
               {/* Category Filter Rail */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
                 {YOUTUBE_CATEGORIES.map((cat) => {
                   const isActive = ytActiveCategory === cat.label;
                   return (
@@ -1286,7 +1286,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
                         isActive
                           ? 'bg-red-600 text-white shadow-sm'
-                          : 'bg-surface-subtle text-content-secondary hover:bg-surface-overlay hover:text-content-primary border border-border-subtle'
+                          : 'bg-[#12141c] text-neutral-400 hover:bg-[#181a24] hover:text-white border border-white/10'
                       }`}
                     >
                       {cat.label}
@@ -1297,7 +1297,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 
               {/* Active Video Player (Theater Mode) */}
               {ytActiveVideo && (
-                <div className="relative w-full rounded-2xl overflow-hidden border border-border-subtle bg-black shadow-2xl">
+                <div className="relative w-full rounded-2xl overflow-hidden border border-white/15 bg-black shadow-2xl">
                   {/* Top Bar inside Player */}
                   <div className="flex items-center justify-between bg-black/90 backdrop-blur px-4 py-2 border-b border-white/10 text-white">
                     <div className="flex items-center gap-2 truncate pr-4">
@@ -1310,14 +1310,14 @@ export const BrowserApp: React.FC<AppProps> = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Open in native YouTube tab"
-                        className="p-1 rounded hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+                        className="p-1 rounded hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                       <button
                         onClick={() => setYtActiveVideo(null)}
                         title="Close Player and view feed"
-                        className="p-1 rounded hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                        className="p-1 rounded hover:bg-white/10 text-neutral-300 hover:text-white transition-colors cursor-pointer"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -1343,10 +1343,10 @@ export const BrowserApp: React.FC<AppProps> = () => {
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-red-500" />
-                  <span className="font-semibold text-xs text-content-primary">
+                  <span className="font-semibold text-xs text-white">
                     {ytActiveCategory}
                   </span>
-                  <span className="text-[10px] text-content-tertiary">
+                  <span className="text-[10px] text-neutral-400">
                     ({ytVideos.length} videos loaded)
                   </span>
                 </div>
@@ -1361,7 +1361,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 
               {/* Search Error Notice (if any) */}
               {ytSearchError && (
-                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
+                <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
                   {ytSearchError}
                 </div>
               )}
@@ -1379,8 +1379,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
                       }}
                       className={`group flex flex-col rounded-xl border overflow-hidden cursor-pointer transition-all duration-200 ${
                         isCurrent
-                          ? 'border-red-500 bg-red-500/10 shadow-md ring-1 ring-red-500'
-                          : 'border-border-subtle bg-surface-subtle/30 hover:border-red-500/50 hover:bg-surface-subtle hover:shadow-lg hover:-translate-y-0.5'
+                          ? 'border-red-500 bg-red-500/10 shadow-lg ring-1 ring-red-500'
+                          : 'border-white/10 bg-[#12141c] hover:border-white/20 hover:bg-[#161822] hover:shadow-xl hover:-translate-y-0.5'
                       }`}
                     >
                       {/* Video Thumbnail */}
@@ -1408,12 +1408,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
                       </div>
 
                       {/* Video Details */}
-                      <div className="p-2.5 flex flex-col flex-1 justify-between">
-                        <h3 className="font-semibold text-xs text-content-primary line-clamp-2 leading-snug group-hover:text-red-400 transition-colors">
+                      <div className="p-3 flex flex-col flex-1 justify-between">
+                        <h3 className="font-semibold text-xs text-white line-clamp-2 leading-snug group-hover:text-red-400 transition-colors">
                           {video.title}
                         </h3>
                         {video.channel && (
-                          <p className="mt-1 text-[10px] text-content-tertiary truncate">
+                          <p className="mt-1 text-[10px] text-neutral-400 truncate">
                             {video.channel}
                           </p>
                         )}
@@ -1424,14 +1424,14 @@ export const BrowserApp: React.FC<AppProps> = () => {
               </div>
 
               {/* Informative Security Banner */}
-              <div className="rounded-xl border border-border-subtle bg-surface-subtle/30 p-3 text-xs text-content-secondary flex gap-3">
-                <Info className="h-4 w-4 text-accent-primary shrink-0 mt-0.5" />
+              <div className="rounded-xl border border-white/10 bg-[#12141c] p-3 text-xs text-neutral-300 flex gap-3">
+                <Info className="h-4 w-4 text-neutral-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <div className="font-medium text-content-primary">
+                  <div className="font-medium text-white">
                     How FlowTube Universal Engine Works
                   </div>
-                  <p className="text-[11px] text-content-tertiary leading-relaxed">
-                    Google serves <code>X-Frame-Options: SAMEORIGIN</code> on <code>youtube.com</code> to prevent clickjacking of account cookies. FlowTube queries YouTube’s live catalog in real time and streams videos through YouTube’s official Embed Engine (<code>youtube.com/embed/...</code>), providing unrestricted access to the entire YouTube library directly inside FlowOS!
+                  <p className="text-[11px] text-neutral-400 leading-relaxed">
+                    Google serves <code>X-Frame-Options: SAMEORIGIN</code> on <code>youtube.com</code> to protect user sessions. FlowTube queries YouTube's live catalog and streams videos through YouTube's official embed engine, enabling full playback inside FlowOS.
                   </p>
                 </div>
               </div>
@@ -1440,13 +1440,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
         ) : activeTab.isLoading ? (
           /* Loading State */
           <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-primary/10 text-accent-primary animate-spin mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] border border-white/10 text-white animate-spin mb-3">
               <RotateCw className="h-5 w-5" />
             </div>
-            <div className="font-medium text-xs text-content-primary">
+            <div className="font-medium text-xs text-white">
               {activeTab.mode === 'reader' ? 'Loading Reader View via Proxy...' : 'Connecting to host...'}
             </div>
-            <div className="mt-1 font-mono text-[10px] text-content-tertiary truncate max-w-sm">
+            <div className="mt-1 font-mono text-[10px] text-neutral-400 truncate max-w-sm">
               {activeTab.url}
             </div>
           </div>
@@ -1454,17 +1454,17 @@ export const BrowserApp: React.FC<AppProps> = () => {
           (activeTab.mode === 'vfs' && activeTab.srcDoc) ||
           (activeTab.mode === 'local' && activeTab.srcDoc) ? (
           /* Rendered via srcDoc (Reader mode or Local HTML / Markdown / Code) */
-          <div className="relative h-full w-full">
+          <div className="relative h-full w-full bg-[#0a0b10]">
             <iframe
               title={activeTab.title}
               srcDoc={activeTab.srcDoc}
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              className="h-full w-full border-none bg-surface-panel"
+              className="h-full w-full border-none bg-[#0a0b10]"
             />
           </div>
         ) : (activeTab.mode === 'vfs' || activeTab.mode === 'local') && activeTab.mediaSrc ? (
           /* Rendered Media / PDF from Local or VFS */
-          <div className="flex h-full w-full items-center justify-center bg-black/90 p-4">
+          <div className="flex h-full w-full items-center justify-center bg-black/95 p-4">
             {activeTab.mediaSrc.startsWith('data:image/') ? (
               <img
                 src={activeTab.mediaSrc}
@@ -1481,7 +1481,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
           </div>
         ) : (
           /* Direct / Proxied Web Embed Iframe */
-          <div className="relative h-full w-full">
+          <div className="relative h-full w-full bg-[#0a0b10]">
             <iframe
               key={activeTab.refreshKey}
               src={
@@ -1504,28 +1504,28 @@ export const BrowserApp: React.FC<AppProps> = () => {
             />
 
             {/* Smart Banner: Provides status and 1-click Reader Mode fallback */}
-            <div className="absolute bottom-2.5 right-2.5 flex items-center gap-2 rounded-lg border border-border-subtle bg-surface-panel/95 backdrop-blur px-3 py-1.5 text-[11px] shadow-lg select-none">
+            <div className="absolute bottom-3 right-3 flex items-center gap-2.5 rounded-full border border-white/15 bg-[#12141c]/95 backdrop-blur-md px-3.5 py-1.5 text-[11px] shadow-2xl select-none text-neutral-300">
               <span className="text-emerald-400 flex items-center gap-1 font-medium">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Unblocked Proxy
+                Unblocked
               </span>
-              <span className="text-content-tertiary">|</span>
+              <span className="text-white/20">|</span>
               <button
                 onClick={handleToggleReader}
-                className="flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 font-medium text-amber-300 hover:bg-amber-400/30 transition-colors cursor-pointer"
+                className="flex items-center gap-1 rounded-full bg-amber-400/15 border border-amber-400/25 px-2.5 py-0.5 font-medium text-amber-300 hover:bg-amber-400/25 transition-colors cursor-pointer"
                 title="Bypass X-Frame-Options with Jina Reader Engine"
               >
                 <Zap className="h-3 w-3" />
                 <span>Reader Mode</span>
               </button>
-              <span className="text-content-tertiary">|</span>
+              <span className="text-white/20">|</span>
               <a
                 href={activeTab.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-accent-primary hover:underline font-medium"
+                className="flex items-center gap-1 text-white hover:text-neutral-300 font-medium"
               >
-                <span>New Window</span>
+                <span>New Tab</span>
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>

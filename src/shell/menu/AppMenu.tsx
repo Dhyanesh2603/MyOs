@@ -157,8 +157,8 @@ export const AppMenu: React.FC = () => {
               </div>
             </div>
 
-            {/* Category Chips */}
-            <div className="flex w-full items-center justify-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
+            {/* Category Chips Bar (Safe Flex Scroll with No-Clipped Start) */}
+            <div className="flex w-full max-w-full items-center justify-start sm:justify-center gap-1.5 overflow-x-auto px-4 py-1 scrollbar-none no-scrollbar">
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected = selectedCategory === cat.id;
@@ -170,10 +170,10 @@ export const AppMenu: React.FC = () => {
                       soundEngine.playClick();
                       setSelectedCategory(cat.id);
                     }}
-                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
                       isSelected
-                        ? 'bg-white text-black font-semibold shadow-sm scale-105'
-                        : 'border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white'
+                        ? 'bg-white text-black font-semibold shadow-sm'
+                        : 'border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/15 hover:text-white'
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5" />
@@ -191,7 +191,7 @@ export const AppMenu: React.FC = () => {
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300, delay: 0.05 }}
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 w-full max-w-4xl my-auto overflow-y-auto px-4 py-6 scrollbar-none"
+            className="flex-1 w-full max-w-4xl my-auto overflow-y-auto px-4 py-6 scrollbar-none no-scrollbar"
           >
             {filteredApps.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">

@@ -169,7 +169,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-col justify-between bg-surface-panel p-5 text-content-primary select-none overflow-hidden relative">
+    <div className="flex h-full w-full flex-col justify-between bg-[#08090d] p-5 text-neutral-100 select-none overflow-hidden relative">
       {/* Hidden File Input for Real Audio Import */}
       <input
         type="file"
@@ -181,25 +181,25 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
       />
 
       {/* Top Header / Actions Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
         <div className="flex items-center gap-2">
-          <MusicIcon className="h-4 w-4 text-accent-primary" />
-          <span className="font-semibold text-xs tracking-wide">Audio & Soundscape Engine</span>
+          <MusicIcon className="h-4 w-4 text-white" />
+          <span className="font-semibold text-xs tracking-wide text-white">Audio & Soundscape Engine</span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1 rounded-lg border border-border-subtle bg-surface-overlay/60 px-2 py-1 text-[11px] font-mono hover:bg-surface-subtle transition-all"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-mono text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-all cursor-pointer"
             title="Import audio files from your computer (MP3, WAV, FLAC, AAC)"
           >
-            <Upload className="h-3 w-3 text-accent-primary" />
-            <span>Open Audio File</span>
+            <Upload className="h-3 w-3" />
+            <span>Open Audio</span>
           </button>
 
           <button
             onClick={() => setIsStreamModalOpen(true)}
-            className="flex items-center gap-1 rounded-lg border border-border-subtle bg-surface-overlay/60 px-2 py-1 text-[11px] font-mono hover:bg-surface-subtle transition-all"
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-mono text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-all cursor-pointer"
             title="Add custom radio stream URL"
           >
             <Radio className="h-3 w-3 text-emerald-400" />
@@ -208,31 +208,31 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
 
           <button
             onClick={() => setShowPlaylist(!showPlaylist)}
-            className={`flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-mono transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-mono transition-all cursor-pointer ${
               showPlaylist
-                ? 'border-accent-primary bg-accent-primary/20 text-accent-primary font-semibold'
-                : 'border-border-subtle bg-surface-overlay/60 hover:bg-surface-subtle'
+                ? 'border-white/30 bg-white/15 text-white font-semibold'
+                : 'border-white/10 bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08] hover:text-white'
             }`}
             title="Toggle playlist"
           >
             <ListMusic className="h-3 w-3" />
-            <span>Playlist ({tracks.length})</span>
+            <span>Queue ({tracks.length})</span>
           </button>
         </div>
       </div>
 
       {showPlaylist ? (
         /* Playlist View */
-        <div className="flex-1 my-3 overflow-y-auto rounded-xl border border-border-subtle bg-surface-overlay/40 p-2 flex flex-col gap-1.5">
-          <div className="text-[10px] font-mono uppercase text-content-tertiary px-2 py-1">
+        <div className="flex-1 my-3 overflow-y-auto rounded-2xl border border-white/10 bg-[#0e1017] p-2.5 flex flex-col gap-1.5 scrollbar-none no-scrollbar">
+          <div className="text-[10px] font-mono uppercase text-neutral-400 px-2 py-1 font-semibold">
             Track Queue & Channels
           </div>
           {tracks.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center my-auto">
-              <MusicIcon className="h-8 w-8 text-content-tertiary mb-2" />
-              <p className="text-xs text-content-secondary font-medium">Playlist is empty</p>
-              <p className="text-[11px] text-content-tertiary mt-1">
-                Click &quot;Open Audio File&quot; or &quot;Add Stream&quot; above to add tracks.
+              <MusicIcon className="h-8 w-8 text-neutral-500 mb-2" />
+              <p className="text-xs text-white font-medium">Playlist is empty</p>
+              <p className="text-[11px] text-neutral-400 mt-1">
+                Click &quot;Open Audio&quot; or &quot;Add Stream&quot; above to add tracks.
               </p>
             </div>
           ) : (
@@ -242,30 +242,30 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
                 <div
                   key={track.id}
                   onClick={() => setTrack(idx)}
-                  className={`group flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-mono transition-all cursor-pointer ${
+                  className={`group flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-mono transition-all cursor-pointer ${
                     isCurrent
-                      ? 'bg-accent-primary/20 border border-accent-primary/40 text-content-primary'
-                      : 'hover:bg-surface-subtle text-content-secondary'
+                      ? 'bg-white/10 border border-white/15 text-white shadow-sm'
+                      : 'hover:bg-white/[0.04] text-neutral-300'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span className="text-[10px] text-content-tertiary w-4">
+                    <span className="text-[10px] text-neutral-400 w-4">
                       {isCurrent && isPlaying ? '▶' : `${idx + 1}`}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate text-content-primary">{track.title}</div>
-                      <div className="text-[10px] text-content-tertiary truncate">{track.artist}</div>
+                      <div className="font-semibold truncate text-white">{track.title}</div>
+                      <div className="text-[10px] text-neutral-400 truncate">{track.artist}</div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {track.isStream && (
-                      <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] text-emerald-400 border border-emerald-500/30">
+                      <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] text-emerald-400 border border-emerald-500/30 font-semibold">
                         LIVE
                       </span>
                     )}
                     {track.audioUrl && !track.isStream && (
-                      <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[9px] text-sky-400 border border-sky-500/30">
+                      <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[9px] text-sky-400 border border-sky-500/30 font-semibold">
                         AUDIO
                       </span>
                     )}
@@ -275,7 +275,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
                           e.stopPropagation();
                           removeTrack(track.id);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-content-tertiary hover:text-rose-400 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-400 hover:text-rose-400 transition-opacity cursor-pointer"
                         title="Remove from playlist"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -289,25 +289,25 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
         </div>
       ) : (
         /* Visualizer Canvas Card or Empty State */
-        <div className="relative flex flex-1 flex-col items-center justify-center rounded-2xl border border-border-subtle bg-surface-overlay/50 my-3 p-4 overflow-hidden">
+        <div className="relative flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#0f1118] my-3 p-4 overflow-hidden">
           {tracks.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center p-6 select-none">
-              <MusicIcon className="h-10 w-10 text-content-tertiary mb-3 animate-pulse" />
-              <h4 className="text-sm font-semibold text-content-primary">No Tracks in Queue</h4>
-              <p className="text-xs text-content-secondary mt-1 max-w-xs">
+              <MusicIcon className="h-10 w-10 text-neutral-500 mb-3 animate-pulse" />
+              <h4 className="text-sm font-semibold text-white">No Tracks in Queue</h4>
+              <p className="text-xs text-neutral-400 mt-1 max-w-xs">
                 Import MP3, WAV, or AAC audio files from your system or add an internet radio stream URL.
               </p>
               <div className="mt-4 flex items-center gap-2">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-1 rounded-xl bg-accent-primary px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-accent-hover transition-colors"
+                  className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-1.5 text-xs font-bold text-black shadow hover:bg-neutral-200 transition-colors cursor-pointer"
                 >
-                  <Upload className="h-3.5 w-3.5" />
+                  <Upload className="h-3.5 w-3.5 text-black" />
                   <span>Open Audio File</span>
                 </button>
                 <button
                   onClick={() => setIsStreamModalOpen(true)}
-                  className="flex items-center gap-1 rounded-xl border border-border-subtle bg-surface-overlay px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-subtle transition-colors"
+                  className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <Radio className="h-3.5 w-3.5 text-emerald-400" />
                   <span>Add Stream</span>
@@ -324,9 +324,9 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
               />
 
               {/* Ambient Disc Glyph */}
-              <div className="absolute top-4 right-4 flex items-center gap-2 text-content-tertiary">
+              <div className="absolute top-4 right-4 flex items-center gap-2 text-neutral-400">
                 <Disc
-                  className={`h-5 w-5 text-accent-primary transition-transform duration-1000 ${
+                  className={`h-5 w-5 text-white transition-transform duration-1000 ${
                     isPlaying ? 'animate-spin' : ''
                   }`}
                 />
@@ -339,24 +339,24 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
       {/* Track Metadata */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5 min-w-0 flex-1 pr-3">
-          <h3 className="font-semibold text-sm text-content-primary truncate">
+          <h3 className="font-semibold text-sm text-white truncate">
             {currentTrack ? currentTrack.title : 'No track loaded'}
           </h3>
-          <p className="font-mono text-xs text-content-secondary truncate">
+          <p className="font-mono text-xs text-neutral-400 truncate">
             {currentTrack ? currentTrack.artist : 'Playback idle • Open an audio file or stream'}
           </p>
         </div>
-        <span className="font-mono text-[10px] text-accent-hover bg-accent-primary/15 border border-accent-primary/30 px-2 py-0.5 rounded-full shrink-0">
+        <span className="font-mono text-[10px] text-white bg-white/10 border border-white/15 px-2.5 py-0.5 rounded-full shrink-0 font-medium">
           {isPlaying ? (currentTrack?.isStream ? 'Streaming Live' : 'Playing') : 'Idle'}
         </span>
       </div>
 
       {/* Playback Controls & Volume */}
-      <div className="mt-3 flex items-center justify-between border-t border-border-subtle pt-3">
+      <div className="mt-3 flex items-center justify-between border-t border-white/[0.08] pt-3">
         <div className="flex items-center gap-3">
           <button
             onClick={handlePrev}
-            className="rounded-full p-2 text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:scale-95 transition-all"
+            className="rounded-full p-2 text-neutral-300 hover:bg-white/10 hover:text-white active:scale-95 transition-all cursor-pointer"
             title="Previous Track"
           >
             <SkipBack className="h-4 w-4" />
@@ -364,19 +364,19 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
 
           <button
             onClick={handleTogglePlay}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-primary text-white shadow-md hover:bg-accent-hover active:scale-95 transition-all"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
             title={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
-              <Pause className="h-4 w-4" />
+              <Pause className="h-4 w-4 fill-black" />
             ) : (
-              <Play className="h-4 w-4 ml-0.5" />
+              <Play className="h-4 w-4 fill-black ml-0.5" />
             )}
           </button>
 
           <button
             onClick={handleNext}
-            className="rounded-full p-2 text-content-secondary hover:bg-surface-subtle hover:text-content-primary active:scale-95 transition-all"
+            className="rounded-full p-2 text-neutral-300 hover:bg-white/10 hover:text-white active:scale-95 transition-all cursor-pointer"
             title="Next Track"
           >
             <SkipForward className="h-4 w-4" />
@@ -385,7 +385,7 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
 
         {/* Volume Slider */}
         <div className="flex items-center gap-2">
-          <Volume2 className="h-4 w-4 text-content-tertiary" />
+          <Volume2 className="h-4 w-4 text-neutral-400" />
           <input
             type="range"
             min="0"
@@ -393,27 +393,27 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
             step="0.05"
             value={volume}
             onChange={(e) => handleVolumeChange(Number(e.target.value))}
-            className="w-24 accent-accent-primary cursor-pointer"
+            className="w-24 accent-white cursor-pointer"
           />
         </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between text-[9px] font-mono text-content-tertiary">
-        <span>win: {windowId.slice(-6)}</span>
+      <div className="mt-2.5 flex items-center justify-between text-[9px] font-mono text-neutral-500">
+        <span>win:{windowId.slice(-4)}</span>
         <span>HTML5 Audio + Web Audio FFT</span>
       </div>
 
       {/* Modal: Add Custom Stream */}
       {isStreamModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-border-subtle bg-surface-panel p-5 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
-              <h3 className="text-xs font-semibold font-mono text-content-primary">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/15 bg-[#12141c] p-5 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="text-xs font-bold font-mono text-white">
                 Add Internet Audio Stream
               </h3>
               <button
                 onClick={() => setIsStreamModalOpen(false)}
-                className="rounded-lg p-1 text-content-tertiary hover:bg-surface-subtle hover:text-content-primary"
+                className="rounded-lg p-1 text-neutral-400 hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -421,39 +421,39 @@ const MusicApp: React.FC<AppProps> = ({ windowId }) => {
 
             <form onSubmit={handleAddStream} className="mt-4 flex flex-col gap-3 font-mono text-xs">
               <div>
-                <label className="text-content-tertiary uppercase text-[10px]">Station Title</label>
+                <label className="text-neutral-400 uppercase text-[10px] font-semibold">Station Title</label>
                 <input
                   type="text"
                   placeholder="e.g. Chillhop Radio Live"
                   value={streamTitle}
                   onChange={(e) => setStreamTitle(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border-subtle bg-surface-overlay/50 px-3 py-2 text-content-primary outline-none focus:border-accent-primary"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-[#161824] px-3 py-2 text-white outline-none focus:border-white/30 placeholder:text-neutral-500"
                 />
               </div>
 
               <div>
-                <label className="text-content-tertiary uppercase text-[10px]">Stream URL *</label>
+                <label className="text-neutral-400 uppercase text-[10px] font-semibold">Stream URL *</label>
                 <input
                   type="url"
                   required
                   placeholder="https://... stream link"
                   value={streamUrl}
                   onChange={(e) => setStreamUrl(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-border-subtle bg-surface-overlay/50 px-3 py-2 text-content-primary outline-none focus:border-accent-primary"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-[#161824] px-3 py-2 text-white outline-none focus:border-white/30 placeholder:text-neutral-500"
                 />
               </div>
 
-              <div className="mt-2 flex justify-end gap-2 border-t border-border-subtle pt-3">
+              <div className="mt-2 flex justify-end gap-2 border-t border-white/10 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsStreamModalOpen(false)}
-                  className="rounded-xl border border-border-subtle px-3 py-1.5 text-content-tertiary hover:bg-surface-subtle"
+                  className="rounded-xl border border-white/10 px-3 py-1.5 text-neutral-300 hover:bg-white/10 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1 rounded-xl bg-accent-primary px-3 py-1.5 font-medium text-white shadow-md hover:bg-accent-hover"
+                  className="flex items-center gap-1 rounded-xl bg-white px-3 py-1.5 font-bold text-black shadow-md hover:bg-neutral-200 cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add Station</span>

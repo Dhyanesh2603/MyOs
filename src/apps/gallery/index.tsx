@@ -123,47 +123,47 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
   const handleRotate = () => setRotation((r) => (r + 90) % 360);
 
   return (
-    <div className="flex h-full w-full flex-col bg-surface-panel text-content-primary select-none text-xs">
+    <div className="flex h-full w-full flex-col bg-[#07080b] text-neutral-100 select-none text-xs">
       {/* Gallery Action Header */}
-      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-overlay/90 px-3 py-1.5">
-        <div className="flex items-center gap-2">
-          <ImageIcon className="h-3.5 w-3.5 text-accent-primary" />
-          <span className="font-sans font-medium text-content-primary">
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0e1017] px-3.5 py-2">
+        <div className="flex items-center gap-2.5">
+          <ImageIcon className="h-4 w-4 text-white" />
+          <span className="font-sans font-semibold text-white">
             {currentFile?.name ?? 'Photo Gallery'}
           </span>
           {currentFile && (
-            <span className="font-mono text-[9px] text-content-tertiary bg-surface-subtle border border-border-subtle px-1.5 py-0.2 rounded">
+            <span className="font-mono text-[9px] text-neutral-400 bg-white/[0.06] border border-white/10 px-2 py-0.5 rounded-md font-medium">
               {currentIndex + 1} / {imageFiles.length}
             </span>
           )}
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={handleZoomOut}
             title="Zoom Out"
-            className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
           >
             <ZoomOut className="h-3.5 w-3.5" />
           </button>
-          <span className="font-mono text-[10px] text-content-tertiary w-8 text-center">
+          <span className="font-mono text-[10px] text-neutral-300 w-8 text-center font-medium">
             {Math.round(zoom * 100)}%
           </span>
           <button
             onClick={handleZoomIn}
             title="Zoom In"
-            className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
           >
             <ZoomIn className="h-3.5 w-3.5" />
           </button>
 
-          <div className="h-3.5 w-px bg-border-subtle/80 mx-1" />
+          <div className="h-4 w-px bg-white/10 mx-1" />
 
           <button
             onClick={handleRotate}
             title="Rotate 90°"
-            className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
           >
             <RotateCw className="h-3.5 w-3.5" />
           </button>
@@ -171,13 +171,13 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             title={isPlaying ? 'Pause Slideshow' : 'Play Slideshow'}
-            className={`flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px] transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-[10px] transition-colors cursor-pointer ${
               isPlaying
-                ? 'bg-accent-primary text-white font-semibold'
-                : 'text-content-secondary hover:bg-surface-subtle'
+                ? 'bg-white text-black font-bold shadow'
+                : 'text-neutral-300 bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:text-white'
             }`}
           >
-            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+            {isPlaying ? <Pause className="h-3 w-3 fill-black text-black" /> : <Play className="h-3 w-3" />}
             <span className="hidden sm:inline">{isPlaying ? 'Pause' : 'Play'}</span>
           </button>
 
@@ -185,7 +185,7 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
             <button
               onClick={() => downloadVFSToPC(currentFile.path)}
               title="Download to PC"
-              className="rounded p-1 text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors"
+              className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
             </button>
@@ -194,12 +194,12 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
       </div>
 
       {/* Main Image Stage */}
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black/40 p-4">
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black/80 p-4">
         {imageFiles.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 text-center text-content-tertiary">
+          <div className="flex flex-col items-center justify-center gap-2 text-center text-neutral-500">
             <ImageIcon className="h-10 w-10 opacity-30" />
-            <h4 className="font-sans text-sm font-semibold text-content-primary">No Images Found</h4>
-            <p className="max-w-xs text-xs">
+            <h4 className="font-sans text-sm font-semibold text-white">No Images Found</h4>
+            <p className="max-w-xs text-xs text-neutral-400">
               Draw an image in FlowPaint or drag and drop photos from your PC to display them here.
             </p>
           </div>
@@ -216,7 +216,7 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
             />
           </div>
         ) : (
-          <div className="text-content-tertiary">Loading image...</div>
+          <div className="text-neutral-400">Loading image...</div>
         )}
 
         {/* Previous / Next Arrow Overlays */}
@@ -224,13 +224,13 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
           <>
             <button
               onClick={handlePrevious}
-              className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white shadow-xl backdrop-blur-md hover:bg-black/80 active:scale-95 transition-all"
+              className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white shadow-xl backdrop-blur-md hover:bg-black active:scale-95 transition-all cursor-pointer"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white shadow-xl backdrop-blur-md hover:bg-black/80 active:scale-95 transition-all"
+              className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white shadow-xl backdrop-blur-md hover:bg-black active:scale-95 transition-all cursor-pointer"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -240,21 +240,21 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
 
       {/* Bottom Thumbnail Carousel Strip */}
       {imageFiles.length > 0 && (
-        <div className="flex h-16 items-center gap-2 border-t border-border-subtle bg-surface-overlay/80 px-3 overflow-x-auto select-none">
+        <div className="flex h-16 items-center gap-2.5 border-t border-white/[0.08] bg-[#0c0e14] px-3.5 overflow-x-auto select-none scrollbar-none no-scrollbar">
           {imageFiles.map((file, idx) => {
             const isSelected = idx === currentIndex;
             return (
               <button
                 key={file.path}
                 onClick={() => { setCurrentIndex(idx); soundEngine.playClick(); }}
-                className={`flex h-12 w-16 shrink-0 items-center justify-center rounded-lg border overflow-hidden transition-all ${
+                className={`flex h-12 w-16 shrink-0 items-center justify-center rounded-xl border overflow-hidden transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-accent-primary ring-2 ring-accent-primary/40 scale-105 shadow-sm'
-                    : 'border-border-subtle hover:border-accent-primary/40 opacity-60 hover:opacity-100'
+                    ? 'border-white ring-2 ring-white/30 scale-105 shadow-md bg-white/10'
+                    : 'border-white/10 hover:border-white/20 opacity-60 hover:opacity-100 bg-[#12141c]'
                 }`}
               >
-                <div className="flex flex-col items-center gap-0.5 p-1 text-[9px] font-mono text-content-tertiary truncate">
-                  <ImageIcon className="h-3.5 w-3.5 text-accent-primary" />
+                <div className="flex flex-col items-center gap-0.5 p-1 text-[9px] font-mono text-neutral-300 truncate">
+                  <ImageIcon className="h-3.5 w-3.5 text-neutral-400" />
                   <span className="truncate max-w-[50px]">{file.name}</span>
                 </div>
               </button>
