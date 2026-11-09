@@ -16,6 +16,7 @@ export interface DockItemProps {
   mouseX: MotionValue<number>;
   isRunning: boolean;
   isFocused: boolean;
+  isMinimized?: boolean;
   onClick: () => void;
 }
 
@@ -29,6 +30,7 @@ export const DockItem: React.FC<DockItemProps> = ({
   mouseX,
   isRunning,
   isFocused,
+  isMinimized = false,
   onClick,
 }) => {
   const itemRef = useRef<HTMLButtonElement>(null);
@@ -151,12 +153,14 @@ export const DockItem: React.FC<DockItemProps> = ({
       >
         <IosAppIcon appId={manifest.id} className="w-full h-full" />
 
-        {/* macOS Active Indicator Pip (No glow) */}
+        {/* macOS Active Indicator Pip (No glow, disappears completely when closed) */}
         {isRunning && (
           <span
             className={`absolute -bottom-1 left-1/2 -translate-x-1/2 transition-all duration-200 ${
               isFocused
-                ? 'h-1 w-2.5 rounded-full bg-white'
+                ? 'h-1 w-2.5 rounded-full bg-white shadow-sm'
+                : isMinimized
+                ? 'h-1 w-1.5 rounded-full bg-amber-400/90 shadow-sm'
                 : 'h-1 w-1 rounded-full bg-white/60'
             }`}
           />

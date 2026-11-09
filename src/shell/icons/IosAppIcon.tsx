@@ -1,4 +1,5 @@
 import React from 'react';
+import { useThemeStore } from '@core/theme/themeStore';
 
 export interface IosIconProps {
   className?: string;
@@ -6,10 +7,17 @@ export interface IosIconProps {
   appId?: string;
 }
 
+const SHAPE_CLASSES: Record<string, string> = {
+  squircle: 'rounded-[22.5%]',
+  circle: 'rounded-full',
+  rounded: 'rounded-xl',
+  smooth: 'rounded-3xl',
+};
+
 /**
- * Universal iOS Icon Wrapper
- * Applies authentic Apple squircle radius (22.5%), specular top gloss,
- * subtle inner border highlight, and soft realistic ambient drop shadow.
+ * Universal Dynamic App Icon Wrapper
+ * Adapts to custom icon shapes (Squircle, Circle, Rounded, Smooth Pebble),
+ * specular top gloss, subtle inner border highlight, and soft realistic ambient drop shadow.
  */
 const IosSquircle: React.FC<{
   children: React.ReactNode;
@@ -17,11 +25,14 @@ const IosSquircle: React.FC<{
   className?: string;
   size?: number | string;
 }> = ({ children, bgGradient, className = '', size }) => {
+  const iconShape = useThemeStore((s) => s.iconShape);
+  const shapeClass = SHAPE_CLASSES[iconShape] || 'rounded-[22.5%]';
   const style = size ? { width: size, height: size } : undefined;
+
   return (
     <div
       style={style}
-      className={`relative select-none overflow-hidden rounded-[22.5%] shadow-[0_3px_10px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)] transition-transform duration-150 ${className}`}
+      className={`relative select-none overflow-hidden ${shapeClass} shadow-[0_3px_10px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.2)] transition-all duration-200 ${className}`}
     >
       {/* Background Gradient */}
       <div className={`absolute inset-0 ${bgGradient}`} />
@@ -30,7 +41,7 @@ const IosSquircle: React.FC<{
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/25 via-white/5 to-transparent" />
 
       {/* Inner Border Rim */}
-      <div className="pointer-events-none absolute inset-0 rounded-[22.5%] ring-1 ring-inset ring-white/25" />
+      <div className={`pointer-events-none absolute inset-0 ${shapeClass} ring-1 ring-inset ring-white/25`} />
 
       {/* SVG Icon Content */}
       <div className="relative flex h-full w-full items-center justify-center p-[14%] text-white">

@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { motion, useMotionValue } from 'motion/react';
+import { useShallow } from 'zustand/react/shallow';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { soundEngine } from '@core/audio/soundEngine';
 import { useAppMenuStore } from '@shell/menu/appMenuStore';
+import { useThemeStore } from '@core/theme/themeStore';
 import { useDockStore } from './dockStore';
 import { DockItem } from './DockItem';
 import type { WindowSize } from '@contracts/window';
@@ -24,7 +26,7 @@ export const Dock: React.FC<DockProps> = ({
   const isDockRevealed = useDockStore((state) => state.isDockRevealed);
   const setIsDockRevealed = useDockStore((state) => state.setIsDockRevealed);
 
-  const { processes, launchApp, isAppRunning } = useProcessStore();
+  const launchApp = useProcessStore((s) => s.launchApp);
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
 
   const hideTimerRef = useRef<number | null>(null);
@@ -35,9 +37,6 @@ export const Dock: React.FC<DockProps> = ({
     Object.values(state.windows).some(
       (w) => !w.isMinimized && (w.workspaceId ?? 1) === activeWorkspaceId
     )
-  );
-  const activeAppId = useWindowStore((state) =>
-    state.activeWindowId ? state.windows[state.activeWindowId]?.appId : null
   );
   const isAutoHideActive =
     autoHideMode === 'always' || (autoHideMode === 'smart' && hasOpenWindows);
@@ -99,14 +98,43 @@ export const Dock: React.FC<DockProps> = ({
     }
   };
 
-  // Determine running apps that are not pinned, so they appear dynamically with running pip
-  const unpinnedRunningAppIds = Object.values(processes)
-    .map((p) => p.appId)
-    .filter((id) => !pinnedAppIds.includes(id))
-    .filter((id, index, arr) => arr.indexOf(id) === index);
+  // Granular window statuses (open, focused, minimized) per appId using useShallow
+  // Prevents re-renders during window dragging because position changes don't alter appId, isMinimized, or isFocused!
+  const appStatuses = useWindowStore(
+    useShallow((state) => {
+      const map: Record<string, { hasWindows: boolean; isMinimized: boolean; isFocused: boolean }> = {};
+      for (const win of Object.values(state.windows)) {
+        const cur = map[win.appId];
+        const isMin = win.isMinimized;
+        const isFoc = win.isFocused && !isMin;
+        map[win.appId] = {
+          hasWindows: true,
+          isMinimized: cur ? cur.isMinimized && isMin : isMin,
+          isFocused: cur ? cur.isFocused || isFoc : isFoc,
+        };
+      }
+      return map;
+    })
+  );
+
+  // Unpinned apps appear in dock ONLY when they have open or minimized windows
+  const unpinnedRunningAppIds = Object.keys(appStatuses).filter(
+    (appId) => !pinnedAppIds.includes(appId)
+  );
+
+  const iconShape = useThemeStore((s) => s.iconShape);
+  const shapeClass =
+    iconShape === 'circle'
+      ? 'rounded-full'
+      : iconShape === 'rounded'
+      ? 'rounded-xl'
+      : iconShape === 'smooth'
+      ? 'rounded-3xl'
+      : 'rounded-[22.5%]';
 
   const handleAppClick = (appId: string) => {
-    const isRunning = isAppRunning(appId);
+    const status = appStatuses[appId];
+    const isRunning = Boolean(status?.hasWindows);
 
     if (!isRunning) {
       launchApp(appId, undefined, viewportSize);
@@ -193,7 +221,7 @@ export const Dock: React.FC<DockProps> = ({
           className="relative flex flex-col items-center justify-center p-0.5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group mb-1 shrink-0"
           title="App Library (All Apps)"
         >
-          <div className="h-11 w-11 rounded-[22.5%] bg-gradient-to-b from-neutral-700 via-neutral-800 to-neutral-900 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+          <div className={`h-11 w-11 ${shapeClass} bg-gradient-to-b from-neutral-700 via-neutral-800 to-neutral-900 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform`}>
             <div className="grid grid-cols-3 gap-1 p-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
@@ -218,8 +246,10 @@ export const Dock: React.FC<DockProps> = ({
           const manifest = appRegistry.get(appId);
           if (!manifest) return null;
 
-          const isRunning = isAppRunning(appId);
-          const isFocused = isRunning && activeAppId === appId;
+          const status = appStatuses[appId];
+          const isRunning = Boolean(status?.hasWindows);
+          const isFocused = Boolean(status?.isFocused);
+          const isMinimized = Boolean(status?.isMinimized);
 
           return (
             <DockItem
@@ -227,7 +257,8 @@ export const Dock: React.FC<DockProps> = ({
               manifest={manifest}
               mouseX={mouseX}
               isRunning={isRunning}
-              isFocused={Boolean(isFocused)}
+              isFocused={isFocused}
+              isMinimized={isMinimized}
               onClick={() => handleAppClick(appId)}
             />
           );
@@ -235,15 +266,17 @@ export const Dock: React.FC<DockProps> = ({
 
         {/* Separator if unpinned apps are running */}
         {unpinnedRunningAppIds.length > 0 && (
-          <div className="mx-1 h-8 w-[1px] self-center bg-border-subtle/80" />
+          <div className="mx-1 h-8 w-[1px] self-center bg-white/15 shrink-0" />
         )}
 
-        {/* Dynamic Unpinned Running Apps */}
+        {/* Dynamic Unpinned Running Apps (Disappear completely when closed) */}
         {unpinnedRunningAppIds.map((appId) => {
           const manifest = appRegistry.get(appId);
           if (!manifest) return null;
 
-          const isFocused = activeAppId === appId;
+          const status = appStatuses[appId];
+          const isFocused = Boolean(status?.isFocused);
+          const isMinimized = Boolean(status?.isMinimized);
 
           return (
             <DockItem
@@ -251,7 +284,8 @@ export const Dock: React.FC<DockProps> = ({
               manifest={manifest}
               mouseX={mouseX}
               isRunning={true}
-              isFocused={Boolean(isFocused)}
+              isFocused={isFocused}
+              isMinimized={isMinimized}
               onClick={() => handleAppClick(appId)}
             />
           );

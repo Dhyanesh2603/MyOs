@@ -15,6 +15,7 @@ import {
   type ViewportInsets,
 } from './geometry';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
+import { useProcessStore } from '@core/process/processStore';
 
 export interface WindowStoreState {
   windows: Record<WindowId, WindowState>;
@@ -198,10 +199,15 @@ export const useWindowStore = create<WindowStoreState>((set, get) => ({
   },
 
   closeWindow: (id) => {
-    set((state) => {
-      const windowToClose = state.windows[id];
-      if (!windowToClose) return state;
+    const windowToClose = get().windows[id];
+    if (!windowToClose) return;
 
+    // Detach window from process; terminates process cleanly if no windows remain
+    if (windowToClose.processId) {
+      useProcessStore.getState().detachWindow(windowToClose.processId, id);
+    }
+
+    set((state) => {
       const remainingWindows = { ...state.windows };
       delete remainingWindows[id];
 

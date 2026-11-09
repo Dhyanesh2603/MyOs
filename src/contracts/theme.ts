@@ -30,6 +30,9 @@ export interface WallpaperDefinition {
 
 export type FontFamilyId = 'inter' | 'ndot' | 'jetbrains' | 'serif';
 
+export type IconShape = 'squircle' | 'circle' | 'rounded' | 'smooth';
+export type WindowMaterial = 'glass' | 'solid' | 'translucent';
+
 export interface ThemePreferences {
   themeId: ThemeId;
   accentColor: AccentColorId;
@@ -39,4 +42,7 @@ export interface ThemePreferences {
   wallpaperId: string;
   fontFamily?: FontFamilyId;
   uiScale?: number;
+  iconShape?: IconShape;
+  windowMaterial?: WindowMaterial;
+  windowOpacity?: number;
 }

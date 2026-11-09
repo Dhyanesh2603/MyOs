@@ -41,7 +41,9 @@ export const useProcessStore = create<ProcessStoreState>((set, get) => ({
   getRunningProcesses: () => Object.values(get().processes),
 
   isAppRunning: (appId) => {
-    return Object.values(get().processes).some((proc) => proc.appId === appId);
+    return Object.values(get().processes).some(
+      (proc) => proc.appId === appId && proc.windowIds.length > 0
+    );
   },
 
   getProcessesByAppId: (appId) => {
@@ -110,13 +112,7 @@ export const useProcessStore = create<ProcessStoreState>((set, get) => ({
     const proc = get().processes[processId];
     if (!proc) return;
 
-    // Close all associated windows in the Window Manager
-    const winStore = useWindowStore.getState();
-    proc.windowIds.forEach((winId) => {
-      winStore.closeWindow(winId);
-    });
-
-    // Clean up process from memory
+    // Clean up process from memory first to prevent recursion
     set((state) => {
       const remaining = { ...state.processes };
       delete remaining[processId];
@@ -128,6 +124,14 @@ export const useProcessStore = create<ProcessStoreState>((set, get) => ({
         processes: remaining,
         activeProcessId: newActive,
       };
+    });
+
+    // Close any associated windows that are still open in Window Manager
+    const winStore = useWindowStore.getState();
+    proc.windowIds.forEach((winId) => {
+      if (winStore.windows[winId]) {
+        winStore.closeWindow(winId);
+      }
     });
   },
 

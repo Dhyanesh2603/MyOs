@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
   X,
-  Sparkles,
   Layers,
   Code2,
   FolderGit2,
@@ -38,7 +37,7 @@ export const AppMenu: React.FC = () => {
     setSelectedCategory,
   } = useAppMenuStore();
 
-  const { launchApp, isAppRunning, processes } = useProcessStore();
+  const { launchApp, isAppRunning } = useProcessStore();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus search input when opened
@@ -104,8 +103,6 @@ export const AppMenu: React.FC = () => {
       return app.category === selectedCategory;
     });
   }, [allApps, searchQuery, selectedCategory]);
-
-  const runningCount = Object.keys(processes).length;
 
   const handleLaunch = (appId: string) => {
     soundEngine.playClick();
@@ -251,43 +248,6 @@ export const AppMenu: React.FC = () => {
                 })}
               </div>
             )}
-          </motion.div>
-
-          {/* Bottom Telemetry & Quick Action Bar */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl flex items-center justify-between rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-mono backdrop-blur-xl text-white/70"
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-white/60" />
-              <span>App Library</span>
-              <span className="text-white/40">•</span>
-              <span className="text-white font-semibold">{allApps.length} Apps Installed</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {runningCount > 0 && (
-                <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                  {runningCount} Running
-                </span>
-              )}
-
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  closeAppMenu();
-                  launchApp('app-store');
-                }}
-                className="flex items-center gap-1 text-[11px] font-semibold text-white/80 hover:text-white transition-colors"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span>Get Apps</span>
-              </button>
-            </div>
           </motion.div>
         </motion.div>
       )}

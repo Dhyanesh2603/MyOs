@@ -5,7 +5,11 @@ import type {
   ThemeId,
   ThemePreferences,
   FontFamilyId,
+  IconShape,
+  WindowMaterial,
 } from '@contracts/theme';
+
+export type { IconShape, WindowMaterial };
 
 export const ACCENT_COLORS: Record<AccentColorId, AccentColorDefinition> = {
   indigo: {
@@ -55,6 +59,9 @@ export const ACCENT_COLORS: Record<AccentColorId, AccentColorDefinition> = {
 export interface ThemeStoreState extends ThemePreferences {
   fontFamily: FontFamilyId;
   uiScale: number;
+  iconShape: IconShape;
+  windowMaterial: WindowMaterial;
+  windowOpacity: number;
   setTheme: (themeId: ThemeId) => void;
   setAccentColor: (accentColor: AccentColorId) => void;
   setWindowRadius: (radius: number) => void;
@@ -62,7 +69,34 @@ export interface ThemeStoreState extends ThemePreferences {
   setReducedMotion: (reduced: boolean) => void;
   setFontFamily: (font: FontFamilyId) => void;
   setUiScale: (scale: number) => void;
+  setIconShape: (shape: IconShape) => void;
+  setWindowMaterial: (material: WindowMaterial) => void;
+  setWindowOpacity: (opacity: number) => void;
 }
+
+const getStoredIconShape = (): IconShape => {
+  try {
+    const s = localStorage.getItem('flowos_icon_shape') as IconShape;
+    if (s === 'squircle' || s === 'circle' || s === 'rounded' || s === 'smooth') return s;
+  } catch {}
+  return 'squircle';
+};
+
+const getStoredWindowMaterial = (): WindowMaterial => {
+  try {
+    const m = localStorage.getItem('flowos_window_material') as WindowMaterial;
+    if (m === 'glass' || m === 'solid' || m === 'translucent') return m;
+  } catch {}
+  return 'glass';
+};
+
+const getStoredWindowOpacity = (): number => {
+  try {
+    const o = parseFloat(localStorage.getItem('flowos_window_opacity') || '0.95');
+    if (!isNaN(o) && o >= 0.5 && o <= 1.0) return o;
+  } catch {}
+  return 0.95;
+};
 
 export const useThemeStore = create<ThemeStoreState>((set) => ({
   themeId: 'dark',
@@ -73,6 +107,9 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
   wallpaperId: 'obsidian-flow',
   fontFamily: 'inter',
   uiScale: 1.0,
+  iconShape: getStoredIconShape(),
+  windowMaterial: getStoredWindowMaterial(),
+  windowOpacity: getStoredWindowOpacity(),
 
   setTheme: (themeId) => {
     set({ themeId });
@@ -132,5 +169,27 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
     set({ uiScale });
     document.documentElement.style.setProperty('--ui-scale', `${uiScale}`);
     document.documentElement.style.fontSize = `${uiScale * 16}px`;
+  },
+
+  setIconShape: (iconShape) => {
+    try {
+      localStorage.setItem('flowos_icon_shape', iconShape);
+    } catch {}
+    set({ iconShape });
+  },
+
+  setWindowMaterial: (windowMaterial) => {
+    try {
+      localStorage.setItem('flowos_window_material', windowMaterial);
+    } catch {}
+    set({ windowMaterial });
+  },
+
+  setWindowOpacity: (windowOpacity) => {
+    const clamped = Math.max(0.5, Math.min(1.0, windowOpacity));
+    try {
+      localStorage.setItem('flowos_window_opacity', clamped.toString());
+    } catch {}
+    set({ windowOpacity: clamped });
   },
 }));

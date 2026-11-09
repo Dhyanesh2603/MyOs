@@ -5,6 +5,7 @@ import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
 import { useStageManagerStore } from '@core/stage/stageManagerStore';
 import { appRegistry } from '@core/process/registry';
+import { useThemeStore } from '@core/theme/themeStore';
 import { WindowHeader } from './WindowHeader';
 import { ResizeHandle } from './ResizeHandle';
 import { ErrorBoundary } from '@core/errors/ErrorBoundary';
@@ -79,6 +80,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
   const peekWindowId = useWindowStore((s) => s.peekWindowId);
   const activeWindowId = useWindowStore((s) => s.activeWindowId);
 
+  const windowMaterial = useThemeStore((s) => s.windowMaterial ?? 'glass');
+  const windowOpacity = useThemeStore((s) => s.windowOpacity ?? 0.95);
+
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
   const isMissionControlOpen = useWorkspaceStore((state) => state.isMissionControlOpen);
   const isStageManagerEnabled = useStageManagerStore((s) => s.isEnabled);
@@ -109,6 +113,13 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
   const isGhosted = peekWindowId !== null && peekWindowId !== windowState.id;
   const isPeekTarget = peekWindowId === windowState.id;
 
+  const materialClasses =
+    windowMaterial === 'solid'
+      ? 'bg-[#090a0f] border-white/[0.10]'
+      : windowMaterial === 'translucent'
+      ? 'bg-[#0e1017]/85 backdrop-blur-xl border-white/[0.14]'
+      : 'bg-black/60 backdrop-blur-3xl border-white/[0.18]';
+
   return (
     <motion.div
       key={windowState.id}
@@ -132,19 +143,19 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
         width: `${windowState.size.width}px`,
         height: `${windowState.size.height}px`,
         zIndex: isPeekTarget ? 9999 : zIndex,
-        opacity: isGhosted ? 0.15 : 1,
+        opacity: isGhosted ? 0.15 : windowOpacity,
         pointerEvents: isGhosted ? 'none' : 'auto',
         filter: isGhosted ? 'blur(1px)' : 'none',
         willChange: isInteracting ? 'left, top, width, height' : 'auto',
       }}
       className={`group flex flex-col overflow-hidden ${
-        windowState.isMaximized ? 'rounded-none border-0' : 'rounded-[14px] border border-white/[0.14]'
+        windowState.isMaximized ? 'rounded-none border-0' : `rounded-[14px] border ${materialClasses}`
       } ${isInteracting ? 'transition-none shadow-xl' : 'transition-shadow duration-150'} ${
         windowState.isMaximized
           ? 'shadow-none'
           : windowState.isFocused
-          ? 'shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
-          : 'shadow-[0_10px_30px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
+          ? 'shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
+          : 'shadow-[0_12px_36px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.06)_inset]'
       } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
     >
       {/* 8-Axis Resize Frame */}
