@@ -437,10 +437,8 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
             ctx.stroke();
           }
 
-          // Food (Glowing green orb)
+          // Food (Crisp apple orb)
           ctx.fillStyle = '#22c55e';
-          ctx.shadowColor = '#22c55e';
-          ctx.shadowBlur = 10;
           ctx.beginPath();
           ctx.arc(
             s.food.x * cellW + cellW / 2,
@@ -451,23 +449,17 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
           );
           ctx.fill();
 
-          // Render Player 1 (Cyan Lightcycle)
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 8;
+          // Render Player 1 (Crisp Cyan Lightcycle)
           s.p1.forEach((pt, idx) => {
             ctx.fillStyle = idx === 0 ? '#ffffff' : '#38bdf8';
             ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
           });
 
-          // Render Player 2 (Amber / Orange Lightcycle)
-          ctx.shadowColor = '#f59e0b';
-          ctx.shadowBlur = 8;
+          // Render Player 2 (Crisp Amber Lightcycle)
           s.p2.forEach((pt, idx) => {
             ctx.fillStyle = idx === 0 ? '#ffffff' : '#f59e0b';
             ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
           });
-
-          ctx.shadowBlur = 0;
         }
       }
     }, 110); // ~9 FPS grid speed

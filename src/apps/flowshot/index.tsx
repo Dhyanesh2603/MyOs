@@ -25,7 +25,7 @@ const PALETTE = [
   { name: 'Red', hex: '#ef4444' },
   { name: 'Amber', hex: '#f59e0b' },
   { name: 'Emerald', hex: '#10b981' },
-  { name: 'Cyan', hex: '#00f0ff' },
+  { name: 'Sky', hex: '#38bdf8' },
   { name: 'Violet', hex: '#a855f7' },
   { name: 'White', hex: '#ffffff' },
 ];
@@ -35,7 +35,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
   const { writeFile } = useVFSStore();
 
   const [activeTool, setActiveTool] = useState<Tool>('arrow');
-  const [activeColor, setActiveColor] = useState('#00f0ff');
+  const [activeColor, setActiveColor] = useState('#38bdf8');
   const [lineWidth, setLineWidth] = useState(3);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -75,8 +75,8 @@ export const FlowShotApp: React.FC<AppProps> = () => {
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 640, 400);
 
-      ctx.fillStyle = '#00f0ff';
-      ctx.font = '16px monospace';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px sans-serif';
       ctx.fillText('FLOWSHOT MARKUP STUDIO', 40, 60);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.font = '12px monospace';
