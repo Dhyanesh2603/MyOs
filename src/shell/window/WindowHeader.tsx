@@ -1,9 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import type { WindowPosition, WindowState } from '@contracts/window';
 import { clampPosition, DEFAULT_INSETS } from '@core/window/geometry';
 import { useWindowStore, type SnapTarget } from '@core/window/windowStore';
 import { useFancyZonesStore } from '@core/window/fancyZonesStore';
 import { soundEngine } from '@core/audio/soundEngine';
+import { Minus, Square, Copy, X } from 'lucide-react';
 import { IosAppIcon } from '@shell/icons/IosAppIcon';
 
 export interface WindowHeaderProps {
@@ -28,8 +29,6 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
   const rafRef = useRef<number | null>(null);
   const pendingPosRef = useRef<WindowPosition | null>(null);
   const activeSnapRef = useRef<SnapTarget>(null);
-
-  const [showTrafficGlyphs, setShowTrafficGlyphs] = useState(false);
 
   // Global keyboard shortcuts for focused window (Aero Snap shortcuts)
   useEffect(() => {
@@ -195,37 +194,31 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onDoubleClick={handleDoubleClick}
-      className={`no-select relative flex h-10 select-none items-center justify-between border-b px-3.5 transition-colors ${
+      className={`no-select relative flex h-9.5 select-none items-center justify-between border-b px-3.5 transition-colors ${
         windowState.isFocused
-          ? 'border-white/10 bg-white/[0.06] backdrop-blur-2xl'
-          : 'border-white/5 bg-white/[0.02] backdrop-blur-xl'
+          ? 'border-white/[0.08] bg-white/[0.05] backdrop-blur-2xl'
+          : 'border-white/[0.04] bg-white/[0.02] backdrop-blur-xl'
       } ${windowState.isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
-      {/* Authentic macOS Traffic Lights (Top-Left) */}
-      <div
-        className="flex items-center gap-2 pl-0.5 z-10"
-        onMouseEnter={() => setShowTrafficGlyphs(true)}
-        onMouseLeave={() => setShowTrafficGlyphs(false)}
-      >
-        {/* Close: #ff5f56 */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            soundEngine.playClick();
-            closeWindow(windowState.id);
-          }}
-          aria-label="Close Window"
-          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#ff5f56] border border-[#e0443e] hover:brightness-90 transition-all cursor-pointer shadow-sm"
+      {/* Top Left: App Icon & Title */}
+      <div className="flex items-center gap-2 overflow-hidden max-w-[70%]">
+        <div className="h-4 w-4 shrink-0">
+          <IosAppIcon appId={windowState.appId} className="h-full w-full" />
+        </div>
+        <span
+          className={`truncate text-xs font-semibold tracking-tight transition-colors ${
+            windowState.isFocused
+              ? 'text-white/95'
+              : 'text-white/60'
+          }`}
         >
-          {showTrafficGlyphs && (
-            <svg className="h-1.5 w-1.5 text-[#4a0002] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          )}
-        </button>
+          {windowState.title}
+        </span>
+      </div>
 
-        {/* Minimize: #ffbd2e */}
+      {/* Top Right: Window Controls (Minimize, Maximize / Restore, Close) */}
+      <div className="flex items-center gap-1 z-10">
+        {/* Minimize Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -233,16 +226,12 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
             minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
-          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#ffbd2e] border border-[#dea123] hover:brightness-90 transition-all cursor-pointer shadow-sm"
+          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
         >
-          {showTrafficGlyphs && (
-            <svg className="h-1.5 w-1.5 text-[#543b00] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          )}
+          <Minus className="h-3.5 w-3.5" />
         </button>
 
-        {/* Maximize / Zoom: #27c93f */}
+        {/* Maximize / Restore Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -252,38 +241,29 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
               height: window.innerHeight,
             });
           }}
-          aria-label="Zoom Window"
-          className="relative flex h-3 w-3 items-center justify-center rounded-full bg-[#27c93f] border border-[#1aab29] hover:brightness-90 transition-all cursor-pointer shadow-sm"
+          aria-label={windowState.isMaximized ? 'Restore Window' : 'Maximize Window'}
+          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
         >
-          {showTrafficGlyphs && (
-            <svg className="h-1.5 w-1.5 text-[#004207] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
-              <polyline points="15 3 21 3 21 9" />
-              <polyline points="9 21 3 21 3 15" />
-              <line x1="21" y1="3" x2="14" y2="10" />
-              <line x1="3" y1="21" x2="10" y2="14" />
-            </svg>
+          {windowState.isMaximized ? (
+            <Copy className="h-3 w-3" />
+          ) : (
+            <Square className="h-3 w-3" />
           )}
         </button>
-      </div>
 
-      {/* Centered Window Title with Authentic Apple App Icon */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none max-w-[55%] truncate">
-        <div className="h-3.5 w-3.5 shrink-0">
-          <IosAppIcon appId={windowState.appId} className="h-full w-full" />
-        </div>
-        <span
-          className={`truncate text-[12px] font-medium tracking-tight ${
-            windowState.isFocused
-              ? 'text-white/90 drop-shadow-sm'
-              : 'text-white/50'
-          }`}
+        {/* Close Button at top-right corner with smooth red hover */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            soundEngine.playClick();
+            closeWindow(windowState.id);
+          }}
+          aria-label="Close Window"
+          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-rose-500/80 hover:text-white transition-colors cursor-pointer"
         >
-          {windowState.title}
-        </span>
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
-
-      {/* Right spacer for balance */}
-      <div className="w-14" />
     </header>
   );
 };
