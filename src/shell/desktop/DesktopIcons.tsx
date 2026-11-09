@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, useMotionValue } from 'motion/react';
 import { useProcessStore } from '@core/process/processStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
@@ -10,48 +10,25 @@ import {
   ExternalLink,
   Download,
   Eye,
+  Trash2,
 } from 'lucide-react';
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
 import { IosAppIcon, IosFilesIcon } from '@shell/icons/IosAppIcon';
 import { soundEngine } from '@core/audio/soundEngine';
-
-interface DesktopShortcut {
-  id: string;
-  name: string;
-  type: 'app' | 'file' | 'folder';
-  target: string;
-  colorClass?: string;
-  badge?: string;
-}
-
-interface IconPosition {
-  x: number;
-  y: number;
-}
-
-const STORAGE_KEY = 'flowos_desktop_icon_positions_v2';
-
-function loadSavedPositions(): Record<string, IconPosition> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    // ignore json errors
-  }
-  return {};
-}
-
-function savePositionsToStorage(positions: Record<string, IconPosition>): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
-  } catch {
-    // ignore
-  }
-}
+import {
+  useDesktopStore,
+  DEFAULT_APPS,
+  DesktopShortcut,
+  IconPosition,
+  ORIGIN_X,
+  ORIGIN_Y,
+  GRID_WIDTH,
+  GRID_HEIGHT,
+} from '@core/desktop/desktopStore';
 
 interface DesktopIconItemProps {
   item: DesktopShortcut;
-  initialPos: IconPosition;
+  pos: IconPosition;
   isSelected: boolean;
   onSelect: (id: string) => void;
   onOpen: (item: DesktopShortcut) => void;
@@ -61,25 +38,26 @@ interface DesktopIconItemProps {
 
 const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
   item,
-  initialPos,
+  pos,
   isSelected,
   onSelect,
   onOpen,
   onContextMenu,
   onPositionChange,
 }) => {
-  const x = useMotionValue(initialPos.x);
-  const y = useMotionValue(initialPos.y);
+  const x = useMotionValue(pos.x);
+  const y = useMotionValue(pos.y);
   const isDraggingRef = useRef(false);
 
-  // Sync motion values if initial position changes from reset or layout
+  // Synchronize motion values if pos changes externally (e.g., auto-arrange grid)
   useEffect(() => {
-    x.set(initialPos.x);
-    y.set(initialPos.y);
-  }, [initialPos.x, initialPos.y, x, y]);
+    x.set(pos.x);
+    y.set(pos.y);
+  }, [pos.x, pos.y, x, y]);
 
   return (
     <motion.div
+      data-desktop-icon="true"
       drag
       dragMomentum={false}
       dragElastic={0}
@@ -131,7 +109,7 @@ const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
           : 'hover:bg-white/10 focus-visible:ring-1 focus-visible:ring-white/40'
       }`}
     >
-      {/* Authentic iOS Squircle Icon */}
+      {/* Authentic Adaptive Icon */}
       <div
         className={`relative flex h-14 w-14 items-center justify-center transition-transform duration-150 group-hover:scale-108 ${
           isSelected ? 'ring-2 ring-white/80 rounded-[22.5%] scale-105' : ''
@@ -160,42 +138,28 @@ export const DesktopIcons: React.FC = () => {
   const { launchApp } = useProcessStore();
   const { nodes } = useVFSStore();
   const openContextMenu = useContextMenuStore((state) => state.openMenu);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [positions, setPositions] = useState<Record<string, IconPosition>>(loadSavedPositions);
 
-  // Curated clean apps on the desktop (Flow OS item completely removed)
-  const curatedApps: DesktopShortcut[] = [
-    {
-      id: 'app-files',
-      name: 'Files',
-      type: 'app',
-      target: 'file-explorer',
-    },
-    {
-      id: 'app-browser',
-      name: 'Browser',
-      type: 'app',
-      target: 'browser',
-    },
-    {
-      id: 'app-code',
-      name: 'Code',
-      type: 'app',
-      target: 'code-editor',
-    },
-    {
-      id: 'app-notes',
-      name: 'Notes',
-      type: 'app',
-      target: 'notes',
-    },
-    {
-      id: 'app-terminal',
-      name: 'Terminal',
-      type: 'app',
-      target: 'terminal',
-    },
-  ];
+  const selectedId = useDesktopStore((state) => state.selectedIconId);
+  const setSelectedId = useDesktopStore((state) => state.setSelectedIconId);
+  const positions = useDesktopStore((state) => state.positions);
+  const customShortcuts = useDesktopStore((state) => state.customShortcuts);
+  const updatePosition = useDesktopStore((state) => state.updatePosition);
+  const removeShortcut = useDesktopStore((state) => state.removeShortcut);
+
+  // Global listener: clicking anywhere outside desktop icons deselects current icon
+  useEffect(() => {
+    const handleGlobalPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest('[data-desktop-icon]') || target.closest('[data-context-menu]')) {
+        return;
+      }
+      setSelectedId(null);
+    };
+
+    window.addEventListener('pointerdown', handleGlobalPointerDown, true);
+    return () => window.removeEventListener('pointerdown', handleGlobalPointerDown, true);
+  }, [setSelectedId]);
 
   // Dynamic user files & folders created inside /home/user/Desktop
   const desktopNodes = Object.values(nodes).filter(
@@ -209,15 +173,7 @@ export const DesktopIcons: React.FC = () => {
     target: node.path,
   }));
 
-  const allShortcuts = [...curatedApps, ...userItems];
-
-  const handlePositionChange = useCallback((id: string, x: number, y: number) => {
-    setPositions((prev) => {
-      const next = { ...prev, [id]: { x, y } };
-      savePositionsToStorage(next);
-      return next;
-    });
-  }, []);
+  const allShortcuts = [...DEFAULT_APPS, ...customShortcuts, ...userItems];
 
   const handleOpen = (item: DesktopShortcut) => {
     soundEngine.playClick();
@@ -234,6 +190,8 @@ export const DesktopIcons: React.FC = () => {
     e.preventDefault();
     soundEngine.playClick();
     setSelectedId(item.id);
+
+    const isCustomShortcut = item.isCustom || customShortcuts.some((s) => s.id === item.id);
 
     openContextMenu({ x: e.clientX, y: e.clientY }, [
       {
@@ -267,6 +225,21 @@ export const DesktopIcons: React.FC = () => {
             },
           ]
         : []),
+      ...(isCustomShortcut
+        ? [
+            { type: 'separator' as const, id: 'sep-custom' },
+            {
+              type: 'item' as const,
+              item: {
+                id: 'remove-shortcut',
+                label: 'Remove from Homescreen',
+                action: () => removeShortcut(item.id),
+                icon: Trash2,
+                danger: true,
+              },
+            },
+          ]
+        : []),
       { type: 'separator', id: 'sep-1' },
       {
         type: 'item',
@@ -283,30 +256,31 @@ export const DesktopIcons: React.FC = () => {
   return (
     <div
       aria-label="Desktop Surface Icons"
-      onClick={() => setSelectedId(null)}
       className="fixed inset-0 z-[20] pointer-events-none select-none overflow-hidden"
     >
       {allShortcuts.map((item, index) => {
-        // Calculate default grid position if not yet dragged:
-        // Column 0 starts at x: 28, y: 56, spacing 100px vertically
-        const col = Math.floor(index / 6);
-        const row = index % 6;
-        const defaultX = 28 + col * 96;
-        const defaultY = 56 + row * 100;
+        // Calculate default grid position if not yet placed
+        const maxRows = typeof window !== 'undefined'
+          ? Math.max(3, Math.floor((window.innerHeight - ORIGIN_Y - 120) / GRID_HEIGHT))
+          : 6;
+        const col = Math.floor(index / maxRows);
+        const row = index % maxRows;
+        const defaultX = ORIGIN_X + col * GRID_WIDTH;
+        const defaultY = ORIGIN_Y + row * GRID_HEIGHT;
 
-        const initialPos = positions[item.id] || { x: defaultX, y: defaultY };
+        const pos = positions[item.id] || { x: defaultX, y: defaultY };
         const isSelected = selectedId === item.id;
 
         return (
           <DesktopIconItem
             key={item.id}
             item={item}
-            initialPos={initialPos}
+            pos={pos}
             isSelected={isSelected}
             onSelect={setSelectedId}
             onOpen={handleOpen}
             onContextMenu={handleContextMenu}
-            onPositionChange={handlePositionChange}
+            onPositionChange={updatePosition}
           />
         );
       })}

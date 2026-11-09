@@ -52,6 +52,7 @@ export const ContextMenu: React.FC = () => {
     <div
       ref={menuRef}
       role="menu"
+      data-context-menu="true"
       aria-label="Context Menu"
       style={{
         left: `${adjustedX}px`,

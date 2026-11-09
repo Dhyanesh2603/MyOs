@@ -12,7 +12,25 @@ import { importHostFileToVFS } from '@core/vfs/hostBridge';
 import { useWidgetStore } from '@core/widgets/widgetStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
-import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye, Globe, SlidersHorizontal } from 'lucide-react';
+import { useDesktopStore, DEFAULT_APPS } from '@core/desktop/desktopStore';
+import { useAppMenuStore } from '@shell/menu/appMenuStore';
+import { useNotificationStore } from '@core/notifications/notificationStore';
+import {
+  FileText,
+  Settings,
+  Image,
+  Minus,
+  X,
+  UploadCloud,
+  LayoutGrid,
+  Eye,
+  Globe,
+  SlidersHorizontal,
+  Grid,
+  Move,
+  PlusCircle,
+  RotateCcw,
+} from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
@@ -32,6 +50,10 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const wallpaper = wallpapers.find((w) => w.id === currentWallpaperId) ?? wallpapers[0]!;
   const { launchApp } = useProcessStore();
   const openMenu = useContextMenuStore((state) => state.openMenu);
+  const layoutMode = useDesktopStore((state) => state.layoutMode);
+  const setLayoutMode = useDesktopStore((state) => state.setLayoutMode);
+  const autoArrangeGrid = useDesktopStore((state) => state.autoArrangeGrid);
+  const customShortcuts = useDesktopStore((state) => state.customShortcuts);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -45,7 +67,15 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   }, []);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target !== e.currentTarget) return;
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('[data-desktop-icon]') ||
+      target.closest('[role="dialog"]') ||
+      target.closest('[role="navigation"]') ||
+      target.closest('[data-context-menu]')
+    ) {
+      return;
+    }
     e.preventDefault();
 
     const currentIdx = wallpapers.findIndex((w) => w.id === wallpaper.id);
@@ -64,6 +94,54 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             action: () => launchApp('notes'),
           },
         },
+        {
+          type: 'item',
+          item: {
+            id: 'add-apps-launchpad',
+            label: 'Add App to Homescreen...',
+            icon: PlusCircle,
+            action: () => useAppMenuStore.getState().openAppMenu(),
+          },
+        },
+        { type: 'separator', id: 'sep-layout' },
+        {
+          type: 'item',
+          item: {
+            id: 'layout-mode-toggle',
+            label: layoutMode === 'grid' ? 'Layout: Snap to Grid (Active)' : 'Layout: Freeform Drag (Active)',
+            icon: layoutMode === 'grid' ? Grid : Move,
+            action: () => {
+              const nextMode = layoutMode === 'grid' ? 'freeform' : 'grid';
+              setLayoutMode(nextMode);
+              useNotificationStore.getState().notify({
+                title: nextMode === 'grid' ? 'Grid Layout Enabled' : 'Freeform Layout Enabled',
+                message: nextMode === 'grid' ? 'Icons snap to fixed grid coordinates.' : 'Icons can be dragged anywhere freely.',
+                type: 'info',
+              });
+            },
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'auto-arrange-grid',
+            label: 'Auto-Arrange Desktop Icons',
+            icon: RotateCcw,
+            action: () => {
+              const allIds = [
+                ...DEFAULT_APPS.map((a) => a.id),
+                ...customShortcuts.map((s) => s.id),
+              ];
+              autoArrangeGrid(allIds);
+              useNotificationStore.getState().notify({
+                title: 'Desktop Arranged',
+                message: 'All desktop icons aligned neatly to grid.',
+                type: 'success',
+              });
+            },
+          },
+        },
+        { type: 'separator', id: 'sep-sys' },
         {
           type: 'item',
           item: {
@@ -185,8 +263,19 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const isSelectingRef = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Only primary click directly on the desktop canvas surface itself
-    if (e.button !== 0 || e.target !== e.currentTarget) return;
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('[data-desktop-icon]') ||
+      target.closest('[role="dialog"]') ||
+      target.closest('[role="navigation"]') ||
+      target.closest('[data-context-menu]')
+    ) {
+      return;
+    }
+    if (e.button !== 0) return;
+
+    // Deselect any desktop icon
+    useDesktopStore.getState().setSelectedIconId(null);
 
     // Defocus any currently active window if user clicked the empty desktop
     const winStore = useWindowStore.getState();
@@ -234,7 +323,11 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       onDragOver={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragOver(true);
+        if (e.dataTransfer.types.includes('application/flowos-app-id')) {
+          e.dataTransfer.dropEffect = 'copy';
+        } else {
+          setIsDragOver(true);
+        }
       }}
       onDragLeave={(e) => {
         if (e.currentTarget === e.target) {
@@ -245,6 +338,23 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
+
+        // Check if an app was dropped from Launchpad
+        const appId = e.dataTransfer.getData('application/flowos-app-id');
+        if (appId) {
+          const added = useDesktopStore.getState().addAppShortcut(appId, {
+            x: e.clientX - 44,
+            y: e.clientY - 44,
+          });
+          useNotificationStore.getState().notify({
+            title: added ? 'App Added to Homescreen' : 'Already on Homescreen',
+            message: added ? 'Shortcut placed on desktop.' : 'App shortcut is already present.',
+            type: added ? 'success' : 'info',
+          });
+          useAppMenuStore.getState().closeAppMenu();
+          return;
+        }
+
         if (e.dataTransfer.files?.length) {
           for (const file of Array.from(e.dataTransfer.files)) {
             await importHostFileToVFS(file, '/home/user/Desktop');

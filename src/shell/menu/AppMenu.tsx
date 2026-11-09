@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
@@ -10,12 +10,18 @@ import {
   Wrench,
   Gamepad2,
   SlidersHorizontal,
+  Plus,
+  PlusCircle,
+  Play,
 } from 'lucide-react';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
 import { soundEngine } from '@core/audio/soundEngine';
 import { IosAppIcon } from '@shell/icons/IosAppIcon';
 import { useAppMenuStore, AppMenuCategory } from './appMenuStore';
+import { useContextMenuStore } from '@core/menu/contextMenuStore';
+import { useDesktopStore } from '@core/desktop/desktopStore';
+import { useNotificationStore } from '@core/notifications/notificationStore';
 
 const CATEGORIES: { id: AppMenuCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'all', label: 'All Apps', icon: Layers },
@@ -38,11 +44,14 @@ export const AppMenu: React.FC = () => {
   } = useAppMenuStore();
 
   const { launchApp, isAppRunning } = useProcessStore();
+  const openMenu = useContextMenuStore((s) => s.openMenu);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isDraggingApp, setIsDraggingApp] = useState(false);
 
   // Auto-focus search input when opened
   useEffect(() => {
     if (isOpen) {
+      setIsDraggingApp(false);
       const timer = setTimeout(() => {
         searchInputRef.current?.focus();
       }, 80);
@@ -96,7 +105,7 @@ export const AppMenu: React.FC = () => {
           app.id.includes('connect') ||
           app.id.includes('2048') ||
           app.id.includes('sweeper') ||
-          app.category === 'utilities' && (app.id.includes('2048') || app.id.includes('sweeper'))
+          (app.category === 'utilities' && (app.id.includes('2048') || app.id.includes('sweeper')))
         );
       }
 
@@ -110,16 +119,68 @@ export const AppMenu: React.FC = () => {
     closeAppMenu();
   };
 
+  const handlePinToDesktop = (appId: string, appName: string) => {
+    const added = useDesktopStore.getState().addAppShortcut(appId);
+    soundEngine.playClick();
+    useNotificationStore.getState().notify({
+      title: added ? 'Pinned to Homescreen' : 'Already on Homescreen',
+      message: added ? `${appName} is now on your desktop.` : `${appName} is already placed on the desktop.`,
+      type: added ? 'success' : 'info',
+    });
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, appId: string, appName: string, category: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    soundEngine.playClick();
+
+    openMenu({ x: e.clientX, y: e.clientY }, [
+      {
+        type: 'item',
+        item: {
+          id: 'pin-to-desktop',
+          label: 'Add to Homescreen',
+          icon: PlusCircle,
+          action: () => {
+            handlePinToDesktop(appId, appName);
+            closeAppMenu();
+          },
+        },
+      },
+      {
+        type: 'item',
+        item: {
+          id: 'launch-app',
+          label: 'Launch Application',
+          icon: Play,
+          action: () => handleLaunch(appId),
+        },
+      },
+      { type: 'separator', id: 'sep-1' },
+      {
+        type: 'item',
+        item: {
+          id: 'app-info',
+          label: `${appName} (${category})`,
+          action: () => {},
+          disabled: true,
+        },
+      },
+    ]);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: isDraggingApp ? 0 : 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.12, ease: 'easeOut' }}
           onClick={closeAppMenu}
-          className="fixed inset-0 z-[9600] flex flex-col items-center justify-between bg-black/80 backdrop-blur-xl select-none px-4 pt-10 pb-6 overflow-hidden"
+          className={`fixed inset-0 z-[9600] flex flex-col items-center justify-between bg-black/80 backdrop-blur-xl select-none px-4 pt-10 pb-6 overflow-hidden ${
+            isDraggingApp ? 'pointer-events-none' : 'pointer-events-auto'
+          }`}
         >
           {/* Top Search & Filter Control Bar */}
           <motion.div
@@ -181,7 +242,7 @@ export const AppMenu: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Main App Grid (Mobile App Library layout) */}
+          {/* Main App Grid (Mobile App Library layout with Drag & Drop Pinning) */}
           <motion.div
             initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -216,25 +277,51 @@ export const AppMenu: React.FC = () => {
                   const running = isAppRunning(app.id);
 
                   return (
-                    <button
+                    <div
                       key={app.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('application/flowos-app-id', app.id);
+                        e.dataTransfer.setData('text/plain', app.id);
+                        e.dataTransfer.effectAllowed = 'copy';
+                        setTimeout(() => {
+                          setIsDraggingApp(true);
+                        }, 20);
+                      }}
+                      onDragEnd={() => {
+                        setIsDraggingApp(false);
+                      }}
                       onClick={() => handleLaunch(app.id)}
-                      className="group flex flex-col items-center w-24 p-1.5 rounded-2xl hover:bg-white/10 transition-all duration-150 ease-out hover:scale-105 active:scale-95 cursor-pointer relative"
+                      onContextMenu={(e) => handleContextMenu(e, app.id, app.name, app.category)}
+                      className="group flex flex-col items-center w-24 p-1.5 rounded-2xl hover:bg-white/10 transition-all duration-150 ease-out hover:scale-105 active:scale-95 cursor-grab active:cursor-grabbing relative"
                     >
                       {/* App Icon Container */}
                       <div className="relative h-16 w-16 shrink-0 shadow-2xl group-hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)] transition-shadow">
                         <IosAppIcon appId={app.id} className="h-full w-full" />
 
-                        {/* Active running pip (solid clean dot, no glow) */}
+                        {/* Active running pip */}
                         {running && (
                           <span
                             title="Application running"
                             className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-black"
                           />
                         )}
+
+                        {/* Quick '+' Pin to Homescreen Hover Button */}
+                        <button
+                          type="button"
+                          title="Add to Homescreen"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePinToDesktop(app.id, app.name);
+                          }}
+                          className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-white/25 hover:bg-white text-white hover:text-black border border-white/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer shadow-md"
+                        >
+                          <Plus className="h-3 w-3 stroke-[3]" />
+                        </button>
                       </div>
 
-                      {/* App Name Label (clean, stark high-contrast typography) */}
+                      {/* App Name Label */}
                       <span className="mt-2 text-[12px] font-semibold text-white/95 text-center leading-tight truncate w-full px-1 group-hover:text-cyan-300 transition-colors drop-shadow-md">
                         {app.name}
                       </span>
@@ -243,7 +330,7 @@ export const AppMenu: React.FC = () => {
                       <span className="text-[9px] font-mono uppercase tracking-wider text-white/50 text-center opacity-0 group-hover:opacity-100 transition-opacity">
                         {app.category}
                       </span>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
