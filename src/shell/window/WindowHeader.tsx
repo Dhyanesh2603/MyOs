@@ -210,6 +210,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
       <div className="flex items-center gap-1 z-10">
         {/* Minimize Button */}
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();
@@ -223,6 +224,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
 
         {/* Maximize / Restore Button */}
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();
@@ -243,6 +245,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
 
         {/* Close Button at top-right corner with smooth red hover */}
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();

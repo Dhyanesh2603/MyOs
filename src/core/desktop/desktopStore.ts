@@ -90,7 +90,7 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
   shortcuts: loadSavedShortcuts(),
   positions: loadSavedPositions(),
 
-  setSelectedIconId: (id) => set({ selectedIconId: id }),
+  setSelectedIconId: (id) => set((s) => (s.selectedIconId === id ? s : { selectedIconId: id })),
 
   setLayoutMode: (mode) => {
     localStorage.setItem(LAYOUT_MODE_KEY, mode);

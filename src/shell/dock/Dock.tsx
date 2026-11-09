@@ -171,7 +171,10 @@ export const Dock: React.FC<DockProps> = ({
       {/* Fluid Magnetic Dock with Spring Physics Slide-up/down (Centered horizontally) */}
       <motion.nav
         ref={dockRef}
+        data-dock="true"
+        role="navigation"
         aria-label="Application Dock"
+        onPointerDown={(e) => e.stopPropagation()}
         initial={{
           x: '-50%',
           y: isVisible ? 0 : 90,
@@ -199,7 +202,7 @@ export const Dock: React.FC<DockProps> = ({
           handleDockMouseLeave();
         }}
         onMouseEnter={handleDockMouseEnter}
-        className="fixed bottom-3 z-[500] flex items-end gap-1.5 rounded-2xl border border-white/20 bg-neutral-900/60 dark:bg-black/50 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-3xl saturate-150"
+        className="fixed bottom-3 left-1/2 z-[500] flex items-end gap-1.5 rounded-2xl border border-white/20 bg-neutral-900/60 dark:bg-black/50 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-3xl saturate-150"
       >
         {/* Apple-style Launchpad / App Library Trigger */}
         <button

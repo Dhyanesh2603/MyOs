@@ -67,15 +67,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   }, []);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('[data-desktop-icon]') ||
-      target.closest('[role="dialog"]') ||
-      target.closest('[role="navigation"]') ||
-      target.closest('[data-context-menu]')
-    ) {
-      return;
-    }
+    if (e.target !== e.currentTarget) return;
     e.preventDefault();
 
     const currentIdx = wallpapers.findIndex((w) => w.id === wallpaper.id);
@@ -260,16 +252,8 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const isSelectingRef = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('[data-desktop-icon]') ||
-      target.closest('[role="dialog"]') ||
-      target.closest('[role="navigation"]') ||
-      target.closest('[data-context-menu]')
-    ) {
-      return;
-    }
-    if (e.button !== 0) return;
+    // Only handle primary click directly on the desktop surface canvas itself
+    if (e.button !== 0 || e.target !== e.currentTarget) return;
 
     // Deselect any desktop icon
     useDesktopStore.getState().setSelectedIconId(null);

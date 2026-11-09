@@ -66,6 +66,9 @@ export const DynamicIsland: React.FC = () => {
     <div className="fixed top-2.5 left-1/2 -translate-x-1/2 z-[9000] pointer-events-auto select-none">
       <motion.button
         layout
+        data-control-center-trigger="true"
+        data-dynamic-island="true"
+        onPointerDown={(e) => e.stopPropagation()}
         onClick={() => {
           soundEngine.playClick();
           toggleControlCenter();

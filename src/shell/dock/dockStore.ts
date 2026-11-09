@@ -29,8 +29,8 @@ export const useDockStore = create<DockState>((set) => ({
     'system-settings',
   ],
   dockSize: 'regular',
-  autoHideMode: 'always',
-  isDockRevealed: false,
+  autoHideMode: 'never',
+  isDockRevealed: true,
 
   pinApp: (appId) => {
     set((state) => {

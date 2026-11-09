@@ -31,18 +31,26 @@ interface WindowContentProps {
   processId: string;
   initialData?: unknown;
   isInteracting: boolean;
+  windowMaterial: string;
 }
 
 // Memoized Window Content: Never re-renders the underlying application (Monaco, Browser iframe, etc.)
 // during window dragging or resizing. Guarantees 120 FPS performance.
 const WindowContent = React.memo<WindowContentProps>(
-  ({ appId, windowId, processId, initialData, isInteracting }) => {
+  ({ appId, windowId, processId, initialData, isInteracting, windowMaterial }) => {
     const manifest = appRegistry.get(appId);
     const AppComponent = manifest?.component;
 
+    const bgClass =
+      windowMaterial === 'solid'
+        ? 'bg-surface-panel'
+        : windowMaterial === 'translucent'
+        ? 'bg-surface-panel/80 backdrop-blur-xl'
+        : 'bg-surface-panel/65 backdrop-blur-2xl';
+
     return (
       <div
-        className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window text-content-primary ${
+        className={`relative flex-1 overflow-auto ${bgClass} text-content-primary ${
           isInteracting ? 'pointer-events-none select-none' : ''
         }`}
       >
@@ -68,7 +76,8 @@ const WindowContent = React.memo<WindowContentProps>(
       prev.windowId === next.windowId &&
       prev.processId === next.processId &&
       prev.initialData === next.initialData &&
-      prev.isInteracting === next.isInteracting
+      prev.isInteracting === next.isInteracting &&
+      prev.windowMaterial === next.windowMaterial
     );
   }
 );
@@ -177,6 +186,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
         processId={windowState.processId}
         initialData={windowState.customState?.initialData}
         isInteracting={isInteracting}
+        windowMaterial={windowMaterial}
       />
     </motion.div>
   );

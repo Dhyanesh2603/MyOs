@@ -157,7 +157,7 @@ export const DesktopIcons: React.FC = () => {
       setSelectedId(null);
     };
 
-    window.addEventListener('pointerdown', handleGlobalPointerDown, true);
+    window.addEventListener('pointerdown', handleGlobalPointerDown);
     return () => window.removeEventListener('pointerdown', handleGlobalPointerDown, true);
   }, [setSelectedId]);
 

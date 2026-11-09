@@ -112,29 +112,32 @@ export const ControlCenterShade: React.FC = () => {
     <AnimatePresence>
       <motion.div
         ref={containerRef}
-        initial={{ opacity: 0, scale: 0.96, y: -10 }}
+        initial={{ opacity: 0, scale: 0.95, y: -12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: -10 }}
-        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-11 right-3 z-[9500] w-[370px] max-h-[90vh] overflow-y-auto no-scrollbar rounded-3xl border border-white/15 bg-[#0a0b10]/90 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)_inset] backdrop-blur-3xl text-white select-none space-y-3.5"
+        exit={{ opacity: 0, scale: 0.95, y: -12 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-11 right-3 z-[9500] w-[380px] max-h-[92vh] overflow-y-auto no-scrollbar rounded-[28px] border border-white/[0.12] bg-[#0c0e17]/85 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.06)_inset] backdrop-blur-3xl text-white select-none space-y-3.5"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-white/70">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span className="text-[11px] font-semibold tracking-wider uppercase text-white/80">
               Control Center
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => {
                 soundEngine.playClick();
                 closeControlCenter();
                 useSessionStore.getState().lock();
               }}
-              className="flex items-center gap-1 text-[11px] font-medium text-white/50 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] px-2.5 py-1 text-[11px] font-medium text-white/70 hover:text-white transition-all cursor-pointer"
               title="Lock System (Ctrl+Alt+L)"
             >
               <Lock className="h-3 w-3" />
@@ -145,15 +148,15 @@ export const ControlCenterShade: React.FC = () => {
                 soundEngine.playClick();
                 closeControlCenter();
               }}
-              className="rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+              className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
               title="Close (ESC)"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Section 1: Tactical Connectivity Bento Grid */}
+        {/* Section 1: Tactile Apple Bento Grid Connectivity */}
         <div className="grid grid-cols-2 gap-2">
           {/* Wi-Fi Card */}
           <button
@@ -161,22 +164,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleWifi();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isWifiEnabled
-                ? 'bg-blue-600/25 border-blue-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-[#007AFF] text-white shadow-[0_4px_16px_rgba(0,122,255,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isWifiEnabled ? 'bg-blue-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isWifiEnabled
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               {isWifiEnabled ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Wi-Fi</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isWifiEnabled ? (navigator.onLine ? 'Connected' : 'No Internet') : 'Off'}
               </div>
             </div>
@@ -188,22 +193,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleBluetooth();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isBluetoothEnabled
-                ? 'bg-indigo-600/25 border-indigo-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-[#5856D6] text-white shadow-[0_4px_16px_rgba(88,86,214,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isBluetoothEnabled ? 'bg-indigo-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isBluetoothEnabled
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               <Bluetooth className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Bluetooth</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isBluetoothEnabled ? 'Ready' : 'Off'}
               </div>
             </div>
@@ -217,22 +224,24 @@ export const ControlCenterShade: React.FC = () => {
               useFlowDropStore.getState().openFlowDrop();
               closeControlCenter();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isAirBridgeActive
-                ? 'bg-emerald-600/25 border-emerald-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-[#34C759] text-white shadow-[0_4px_16px_rgba(52,199,89,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isAirBridgeActive ? 'bg-emerald-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isAirBridgeActive
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               <UploadCloud className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Host Bridge</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isAirBridgeActive ? 'Drop Ready' : 'Paused'}
               </div>
             </div>
@@ -244,22 +253,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleFocusMode();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isFocusMode
-                ? 'bg-purple-600/25 border-purple-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-[#AF52DE] text-white shadow-[0_4px_16px_rgba(175,82,222,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isFocusMode ? 'bg-purple-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isFocusMode
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               <Moon className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Focus Mode</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isFocusMode ? 'Do Not Disturb' : 'Off'}
               </div>
             </div>
@@ -271,22 +282,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleStageManager();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isStageManagerEnabled
-                ? 'bg-cyan-600/25 border-cyan-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-[#0EA5E9] text-white shadow-[0_4px_16px_rgba(14,165,233,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isStageManagerEnabled ? 'bg-cyan-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isStageManagerEnabled
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Stage Mgr</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isStageManagerEnabled ? 'Active (Alt+S)' : 'Off'}
               </div>
             </div>
@@ -298,149 +311,158 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleCopilot();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 border transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
               isCopilotOpen
-                ? 'bg-rose-600/25 border-rose-500/40 text-white'
-                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white'
+                ? 'bg-gradient-to-br from-[#FF2D55] to-[#FF375F] text-white shadow-[0_4px_16px_rgba(255,45,85,0.35)]'
+                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.06]'
             }`}
           >
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isCopilotOpen ? 'bg-rose-500 text-white shadow-md' : 'bg-white/10 text-white/40'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                isCopilotOpen
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/10 text-white/40'
               }`}
             >
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">AI Copilot</div>
-              <div className="truncate text-[10px] opacity-70">
+              <div className="truncate text-[11px] opacity-80 mt-0.5">
                 {isCopilotOpen ? 'Active (Ctrl+J)' : 'Ready'}
               </div>
             </div>
           </button>
         </div>
 
-        {/* Section 2: Display & Sound Ergonomic Faders */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 space-y-3">
-          {/* Display Brightness Fader */}
-          <div>
-            <div className="flex items-center justify-between text-xs font-medium text-white/70 mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <Sun className="h-3.5 w-3.5 text-amber-400" />
-                <span>Display Brightness</span>
-              </div>
-              <span className="font-mono text-[11px] text-white/50">
-                {Math.round(brightness * 100)}%
-              </span>
-            </div>
+        {/* Section 2: Authentic Apple Capsule Sliders (Brightness & Sound) */}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 space-y-3">
+          {/* Display Brightness Capsule Slider */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 h-10 rounded-xl bg-white/[0.08] overflow-hidden flex items-center">
+              {/* Fill Track */}
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-400 to-amber-200 transition-all pointer-events-none rounded-xl"
+                style={{ width: `${brightness * 100}%` }}
+              />
 
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-400 to-amber-200 rounded-full"
-                  style={{ width: `${brightness * 100}%` }}
-                />
-                <input
-                  type="range"
-                  min="0.35"
-                  max="1.0"
-                  step="0.01"
-                  value={brightness}
-                  onChange={(e) => setBrightness(parseFloat(e.target.value))}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                />
+              {/* Inside Content */}
+              <div className="relative z-10 flex w-full items-center justify-between px-3 pointer-events-none">
+                <div className="flex items-center gap-2">
+                  <Sun className={`h-4 w-4 ${brightness > 0.4 ? 'text-black/80' : 'text-amber-400'}`} />
+                  <span className={`text-xs font-semibold ${brightness > 0.4 ? 'text-black/90' : 'text-white/90'}`}>
+                    Brightness
+                  </span>
+                </div>
+                <span className={`font-mono text-xs font-semibold ${brightness > 0.4 ? 'text-black/80' : 'text-white/70'}`}>
+                  {Math.round(brightness * 100)}%
+                </span>
               </div>
 
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  toggleNightShift();
-                }}
-                className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                  isNightShift
-                    ? 'border-amber-500/50 bg-amber-500/25 text-amber-300'
-                    : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                }`}
-                title="Night Shift Warmth Filter"
-              >
-                <Flame className="h-3 w-3" />
-                <span>Night</span>
-              </button>
+              {/* Range Input Overlay */}
+              <input
+                type="range"
+                min="0.3"
+                max="1.0"
+                step="0.01"
+                value={brightness}
+                onChange={(e) => setBrightness(parseFloat(e.target.value))}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
+              />
             </div>
+
+            {/* Night Shift Quick Button */}
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                toggleNightShift();
+              }}
+              className={`flex h-10 px-3 items-center gap-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
+                isNightShift
+                  ? 'border-amber-400/50 bg-amber-500/25 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                  : 'border-white/[0.08] bg-white/[0.05] text-white/60 hover:bg-white/[0.1] hover:text-white'
+              }`}
+              title="Night Shift Warmth Filter"
+            >
+              <Flame className="h-4 w-4" />
+              <span className="hidden sm:inline">Night</span>
+            </button>
           </div>
 
-          {/* Sound Volume Fader */}
-          <div>
-            <div className="flex items-center justify-between text-xs font-medium text-white/70 mb-1.5">
-              <div className="flex items-center gap-1.5">
-                {isMuted ? (
-                  <VolumeX className="h-3.5 w-3.5 text-rose-400" />
-                ) : (
-                  <Volume2 className="h-3.5 w-3.5 text-blue-400" />
-                )}
-                <span>Master Volume</span>
-              </div>
-              <span className="font-mono text-[11px] text-white/50">
-                {isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}
-              </span>
-            </div>
+          {/* Sound Volume Capsule Slider */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 h-10 rounded-xl bg-white/[0.08] overflow-hidden flex items-center">
+              {/* Fill Track */}
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 to-cyan-300 transition-all pointer-events-none rounded-xl"
+                style={{ width: isMuted ? '0%' : `${volume * 100}%` }}
+              />
 
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-300 rounded-full"
-                  style={{ width: isMuted ? '0%' : `${volume * 100}%` }}
-                />
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.02"
-                  value={isMuted ? 0 : volume}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    setVolume(val);
-                    if (isMuted && val > 0) setMuted(false);
-                  }}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                />
+              {/* Inside Content */}
+              <div className="relative z-10 flex w-full items-center justify-between px-3 pointer-events-none">
+                <div className="flex items-center gap-2">
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4 text-rose-400" />
+                  ) : (
+                    <Volume2 className={`h-4 w-4 ${volume > 0.4 ? 'text-black/80' : 'text-blue-400'}`} />
+                  )}
+                  <span className={`text-xs font-semibold ${!isMuted && volume > 0.4 ? 'text-black/90' : 'text-white/90'}`}>
+                    Volume
+                  </span>
+                </div>
+                <span className={`font-mono text-xs font-semibold ${!isMuted && volume > 0.4 ? 'text-black/80' : 'text-white/70'}`}>
+                  {isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}
+                </span>
               </div>
 
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  setMuted(!isMuted);
+              {/* Range Input Overlay */}
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.02"
+                value={isMuted ? 0 : volume}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setVolume(val);
+                  if (isMuted && val > 0) setMuted(false);
                 }}
-                className={`rounded-xl border px-2.5 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                  isMuted
-                    ? 'border-rose-500/40 bg-rose-500/20 text-rose-300'
-                    : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                }`}
-              >
-                {isMuted ? 'Unmute' : 'Mute'}
-              </button>
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
+              />
             </div>
+
+            {/* Mute Toggle Quick Button */}
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                setMuted(!isMuted);
+              }}
+              className={`flex h-10 px-3 items-center justify-center rounded-xl border text-xs font-medium transition-all cursor-pointer ${
+                isMuted
+                  ? 'border-rose-500/50 bg-rose-500/25 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.25)]'
+                  : 'border-white/[0.08] bg-white/[0.05] text-white/60 hover:bg-white/[0.1] hover:text-white'
+              }`}
+            >
+              {isMuted ? 'Unmute' : 'Mute'}
+            </button>
           </div>
         </div>
 
         {/* Section 3: Appearance & Window Customization Studio */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 space-y-2.5">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 space-y-2.5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/80">
-              <Shapes className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Icon Shape & Window Material</span>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/90">
+              <Shapes className="h-4 w-4 text-cyan-400" />
+              <span>Icon Geometry & Materiality</span>
             </div>
-            <span className="text-[10px] font-mono text-white/50 capitalize">
-              {iconShape} • {windowMaterial}
-            </span>
           </div>
 
-          {/* Icon Shape Selector */}
+          {/* Icon Shape iOS Segmented Picker */}
           <div>
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/50 mb-1.5">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-white/50 mb-1.5">
               Icon Geometry
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
               {(
                 [
                   { id: 'squircle', label: 'Squircle' },
@@ -457,21 +479,21 @@ export const ControlCenterShade: React.FC = () => {
                       soundEngine.playClick();
                       setIconShape(shape.id);
                     }}
-                    className={`flex flex-col items-center gap-1 py-1.5 px-1 rounded-xl border text-[11px] font-medium transition-all cursor-pointer ${
+                    className={`flex flex-col items-center gap-1 py-1.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                       active
-                        ? 'bg-white text-black font-semibold border-white shadow-sm'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white text-black font-semibold shadow-md'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
                     }`}
                   >
                     <span
-                      className={`h-4 w-4 border border-current ${
+                      className={`h-3.5 w-3.5 border-2 border-current ${
                         shape.id === 'squircle'
                           ? 'rounded-[22.5%]'
                           : shape.id === 'circle'
                           ? 'rounded-full'
                           : shape.id === 'rounded'
-                          ? 'rounded-md'
-                          : 'rounded-xl'
+                          ? 'rounded-sm'
+                          : 'rounded-md'
                       }`}
                     />
                     <span>{shape.label}</span>
@@ -481,12 +503,12 @@ export const ControlCenterShade: React.FC = () => {
             </div>
           </div>
 
-          {/* Window Material Selector */}
+          {/* Window Surface Style iOS Segmented Picker */}
           <div>
-            <div className="text-[10px] uppercase font-mono tracking-wider text-white/50 mb-1.5">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-white/50 mb-1.5">
               Window Surface Style
             </div>
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
               {(
                 [
                   { id: 'glass', label: 'Glass Blur' },
@@ -502,10 +524,10 @@ export const ControlCenterShade: React.FC = () => {
                       soundEngine.playClick();
                       setWindowMaterial(mat.id);
                     }}
-                    className={`py-1.5 px-2 rounded-xl border text-[11px] font-medium transition-all text-center cursor-pointer ${
+                    className={`py-1.5 rounded-lg text-[11px] font-medium transition-all text-center cursor-pointer ${
                       active
-                        ? 'bg-white text-black font-semibold border-white shadow-sm'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white text-black font-semibold shadow-md'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
                     }`}
                   >
                     {mat.label}
@@ -519,7 +541,7 @@ export const ControlCenterShade: React.FC = () => {
           <div>
             <div className="flex items-center justify-between text-[11px] text-white/60 mb-1">
               <span>Window Opacity</span>
-              <span className="font-mono text-[10px] text-white/80">
+              <span className="font-mono text-[10px] text-white/90">
                 {Math.round(windowOpacity * 100)}%
               </span>
             </div>
@@ -542,20 +564,20 @@ export const ControlCenterShade: React.FC = () => {
         </div>
 
         {/* Section 4: Acoustic Soundscapes & Lo-Fi Noise */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 space-y-2.5">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 space-y-2.5">
           {/* Keyboard Acoustics */}
           <div>
-            <div className="flex items-center justify-between text-xs font-semibold text-white/80 mb-1.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-white/90 mb-1.5">
               <div className="flex items-center gap-1.5">
-                <Keyboard className="h-3.5 w-3.5 text-blue-400" />
+                <Keyboard className="h-4 w-4 text-blue-400" />
                 <span>Keyboard Soundscapes</span>
               </div>
-              <span className="font-mono text-[10px] uppercase text-blue-400 font-semibold">
+              <span className="text-[10px] font-semibold uppercase text-blue-400">
                 {audioTheme}
               </span>
             </div>
 
-            <div className="grid grid-cols-4 gap-1">
+            <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
               {(
                 [
                   { id: 'mechanical', label: 'Mechanical' },
@@ -574,10 +596,10 @@ export const ControlCenterShade: React.FC = () => {
                         setTimeout(() => soundEngine.playKeypress('a'), 20);
                       }
                     }}
-                    className={`rounded-xl py-1 text-center font-mono text-[10px] transition-all border cursor-pointer ${
+                    className={`py-1 rounded-lg text-center text-[11px] font-medium transition-all cursor-pointer ${
                       active
-                        ? 'border-blue-400 bg-blue-500/25 text-blue-200 font-semibold shadow-sm'
-                        : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                        ? 'bg-blue-500 text-white font-semibold shadow-md'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
                     }`}
                   >
                     {t.label}
@@ -589,20 +611,20 @@ export const ControlCenterShade: React.FC = () => {
 
           {/* Lo-Fi Ambient Soundscapes */}
           <div className="pt-2 border-t border-white/[0.06]">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-white/80">
-                <Headphones className="h-3.5 w-3.5 text-emerald-400" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-white/90">
+                <Headphones className="h-4 w-4 text-emerald-400" />
                 <span>Lo-Fi Ambient Noise</span>
               </div>
               {ambientTrack !== 'none' && (
-                <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/25">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Playing</span>
                 </span>
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'rain', label: 'Rain', icon: CloudRain },
                 { id: 'campfire', label: 'Campfire', icon: Flame },
@@ -624,22 +646,22 @@ export const ControlCenterShade: React.FC = () => {
                         setAmbientTrack(t.id as AmbientTrack);
                       }
                     }}
-                    className={`flex flex-col items-center gap-1 rounded-xl border py-1.5 transition-all text-center cursor-pointer ${
+                    className={`flex flex-col items-center gap-1.5 rounded-xl border py-2 px-1 transition-all text-center cursor-pointer active:scale-95 ${
                       isActive
-                        ? 'border-emerald-500/50 bg-emerald-500/25 text-emerald-300 font-semibold shadow-sm'
-                        : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                        ? 'border-emerald-500/60 bg-emerald-500/25 text-emerald-300 font-semibold shadow-[0_0_16px_rgba(52,199,89,0.3)]'
+                        : 'border-white/[0.06] bg-white/[0.05] text-white/60 hover:bg-white/[0.1] hover:text-white'
                     }`}
                   >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="font-mono text-[9px]">{t.label}</span>
+                    <Icon className="h-4 w-4" />
+                    <span className="text-[10px] font-medium">{t.label}</span>
                   </button>
                 );
               })}
             </div>
 
             {ambientTrack !== 'none' && (
-              <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
-                <span className="text-[10px] text-white/50">Volume</span>
+              <div className="flex items-center gap-2 pt-2.5 mt-2 border-t border-white/[0.06]">
+                <span className="text-[10px] text-white/60">Volume</span>
                 <input
                   type="range"
                   min="0"
@@ -653,7 +675,7 @@ export const ControlCenterShade: React.FC = () => {
                   }}
                   className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-white/10 accent-emerald-400"
                 />
-                <span className="font-mono text-[10px] text-white/60 min-w-[28px] text-right">
+                <span className="font-mono text-[10px] text-white/70 min-w-[28px] text-right">
                   {Math.round(ambientVol * 100)}%
                 </span>
               </div>
@@ -662,23 +684,23 @@ export const ControlCenterShade: React.FC = () => {
         </div>
 
         {/* Section 5: Now Playing Dynamic Music Card */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 flex items-center justify-between">
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/40 border border-white/15 text-white shadow-md overflow-hidden">
-              <Disc3 className={`h-5 w-5 ${isPlaying ? 'animate-spin' : 'text-white/60'}`} />
+            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-black/50 border border-white/15 text-white shadow-md overflow-hidden">
+              <Disc3 className={`h-6 w-6 ${isPlaying ? 'animate-spin text-cyan-400' : 'text-white/60'}`} />
             </div>
 
             <div className="min-w-0 leading-tight">
               <div className="truncate text-xs font-semibold text-white">
                 {currentTrack ? currentTrack.title : 'No track playing'}
               </div>
-              <div className="truncate text-[10px] text-white/50 mt-0.5">
+              <div className="truncate text-[11px] text-white/50 mt-0.5">
                 {currentTrack ? currentTrack.artist : 'Audio queue idle'}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => {
                 if (currentTrack) togglePlay();
@@ -707,12 +729,12 @@ export const ControlCenterShade: React.FC = () => {
         </div>
 
         {/* Section 6: Minimalist Status Footer */}
-        <div className="flex items-center justify-between px-1 pt-1 text-[10px] font-mono text-white/50">
-          <div className="flex items-center gap-1 text-emerald-400">
-            <BatteryCharging className="h-3 w-3" />
-            <span>Power: High Performance</span>
+        <div className="flex items-center justify-between px-1 pt-0.5 text-[11px] text-white/50">
+          <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
+            <BatteryCharging className="h-3.5 w-3.5" />
+            <span>High Performance Mode</span>
           </div>
-          <span>FlowOS 2.0</span>
+          <span className="font-semibold text-white/40">FlowOS 2.0</span>
         </div>
       </motion.div>
     </AnimatePresence>
