@@ -11,7 +11,8 @@ import { DynamicWallpaperHost } from './wallpapers/DynamicWallpaperHost';
 import { importHostFileToVFS } from '@core/vfs/hostBridge';
 import { useWidgetStore } from '@core/widgets/widgetStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
-import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye, Globe } from 'lucide-react';
+import { useControlCenterStore } from '@core/system/controlCenterStore';
+import { FileText, Settings, Image, Minus, X, UploadCloud, LayoutGrid, Eye, Globe, SlidersHorizontal } from 'lucide-react';
 
 export interface DesktopSurfaceProps {
   children?: React.ReactNode;
@@ -70,6 +71,16 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             label: 'System Settings',
             icon: Settings,
             action: () => launchApp('system-settings'),
+          },
+        },
+        {
+          type: 'item',
+          item: {
+            id: 'control-center',
+            label: 'Control Center (Quick Hub)',
+            icon: SlidersHorizontal,
+            shortcut: 'Alt+C',
+            action: () => useControlCenterStore.getState().toggleControlCenter(),
           },
         },
         { type: 'separator', id: 'sep-1' },

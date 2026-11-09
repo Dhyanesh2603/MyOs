@@ -11,18 +11,7 @@ export interface WindowHeaderProps {
   windowState: WindowState;
 }
 
-export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
-  const {
-    focusWindow,
-    closeWindow,
-    minimizeWindow,
-    toggleMaximize,
-    updatePosition,
-    setDragging,
-    snapWindow,
-    setSnapPreview,
-  } = useWindowStore();
-
+export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowState }) => {
   const isDraggingRef = useRef(false);
   const startPointerRef = useRef({ x: 0, y: 0 });
   const startPosRef = useRef<WindowPosition>({ x: 0, y: 0 });
@@ -43,21 +32,21 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       if (e.altKey && (e.key === '[' || e.key === 'ArrowLeft')) {
         e.preventDefault();
         soundEngine.playSnap();
-        snapWindow(windowState.id, 'left', { width: window.innerWidth, height: window.innerHeight });
+        useWindowStore.getState().snapWindow(windowState.id, 'left', { width: window.innerWidth, height: window.innerHeight });
       } else if (e.altKey && (e.key === ']' || e.key === 'ArrowRight')) {
         e.preventDefault();
         soundEngine.playSnap();
-        snapWindow(windowState.id, 'right', { width: window.innerWidth, height: window.innerHeight });
+        useWindowStore.getState().snapWindow(windowState.id, 'right', { width: window.innerWidth, height: window.innerHeight });
       } else if (e.altKey && (e.key === 'Enter' || e.key === 'ArrowUp')) {
         e.preventDefault();
         soundEngine.playSnap();
-        toggleMaximize(windowState.id, { width: window.innerWidth, height: window.innerHeight });
+        useWindowStore.getState().toggleMaximize(windowState.id, { width: window.innerWidth, height: window.innerHeight });
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [windowState.id, windowState.isFocused, snapWindow, toggleMaximize]);
+  }, [windowState.id, windowState.isFocused]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Only primary button and when not maximized
@@ -69,8 +58,9 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
 
-    focusWindow(windowState.id);
-    setDragging(windowState.id, true);
+    const store = useWindowStore.getState();
+    store.focusWindow(windowState.id);
+    store.setDragging(windowState.id, true);
 
     isDraggingRef.current = true;
     startPointerRef.current = { x: e.clientX, y: e.clientY };
@@ -121,7 +111,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
     if (activeSnapRef.current !== detectedSnap) {
       activeSnapRef.current = detectedSnap;
-      setSnapPreview(detectedSnap);
+      useWindowStore.getState().setSnapPreview(detectedSnap);
       if (detectedSnap) {
         soundEngine.playSnap();
       }
@@ -131,7 +121,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(() => {
         if (pendingPosRef.current) {
-          updatePosition(windowState.id, pendingPosRef.current);
+          useWindowStore.getState().updatePosition(windowState.id, pendingPosRef.current);
         }
         rafRef.current = null;
       });
@@ -150,27 +140,27 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
     if (activeZone) {
       useFancyZonesStore.getState().snapWindowToZone(windowState.id, activeZone);
       activeSnapRef.current = null;
-      setSnapPreview(null);
+      useWindowStore.getState().setSnapPreview(null);
     } else {
       useFancyZonesStore.getState().hideOverlay();
       const snapTarget = activeSnapRef.current;
       if (snapTarget) {
         soundEngine.playSnap();
-        snapWindow(windowState.id, snapTarget, {
+        useWindowStore.getState().snapWindow(windowState.id, snapTarget, {
           width: window.innerWidth,
           height: window.innerHeight,
         });
         activeSnapRef.current = null;
-        setSnapPreview(null);
+        useWindowStore.getState().setSnapPreview(null);
       } else if (pendingPosRef.current) {
-        updatePosition(windowState.id, pendingPosRef.current);
+        useWindowStore.getState().updatePosition(windowState.id, pendingPosRef.current);
         pendingPosRef.current = null;
       }
     }
 
     isDraggingRef.current = false;
-    setDragging(windowState.id, false);
-    setSnapPreview(null);
+    useWindowStore.getState().setDragging(windowState.id, false);
+    useWindowStore.getState().setSnapPreview(null);
 
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
@@ -181,7 +171,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
 
   const handleDoubleClick = () => {
     soundEngine.playClick();
-    toggleMaximize(windowState.id, {
+    useWindowStore.getState().toggleMaximize(windowState.id, {
       width: window.innerWidth,
       height: window.innerHeight,
     });
@@ -223,7 +213,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();
-            minimizeWindow(windowState.id);
+            useWindowStore.getState().minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
           className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
@@ -236,7 +226,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();
-            toggleMaximize(windowState.id, {
+            useWindowStore.getState().toggleMaximize(windowState.id, {
               width: window.innerWidth,
               height: window.innerHeight,
             });
@@ -256,7 +246,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
           onClick={(e) => {
             e.stopPropagation();
             soundEngine.playClick();
-            closeWindow(windowState.id);
+            useWindowStore.getState().closeWindow(windowState.id);
           }}
           aria-label="Close Window"
           className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-rose-500/80 hover:text-white transition-colors cursor-pointer"
@@ -266,4 +256,6 @@ export const WindowHeader: React.FC<WindowHeaderProps> = ({ windowState }) => {
       </div>
     </header>
   );
-};
+});
+
+WindowHeader.displayName = 'WindowHeader';

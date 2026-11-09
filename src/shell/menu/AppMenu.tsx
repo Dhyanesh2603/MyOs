@@ -157,35 +157,30 @@ export const AppMenu: React.FC = () => {
               </div>
             </div>
 
-            {/* Category Chips Bar (Safe Flex Scroll with No-Clipped Start) */}
-            <div className="w-full overflow-x-auto scrollbar-none no-scrollbar py-1">
-              <div
-                className="flex w-max min-w-full items-center justify-start sm:justify-center gap-2 px-6"
-                style={{ justifyContent: 'safe center' }}
-              >
-                {CATEGORIES.map((cat) => {
-                  const Icon = cat.icon;
-                  const isSelected = selectedCategory === cat.id;
+            {/* Category Chips Bar (Zero-Scrollbar, Centered, No-Clip Flex Architecture) */}
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-3xl px-2 py-1">
+              {CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = selectedCategory === cat.id;
 
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        soundEngine.playClick();
-                        setSelectedCategory(cat.id);
-                      }}
-                      className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-all ${
-                        isSelected
-                          ? 'bg-white text-black font-semibold shadow-sm'
-                          : 'border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/15 hover:text-white'
-                      }`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      <span>{cat.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      setSelectedCategory(cat.id);
+                    }}
+                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                      isSelected
+                        ? 'bg-white text-black font-semibold shadow-md'
+                        : 'border border-white/10 bg-white/5 text-neutral-300 hover:bg-white/15 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </motion.div>
 
@@ -194,9 +189,10 @@ export const AppMenu: React.FC = () => {
             initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.98, opacity: 0 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            transition={{ duration: 0.12, ease: 'easeOut' }}
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 w-full max-w-4xl my-auto overflow-y-auto px-4 py-6 scrollbar-none no-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex-1 w-full max-w-4xl my-auto overflow-y-auto px-4 py-4 scrollbar-none no-scrollbar [&::-webkit-scrollbar]:hidden"
           >
             {filteredApps.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">

@@ -19,12 +19,10 @@ const HANDLE_CLASSES: Record<ResizeDirection, string> = {
   se: 'bottom-0 right-0 w-3 h-3 translate-x-1/2 translate-y-1/2 cursor-nwse-resize z-20',
 };
 
-export const ResizeHandle: React.FC<ResizeHandleProps> = ({
+export const ResizeHandle: React.FC<ResizeHandleProps> = React.memo(({
   direction,
   windowState,
 }) => {
-  const { updateBounds, setResizing, focusWindow } = useWindowStore();
-
   const isResizingRef = useRef(false);
   const startPointerRef = useRef({ x: 0, y: 0 });
   const startRectRef = useRef<Rect>({ x: 0, y: 0, width: 0, height: 0 });
@@ -37,8 +35,9 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
 
-    focusWindow(windowState.id);
-    setResizing(windowState.id, true);
+    const store = useWindowStore.getState();
+    store.focusWindow(windowState.id);
+    store.setResizing(windowState.id, true);
 
     isResizingRef.current = true;
     startPointerRef.current = { x: e.clientX, y: e.clientY };
@@ -69,7 +68,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(() => {
         if (pendingRectRef.current) {
-          updateBounds(
+          useWindowStore.getState().updateBounds(
             windowState.id,
             { x: pendingRectRef.current.x, y: pendingRectRef.current.y },
             { width: pendingRectRef.current.width, height: pendingRectRef.current.height }
@@ -88,7 +87,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
       rafRef.current = null;
     }
     if (pendingRectRef.current) {
-      updateBounds(
+      useWindowStore.getState().updateBounds(
         windowState.id,
         { x: pendingRectRef.current.x, y: pendingRectRef.current.y },
         { width: pendingRectRef.current.width, height: pendingRectRef.current.height }
@@ -97,7 +96,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
     }
 
     isResizingRef.current = false;
-    setResizing(windowState.id, false);
+    useWindowStore.getState().setResizing(windowState.id, false);
 
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
@@ -118,4 +117,6 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({
       className={`absolute select-none touch-none ${HANDLE_CLASSES[direction]}`}
     />
   );
-};
+});
+
+ResizeHandle.displayName = 'ResizeHandle';

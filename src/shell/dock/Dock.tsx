@@ -8,9 +8,6 @@ import { soundEngine } from '@core/audio/soundEngine';
 import { useAppMenuStore } from '@shell/menu/appMenuStore';
 import { useDockStore } from './dockStore';
 import { DockItem } from './DockItem';
-import { DynamicActivityCapsule } from '@shell/topbar/DynamicActivityCapsule';
-import { SystemTray } from '@shell/topbar/SystemTray';
-import { WorkspaceSwitcher } from '@shell/topbar/WorkspaceSwitcher';
 import type { WindowSize } from '@contracts/window';
 
 export interface DockProps {
@@ -259,18 +256,6 @@ export const Dock: React.FC<DockProps> = ({
             />
           );
         })}
-
-        {/* Right Status Capsule: Integrated Activity & System Controls */}
-        <div className="mx-1 h-8 w-[1px] self-center bg-white/15 shrink-0" />
-
-        <div className="flex items-center gap-1.5 shrink-0 mb-1">
-          <DynamicActivityCapsule placement="bottom" />
-          <div className="flex items-center gap-1 rounded-xl bg-white/[0.08] border border-white/10 px-2 py-0.5 text-white shadow-sm backdrop-blur-md">
-            <WorkspaceSwitcher />
-            <div className="h-3 w-[1px] bg-white/20 mx-0.5" />
-            <SystemTray direction="up" />
-          </div>
-        </div>
       </motion.nav>
     </>
   );

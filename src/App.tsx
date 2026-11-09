@@ -23,6 +23,7 @@ import { BatchRenamerModal } from '@shell/dialogs/BatchRenamerModal';
 import { FocusModeOverlay } from '@shell/focus/FocusModeOverlay';
 import { ScratchpadDrawer } from '@shell/scratchpad/ScratchpadDrawer';
 import { SplitScreenDivider } from '@shell/window/SplitScreenDivider';
+import { DynamicIsland } from '@shell/topbar/DynamicIsland';
 import { ControlCenterShade } from '@shell/control-center/ControlCenterShade';
 import { LockScreen } from '@shell/session/LockScreen';
 import { AppMenu } from '@shell/menu/AppMenu';
@@ -128,6 +129,16 @@ export const App: React.FC = () => {
         return;
       }
 
+      // Control Center Quick Hub: Ctrl+Shift+C or Alt+C
+      if (
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c') ||
+        (e.altKey && e.key.toLowerCase() === 'c')
+      ) {
+        e.preventDefault();
+        useControlCenterStore.getState().toggleControlCenter();
+        return;
+      }
+
       // Quick Scratchpad Drawer: Ctrl+\
       if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
         e.preventDefault();
@@ -158,7 +169,8 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const { brightness, isNightShift } = useControlCenterStore();
+  const brightness = useControlCenterStore((s) => s.brightness);
+  const isNightShift = useControlCenterStore((s) => s.isNightShift);
 
   return (
     <DesktopSurface>
@@ -174,6 +186,9 @@ export const App: React.FC = () => {
           }}
         />
       )}
+
+      {/* Dynamic Activity Island (Floating Capsule, No Menu Bar) */}
+      <DynamicIsland />
 
       {/* Interactive Rendered Windows (Decoupled & Isolated with WindowsLayer) */}
       <WindowsLayer />

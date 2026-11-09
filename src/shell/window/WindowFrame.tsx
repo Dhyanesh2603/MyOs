@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import type { ResizeDirection, WindowState } from '@contracts/window';
 import { useWindowStore } from '@core/window/windowStore';
 import { useWorkspaceStore } from '@core/workspace/workspaceStore';
@@ -24,15 +24,66 @@ const RESIZE_DIRECTIONS: ResizeDirection[] = [
   'sw',
 ];
 
+interface WindowContentProps {
+  appId: string;
+  windowId: string;
+  processId: string;
+  initialData?: unknown;
+  isInteracting: boolean;
+}
+
+// Memoized Window Content: Never re-renders the underlying application (Monaco, Browser iframe, etc.)
+// during window dragging or resizing. Guarantees 120 FPS performance.
+const WindowContent = React.memo<WindowContentProps>(
+  ({ appId, windowId, processId, initialData, isInteracting }) => {
+    const manifest = appRegistry.get(appId);
+    const AppComponent = manifest?.component;
+
+    return (
+      <div
+        className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window text-content-primary ${
+          isInteracting ? 'pointer-events-none select-none' : ''
+        }`}
+      >
+        {AppComponent ? (
+          <ErrorBoundary fallbackTitle={`${manifest?.name || 'Application'} Error`}>
+            <AppComponent
+              windowId={windowId}
+              processId={processId}
+              initialData={initialData}
+            />
+          </ErrorBoundary>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-6 text-center text-xs text-content-secondary">
+            Application component &apos;{appId}&apos; could not be resolved.
+          </div>
+        )}
+      </div>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.appId === next.appId &&
+      prev.windowId === next.windowId &&
+      prev.processId === next.processId &&
+      prev.initialData === next.initialData &&
+      prev.isInteracting === next.isInteracting
+    );
+  }
+);
+
+WindowContent.displayName = 'WindowContent';
+
 export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState }) => {
-  const { focusWindow, getZIndex, peekWindowId, activeWindowId } = useWindowStore();
+  const focusWindow = useWindowStore((s) => s.focusWindow);
+  const peekWindowId = useWindowStore((s) => s.peekWindowId);
+  const activeWindowId = useWindowStore((s) => s.activeWindowId);
+
   const activeWorkspaceId = useWorkspaceStore((state) => state.activeWorkspaceId);
   const isMissionControlOpen = useWorkspaceStore((state) => state.isMissionControlOpen);
   const isStageManagerEnabled = useStageManagerStore((s) => s.isEnabled);
 
-  const zIndex = getZIndex(windowState.id);
-  const manifest = appRegistry.get(windowState.appId);
-  const AppComponent = manifest?.component;
+  const zIndex = windowState.zIndex ?? 100;
 
   // Workspace visibility filter: hide if not in active workspace unless Mission Control is open
   const isCurrentWorkspace = (windowState.workspaceId ?? 1) === activeWorkspaceId;
@@ -59,77 +110,64 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
   const isPeekTarget = peekWindowId === windowState.id;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key={windowState.id}
-        initial={{ scale: 0.96, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.96, opacity: 0 }}
-        transition={{
-          duration: 0.16,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-        onPointerDown={() => {
-          if (!windowState.isFocused) {
-            focusWindow(windowState.id);
-          }
-        }}
-        style={{
-          position: 'absolute',
-          left: `${windowState.position.x}px`,
-          top: `${windowState.position.y}px`,
-          width: `${windowState.size.width}px`,
-          height: `${windowState.size.height}px`,
-          zIndex: isPeekTarget ? 9999 : zIndex,
-          opacity: isGhosted ? 0.15 : 1,
-          pointerEvents: isGhosted ? 'none' : 'auto',
-          filter: isGhosted ? 'blur(1px)' : 'none',
-          willChange: isInteracting ? 'left, top, width, height' : 'auto',
-        }}
-        className={`group flex flex-col overflow-hidden ${
-          windowState.isMaximized ? 'rounded-none border-0' : 'rounded-[14px] border border-white/[0.14]'
-        } ${isInteracting ? 'transition-none shadow-xl' : 'transition-shadow duration-150'} ${
-          windowState.isMaximized
-            ? 'shadow-none'
-            : windowState.isFocused
-            ? 'shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
-            : 'shadow-[0_10px_30px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
-        } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
-      >
-        {/* 8-Axis Resize Frame */}
-        {RESIZE_DIRECTIONS.map((dir) => (
-          <ResizeHandle
-            key={dir}
-            direction={dir}
-            windowState={windowState}
-          />
-        ))}
+    <motion.div
+      key={windowState.id}
+      initial={{ scale: 0.98, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.98, opacity: 0 }}
+      transition={{
+        opacity: { duration: 0.12, ease: 'easeOut' },
+        scale: { duration: 0.12, ease: [0.16, 1, 0.3, 1] },
+        default: { duration: 0 },
+      }}
+      onPointerDown={() => {
+        if (!windowState.isFocused) {
+          focusWindow(windowState.id);
+        }
+      }}
+      style={{
+        position: 'absolute',
+        left: `${windowState.position.x}px`,
+        top: `${windowState.position.y}px`,
+        width: `${windowState.size.width}px`,
+        height: `${windowState.size.height}px`,
+        zIndex: isPeekTarget ? 9999 : zIndex,
+        opacity: isGhosted ? 0.15 : 1,
+        pointerEvents: isGhosted ? 'none' : 'auto',
+        filter: isGhosted ? 'blur(1px)' : 'none',
+        willChange: isInteracting ? 'left, top, width, height' : 'auto',
+      }}
+      className={`group flex flex-col overflow-hidden ${
+        windowState.isMaximized ? 'rounded-none border-0' : 'rounded-[14px] border border-white/[0.14]'
+      } ${isInteracting ? 'transition-none shadow-xl' : 'transition-shadow duration-150'} ${
+        windowState.isMaximized
+          ? 'shadow-none'
+          : windowState.isFocused
+          ? 'shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
+          : 'shadow-[0_10px_30px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)_inset] opacity-[0.98]'
+      } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
+    >
+      {/* 8-Axis Resize Frame */}
+      {RESIZE_DIRECTIONS.map((dir) => (
+        <ResizeHandle
+          key={dir}
+          direction={dir}
+          windowState={windowState}
+        />
+      ))}
 
-        {/* Window Command Rail / Titlebar */}
-        <WindowHeader windowState={windowState} />
+      {/* Window Command Rail / Titlebar */}
+      <WindowHeader windowState={windowState} />
 
-        {/* Application Content Viewport (Disable pointer events during drag/resize for 120 FPS performance) */}
-        <div
-          className={`relative flex-1 overflow-auto bg-surface-panel/95 backdrop-blur-window text-content-primary ${
-            isInteracting ? 'pointer-events-none select-none' : ''
-          }`}
-        >
-          {AppComponent ? (
-            <ErrorBoundary fallbackTitle={`${manifest?.name || 'Application'} Error`}>
-              <AppComponent
-                windowId={windowState.id}
-                processId={windowState.processId}
-                initialData={windowState.customState?.initialData}
-              />
-            </ErrorBoundary>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center p-6 text-center text-xs text-content-secondary">
-              Application component &apos;{windowState.appId}&apos; could not be resolved.
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+      {/* Memoized Application Content Viewport (Isolated from Drag & Resize updates) */}
+      <WindowContent
+        appId={windowState.appId}
+        windowId={windowState.id}
+        processId={windowState.processId}
+        initialData={windowState.customState?.initialData}
+        isInteracting={isInteracting}
+      />
+    </motion.div>
   );
 });
 
