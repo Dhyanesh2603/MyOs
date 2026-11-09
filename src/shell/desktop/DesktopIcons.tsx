@@ -15,9 +15,9 @@ import {
 import { useQuickLookStore } from '@core/quicklook/quickLookStore';
 import { IosAppIcon, IosFilesIcon } from '@shell/icons/IosAppIcon';
 import { soundEngine } from '@core/audio/soundEngine';
+import { useNotificationStore } from '@core/notifications/notificationStore';
 import {
   useDesktopStore,
-  DEFAULT_APPS,
   DesktopShortcut,
   IconPosition,
   ORIGIN_X,
@@ -136,15 +136,15 @@ const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
 
 export const DesktopIcons: React.FC = () => {
   const { launchApp } = useProcessStore();
-  const { nodes } = useVFSStore();
+  const { nodes, deleteNode } = useVFSStore();
   const openContextMenu = useContextMenuStore((state) => state.openMenu);
 
   const selectedId = useDesktopStore((state) => state.selectedIconId);
   const setSelectedId = useDesktopStore((state) => state.setSelectedIconId);
   const positions = useDesktopStore((state) => state.positions);
-  const customShortcuts = useDesktopStore((state) => state.customShortcuts);
+  const shortcuts = useDesktopStore((state) => state.shortcuts);
   const updatePosition = useDesktopStore((state) => state.updatePosition);
-  const removeShortcut = useDesktopStore((state) => state.removeShortcut);
+  const removeAppShortcut = useDesktopStore((state) => state.removeAppShortcut);
 
   // Global listener: clicking anywhere outside desktop icons deselects current icon
   useEffect(() => {
@@ -173,7 +173,7 @@ export const DesktopIcons: React.FC = () => {
     target: node.path,
   }));
 
-  const allShortcuts = [...DEFAULT_APPS, ...customShortcuts, ...userItems];
+  const allShortcuts = [...shortcuts, ...userItems];
 
   const handleOpen = (item: DesktopShortcut) => {
     soundEngine.playClick();
@@ -190,8 +190,6 @@ export const DesktopIcons: React.FC = () => {
     e.preventDefault();
     soundEngine.playClick();
     setSelectedId(item.id);
-
-    const isCustomShortcut = item.isCustom || customShortcuts.some((s) => s.id === item.id);
 
     openContextMenu({ x: e.clientX, y: e.clientY }, [
       {
@@ -225,21 +223,48 @@ export const DesktopIcons: React.FC = () => {
             },
           ]
         : []),
-      ...(isCustomShortcut
+      { type: 'separator', id: 'sep-action' },
+      ...(item.type === 'app'
         ? [
-            { type: 'separator' as const, id: 'sep-custom' },
             {
               type: 'item' as const,
               item: {
                 id: 'remove-shortcut',
                 label: 'Remove from Homescreen',
-                action: () => removeShortcut(item.id),
+                action: () => {
+                  removeAppShortcut(item.id);
+                  soundEngine.playClick();
+                  useNotificationStore.getState().notify({
+                    title: 'Removed from Homescreen',
+                    message: `${item.name} removed from your desktop.`,
+                    type: 'info',
+                  });
+                },
                 icon: Trash2,
                 danger: true,
               },
             },
           ]
-        : []),
+        : [
+            {
+              type: 'item' as const,
+              item: {
+                id: 'delete-vfs-item',
+                label: item.type === 'folder' ? 'Delete Folder' : 'Delete File',
+                action: async () => {
+                  await deleteNode(item.target);
+                  soundEngine.playClick();
+                  useNotificationStore.getState().notify({
+                    title: item.type === 'folder' ? 'Folder Deleted' : 'File Deleted',
+                    message: `${item.name} permanently deleted from Desktop.`,
+                    type: 'info',
+                  });
+                },
+                icon: Trash2,
+                danger: true,
+              },
+            },
+          ]),
       { type: 'separator', id: 'sep-1' },
       {
         type: 'item',

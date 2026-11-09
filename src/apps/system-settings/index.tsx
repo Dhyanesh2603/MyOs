@@ -20,7 +20,7 @@ import type { AppManifest, AppProps } from '@contracts/app';
 import type { ThemeId, AccentColorId, IconShape, WindowMaterial } from '@contracts/theme';
 import { useThemeStore, ACCENT_COLORS } from '@core/theme/themeStore';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
-import { useDesktopStore, DEFAULT_APPS } from '@core/desktop/desktopStore';
+import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 
 type SettingsTab = 'appearance' | 'desktop' | 'geometry' | 'accessibility' | 'about';
@@ -55,7 +55,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const layoutMode = useDesktopStore((state) => state.layoutMode);
   const setLayoutMode = useDesktopStore((state) => state.setLayoutMode);
   const autoArrangeGrid = useDesktopStore((state) => state.autoArrangeGrid);
-  const customShortcuts = useDesktopStore((state) => state.customShortcuts);
+  const shortcuts = useDesktopStore((state) => state.shortcuts);
 
   return (
     <div className="flex h-full w-full bg-[#0a0b10] text-neutral-100 select-none">
@@ -414,10 +414,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                 </div>
                 <button
                   onClick={() => {
-                    const allIds = [
-                      ...DEFAULT_APPS.map((a) => a.id),
-                      ...customShortcuts.map((s) => s.id),
-                    ];
+                    const allIds = shortcuts.map((s) => s.id);
                     autoArrangeGrid(allIds);
                     useNotificationStore.getState().notify({
                       title: 'Desktop Arranged',
@@ -615,3 +612,4 @@ export const settingsManifest: AppManifest = {
   permissions: ['notifications'],
   component: SettingsApp,
 };
+

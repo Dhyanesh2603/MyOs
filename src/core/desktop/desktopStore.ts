@@ -21,11 +21,11 @@ export const GRID_HEIGHT = 100;
 export const ORIGIN_X = 28;
 export const ORIGIN_Y = 56;
 
-const POSITIONS_STORAGE_KEY = 'flowos_desktop_icon_positions_v2';
-const SHORTCUTS_STORAGE_KEY = 'flowos_desktop_custom_apps_v2';
-const LAYOUT_MODE_KEY = 'flowos_desktop_layout_mode_v2';
+const POSITIONS_STORAGE_KEY = 'flowos_desktop_icon_positions_v3';
+const SHORTCUTS_STORAGE_KEY = 'flowos_desktop_app_shortcuts_v3';
+const LAYOUT_MODE_KEY = 'flowos_desktop_layout_mode_v3';
 
-export const DEFAULT_APPS: DesktopShortcut[] = [
+export const INITIAL_DEFAULT_APPS: DesktopShortcut[] = [
   { id: 'app-files', name: 'Files', type: 'app', target: 'file-explorer' },
   { id: 'app-browser', name: 'Browser', type: 'app', target: 'browser' },
   { id: 'app-code', name: 'Code', type: 'app', target: 'code-editor' },
@@ -41,12 +41,15 @@ function loadSavedPositions(): Record<string, IconPosition> {
   return {};
 }
 
-function loadSavedCustomShortcuts(): DesktopShortcut[] {
+function loadSavedShortcuts(): DesktopShortcut[] {
   try {
     const raw = localStorage.getItem(SHORTCUTS_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch {}
-  return [];
+  return INITIAL_DEFAULT_APPS;
 }
 
 function loadSavedLayoutMode(): DesktopLayoutMode {
@@ -69,21 +72,22 @@ export function snapToGrid(rawX: number, rawY: number): IconPosition {
 export interface DesktopStoreState {
   selectedIconId: string | null;
   layoutMode: DesktopLayoutMode;
-  customShortcuts: DesktopShortcut[];
+  shortcuts: DesktopShortcut[];
   positions: Record<string, IconPosition>;
 
   setSelectedIconId: (id: string | null) => void;
   setLayoutMode: (mode: DesktopLayoutMode) => void;
   updatePosition: (id: string, x: number, y: number) => void;
+  isAppOnDesktop: (appId: string) => boolean;
   addAppShortcut: (appId: string, customPosition?: IconPosition) => boolean;
-  removeShortcut: (id: string) => void;
+  removeAppShortcut: (appIdOrShortcutId: string) => boolean;
   autoArrangeGrid: (allItemIds: string[]) => void;
 }
 
 export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
   selectedIconId: null,
   layoutMode: loadSavedLayoutMode(),
-  customShortcuts: loadSavedCustomShortcuts(),
+  shortcuts: loadSavedShortcuts(),
   positions: loadSavedPositions(),
 
   setSelectedIconId: (id) => set({ selectedIconId: id }),
@@ -92,7 +96,6 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
     localStorage.setItem(LAYOUT_MODE_KEY, mode);
     set({ layoutMode: mode });
     if (mode === 'grid') {
-      // Snap all existing positions to grid
       const current = get().positions;
       const snapped: Record<string, IconPosition> = {};
       for (const [id, pos] of Object.entries(current)) {
@@ -118,21 +121,25 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
     });
   },
 
+  isAppOnDesktop: (appId: string) => {
+    const shortcuts = get().shortcuts;
+    const shortcutId = `app-${appId}`;
+    return shortcuts.some((s) => s.target === appId || s.id === shortcutId || s.id === appId);
+  },
+
   addAppShortcut: (appId, customPosition) => {
     const state = get();
     const shortcutId = `app-${appId}`;
 
-    // Check if already in default apps or custom shortcuts
-    const existsInDefault = DEFAULT_APPS.some((s) => s.target === appId);
-    const existsInCustom = state.customShortcuts.some((s) => s.target === appId || s.id === shortcutId);
+    // Check if already in shortcuts
+    const exists = state.shortcuts.some((s) => s.target === appId || s.id === shortcutId || s.id === appId);
 
-    if (existsInDefault || existsInCustom) {
-      // If position provided, just update its position
+    if (exists) {
       if (customPosition) {
         state.updatePosition(shortcutId, customPosition.x, customPosition.y);
       }
       set({ selectedIconId: shortcutId });
-      return false; // Already present
+      return false;
     }
 
     const app = appRegistry.get(appId);
@@ -146,20 +153,19 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
       isCustom: true,
     };
 
-    const nextCustom = [...state.customShortcuts, newShortcut];
+    const nextShortcuts = [...state.shortcuts, newShortcut];
     try {
-      localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(nextCustom));
+      localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(nextShortcuts));
     } catch {}
 
-    // Compute placement
+    // Compute initial coordinate
     let initialPos: IconPosition;
     if (customPosition) {
       initialPos = state.layoutMode === 'grid'
         ? snapToGrid(customPosition.x, customPosition.y)
         : { x: Math.round(customPosition.x), y: Math.round(customPosition.y) };
     } else {
-      // Find open grid slot
-      const totalCount = DEFAULT_APPS.length + nextCustom.length;
+      const totalCount = nextShortcuts.length;
       const maxRows = typeof window !== 'undefined'
         ? Math.max(3, Math.floor((window.innerHeight - ORIGIN_Y - 120) / GRID_HEIGHT))
         : 6;
@@ -177,30 +183,36 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
     } catch {}
 
     set({
-      customShortcuts: nextCustom,
+      shortcuts: nextShortcuts,
       positions: nextPositions,
       selectedIconId: shortcutId,
     });
     return true;
   },
 
-  removeShortcut: (id) => {
-    set((state) => {
-      const nextCustom = state.customShortcuts.filter((s) => s.id !== id);
-      const nextPositions = { ...state.positions };
-      delete nextPositions[id];
+  removeAppShortcut: (appIdOrShortcutId) => {
+    const state = get();
+    const targetShortcut = state.shortcuts.find(
+      (s) => s.id === appIdOrShortcutId || s.target === appIdOrShortcutId
+    );
 
-      try {
-        localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(nextCustom));
-        localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(nextPositions));
-      } catch {}
+    if (!targetShortcut) return false;
 
-      return {
-        customShortcuts: nextCustom,
-        positions: nextPositions,
-        selectedIconId: state.selectedIconId === id ? null : state.selectedIconId,
-      };
+    const nextShortcuts = state.shortcuts.filter((s) => s.id !== targetShortcut.id);
+    const nextPositions = { ...state.positions };
+    delete nextPositions[targetShortcut.id];
+
+    try {
+      localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(nextShortcuts));
+      localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(nextPositions));
+    } catch {}
+
+    set({
+      shortcuts: nextShortcuts,
+      positions: nextPositions,
+      selectedIconId: state.selectedIconId === targetShortcut.id ? null : state.selectedIconId,
     });
+    return true;
   },
 
   autoArrangeGrid: (allItemIds) => {

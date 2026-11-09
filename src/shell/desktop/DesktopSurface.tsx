@@ -12,7 +12,7 @@ import { importHostFileToVFS } from '@core/vfs/hostBridge';
 import { useWidgetStore } from '@core/widgets/widgetStore';
 import { useCustomAppStore } from '@core/packages/customAppStore';
 import { useControlCenterStore } from '@core/system/controlCenterStore';
-import { useDesktopStore, DEFAULT_APPS } from '@core/desktop/desktopStore';
+import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useAppMenuStore } from '@shell/menu/appMenuStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import {
@@ -53,7 +53,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
   const layoutMode = useDesktopStore((state) => state.layoutMode);
   const setLayoutMode = useDesktopStore((state) => state.setLayoutMode);
   const autoArrangeGrid = useDesktopStore((state) => state.autoArrangeGrid);
-  const customShortcuts = useDesktopStore((state) => state.customShortcuts);
+  const shortcuts = useDesktopStore((state) => state.shortcuts);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -128,10 +128,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             label: 'Auto-Arrange Desktop Icons',
             icon: RotateCcw,
             action: () => {
-              const allIds = [
-                ...DEFAULT_APPS.map((a) => a.id),
-                ...customShortcuts.map((s) => s.id),
-              ];
+              const allIds = shortcuts.map((s) => s.id);
               autoArrangeGrid(allIds);
               useNotificationStore.getState().notify({
                 title: 'Desktop Arranged',

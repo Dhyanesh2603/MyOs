@@ -12,7 +12,9 @@ import {
   SlidersHorizontal,
   Plus,
   PlusCircle,
+  Minus,
   Play,
+  Trash2,
 } from 'lucide-react';
 import { appRegistry } from '@core/process/registry';
 import { useProcessStore } from '@core/process/processStore';
@@ -22,6 +24,8 @@ import { useAppMenuStore, AppMenuCategory } from './appMenuStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
 import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
+import { useCustomAppStore } from '@core/packages/customAppStore';
+import { usePackageStore } from '@core/packages/packageStore';
 
 const CATEGORIES: { id: AppMenuCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'all', label: 'All Apps', icon: Layers },
@@ -45,6 +49,14 @@ export const AppMenu: React.FC = () => {
 
   const { launchApp, isAppRunning } = useProcessStore();
   const openMenu = useContextMenuStore((s) => s.openMenu);
+  const isAppOnDesktop = useDesktopStore((s) => s.isAppOnDesktop);
+  const addAppShortcut = useDesktopStore((s) => s.addAppShortcut);
+  const removeAppShortcut = useDesktopStore((s) => s.removeAppShortcut);
+  const customApps = useCustomAppStore((s) => s.customApps);
+  const deleteWebApp = useCustomAppStore((s) => s.deleteWebApp);
+  const packages = usePackageStore((s) => s.packages);
+  const uninstallPackage = usePackageStore((s) => s.uninstallPackage);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingApp, setIsDraggingApp] = useState(false);
 
@@ -119,14 +131,25 @@ export const AppMenu: React.FC = () => {
     closeAppMenu();
   };
 
-  const handlePinToDesktop = (appId: string, appName: string) => {
-    const added = useDesktopStore.getState().addAppShortcut(appId);
+  const handleToggleHomescreen = (appId: string, appName: string) => {
+    const onHomescreen = isAppOnDesktop(appId);
     soundEngine.playClick();
-    useNotificationStore.getState().notify({
-      title: added ? 'Pinned to Homescreen' : 'Already on Homescreen',
-      message: added ? `${appName} is now on your desktop.` : `${appName} is already placed on the desktop.`,
-      type: added ? 'success' : 'info',
-    });
+
+    if (onHomescreen) {
+      removeAppShortcut(appId);
+      useNotificationStore.getState().notify({
+        title: 'Removed from Homescreen',
+        message: `${appName} removed from desktop.`,
+        type: 'info',
+      });
+    } else {
+      addAppShortcut(appId);
+      useNotificationStore.getState().notify({
+        title: 'Pinned to Homescreen',
+        message: `${appName} added to desktop.`,
+        type: 'success',
+      });
+    }
   };
 
   const handleContextMenu = (e: React.MouseEvent, appId: string, appName: string, category: string) => {
@@ -134,16 +157,20 @@ export const AppMenu: React.FC = () => {
     e.stopPropagation();
     soundEngine.playClick();
 
+    const onHomescreen = isAppOnDesktop(appId);
+    const isCustomPwa = customApps.some((c) => c.id === appId);
+    const isCommunityPkg = packages.some((p) => p.id === appId && p.installed);
+
     openMenu({ x: e.clientX, y: e.clientY }, [
       {
         type: 'item',
         item: {
-          id: 'pin-to-desktop',
-          label: 'Add to Homescreen',
-          icon: PlusCircle,
+          id: 'toggle-homescreen',
+          label: onHomescreen ? 'Remove from Homescreen' : 'Add to Homescreen',
+          icon: onHomescreen ? Trash2 : PlusCircle,
+          danger: onHomescreen,
           action: () => {
-            handlePinToDesktop(appId, appName);
-            closeAppMenu();
+            handleToggleHomescreen(appId, appName);
           },
         },
       },
@@ -156,6 +183,46 @@ export const AppMenu: React.FC = () => {
           action: () => handleLaunch(appId),
         },
       },
+      ...(isCustomPwa
+        ? [
+            { type: 'separator' as const, id: 'sep-pwa' },
+            {
+              type: 'item' as const,
+              item: {
+                id: 'delete-pwa',
+                label: 'Delete Web App (Uninstall)',
+                icon: Trash2,
+                danger: true,
+                action: () => {
+                  deleteWebApp(appId);
+                  removeAppShortcut(appId);
+                  soundEngine.playClick();
+                  closeAppMenu();
+                },
+              },
+            },
+          ]
+        : []),
+      ...(isCommunityPkg
+        ? [
+            { type: 'separator' as const, id: 'sep-pkg' },
+            {
+              type: 'item' as const,
+              item: {
+                id: 'uninstall-pkg',
+                label: 'Uninstall Package',
+                icon: Trash2,
+                danger: true,
+                action: () => {
+                  uninstallPackage(appId);
+                  removeAppShortcut(appId);
+                  soundEngine.playClick();
+                  closeAppMenu();
+                },
+              },
+            },
+          ]
+        : []),
       { type: 'separator', id: 'sep-1' },
       {
         type: 'item',
@@ -215,7 +282,7 @@ export const AppMenu: React.FC = () => {
               </div>
             </div>
 
-            {/* Category Chips Bar (Zero-Scrollbar, Centered, No-Clip Flex Architecture) */}
+            {/* Category Chips Bar */}
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-3xl px-2 py-1">
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
@@ -242,7 +309,7 @@ export const AppMenu: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Main App Grid (Mobile App Library layout with Drag & Drop Pinning) */}
+          {/* Main App Grid */}
           <motion.div
             initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -275,6 +342,7 @@ export const AppMenu: React.FC = () => {
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-y-7 gap-x-5 justify-items-center">
                 {filteredApps.map((app) => {
                   const running = isAppRunning(app.id);
+                  const onHomescreen = isAppOnDesktop(app.id);
 
                   return (
                     <div
@@ -307,17 +375,25 @@ export const AppMenu: React.FC = () => {
                           />
                         )}
 
-                        {/* Quick '+' Pin to Homescreen Hover Button */}
+                        {/* Add / Remove from Homescreen Quick Hover Button */}
                         <button
                           type="button"
-                          title="Add to Homescreen"
+                          title={onHomescreen ? 'Remove from Homescreen' : 'Add to Homescreen'}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handlePinToDesktop(app.id, app.name);
+                            handleToggleHomescreen(app.id, app.name);
                           }}
-                          className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-white/25 hover:bg-white text-white hover:text-black border border-white/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer shadow-md"
+                          className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer shadow-md ${
+                            onHomescreen
+                              ? 'bg-rose-500/80 hover:bg-rose-500 text-white border border-rose-300/40'
+                              : 'bg-white/25 hover:bg-white text-white hover:text-black border border-white/40'
+                          }`}
                         >
-                          <Plus className="h-3 w-3 stroke-[3]" />
+                          {onHomescreen ? (
+                            <Minus className="h-3 w-3 stroke-[3]" />
+                          ) : (
+                            <Plus className="h-3 w-3 stroke-[3]" />
+                          )}
                         </button>
                       </div>
 
