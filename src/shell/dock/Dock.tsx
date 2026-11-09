@@ -98,27 +98,22 @@ export const Dock: React.FC<DockProps> = ({
     }
   };
 
-  // Granular window statuses (open, focused, minimized) per appId using useShallow
-  // Prevents re-renders during window dragging because position changes don't alter appId, isMinimized, or isFocused!
-  const appStatuses = useWindowStore(
+  // List of unique app IDs for all currently open windows (array of primitive strings)
+  // useShallow on primitive string array guarantees 100% stable reference checks!
+  const openAppIds = useWindowStore(
     useShallow((state) => {
-      const map: Record<string, { hasWindows: boolean; isMinimized: boolean; isFocused: boolean }> = {};
+      const ids: string[] = [];
       for (const win of Object.values(state.windows)) {
-        const cur = map[win.appId];
-        const isMin = win.isMinimized;
-        const isFoc = win.isFocused && !isMin;
-        map[win.appId] = {
-          hasWindows: true,
-          isMinimized: cur ? cur.isMinimized && isMin : isMin,
-          isFocused: cur ? cur.isFocused || isFoc : isFoc,
-        };
+        if (!ids.includes(win.appId)) {
+          ids.push(win.appId);
+        }
       }
-      return map;
+      return ids;
     })
   );
 
   // Unpinned apps appear in dock ONLY when they have open or minimized windows
-  const unpinnedRunningAppIds = Object.keys(appStatuses).filter(
+  const unpinnedRunningAppIds = openAppIds.filter(
     (appId) => !pinnedAppIds.includes(appId)
   );
 
@@ -133,26 +128,20 @@ export const Dock: React.FC<DockProps> = ({
       : 'rounded-[22.5%]';
 
   const handleAppClick = (appId: string) => {
-    const status = appStatuses[appId];
-    const isRunning = Boolean(status?.hasWindows);
+    const winStore = useWindowStore.getState();
+    const appWindows = Object.values(winStore.windows).filter((w) => w.appId === appId);
 
-    if (!isRunning) {
+    if (appWindows.length === 0) {
       launchApp(appId, undefined, viewportSize);
     } else {
-      const winStore = useWindowStore.getState();
-      const appWindows = Object.values(winStore.windows).filter((w) => w.appId === appId);
-      if (appWindows.length === 0) {
-        launchApp(appId, undefined, viewportSize);
-      } else {
-        const primaryWin = appWindows[0];
-        if (primaryWin) {
-          if (primaryWin.isMinimized) {
-            winStore.restoreWindow(primaryWin.id);
-          } else if (primaryWin.isFocused) {
-            winStore.minimizeWindow(primaryWin.id);
-          } else {
-            winStore.focusWindow(primaryWin.id);
-          }
+      const primaryWin = appWindows[0];
+      if (primaryWin) {
+        if (primaryWin.isMinimized) {
+          winStore.restoreWindow(primaryWin.id);
+        } else if (primaryWin.isFocused) {
+          winStore.minimizeWindow(primaryWin.id);
+        } else {
+          winStore.focusWindow(primaryWin.id);
         }
       }
     }
@@ -246,19 +235,11 @@ export const Dock: React.FC<DockProps> = ({
           const manifest = appRegistry.get(appId);
           if (!manifest) return null;
 
-          const status = appStatuses[appId];
-          const isRunning = Boolean(status?.hasWindows);
-          const isFocused = Boolean(status?.isFocused);
-          const isMinimized = Boolean(status?.isMinimized);
-
           return (
             <DockItem
               key={appId}
               manifest={manifest}
               mouseX={mouseX}
-              isRunning={isRunning}
-              isFocused={isFocused}
-              isMinimized={isMinimized}
               onClick={() => handleAppClick(appId)}
             />
           );
@@ -274,18 +255,11 @@ export const Dock: React.FC<DockProps> = ({
           const manifest = appRegistry.get(appId);
           if (!manifest) return null;
 
-          const status = appStatuses[appId];
-          const isFocused = Boolean(status?.isFocused);
-          const isMinimized = Boolean(status?.isMinimized);
-
           return (
             <DockItem
               key={appId}
               manifest={manifest}
               mouseX={mouseX}
-              isRunning={true}
-              isFocused={isFocused}
-              isMinimized={isMinimized}
               onClick={() => handleAppClick(appId)}
             />
           );

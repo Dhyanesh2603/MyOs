@@ -14,9 +14,6 @@ import { IosAppIcon } from '@shell/icons/IosAppIcon';
 export interface DockItemProps {
   manifest: AppManifest;
   mouseX: MotionValue<number>;
-  isRunning: boolean;
-  isFocused: boolean;
-  isMinimized?: boolean;
   onClick: () => void;
 }
 
@@ -25,12 +22,9 @@ const PEAK_SIZE = 62;
 const PROXIMITY_RADIUS = 130;
 const EMPTY_WINDOWS: WindowState[] = [];
 
-export const DockItem: React.FC<DockItemProps> = ({
+export const DockItem: React.FC<DockItemProps> = React.memo(({
   manifest,
   mouseX,
-  isRunning,
-  isFocused,
-  isMinimized = false,
   onClick,
 }) => {
   const itemRef = useRef<HTMLButtonElement>(null);
@@ -39,9 +33,20 @@ export const DockItem: React.FC<DockItemProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  // Optimized selective subscriptions: boolean primitive avoids React getSnapshot infinite loops
-  const hasWindows = useWindowStore((state) =>
+  // Optimized selective subscriptions: primitive booleans avoid React getSnapshot infinite loops
+  const isRunning = useWindowStore((state) =>
     Object.values(state.windows).some((w) => w.appId === manifest.id)
+  );
+
+  const isMinimized = useWindowStore((state) =>
+    Object.values(state.windows).some((w) => w.appId === manifest.id && w.isMinimized)
+  );
+
+  const isFocused = useWindowStore((state) =>
+    state.activeWindowId
+      ? state.windows[state.activeWindowId]?.appId === manifest.id &&
+        !state.windows[state.activeWindowId]?.isMinimized
+      : false
   );
 
   // Read app windows only when hover preview is actually displayed
@@ -115,7 +120,7 @@ export const DockItem: React.FC<DockItemProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       {/* Live Miniature Hover Preview or Simple Tooltip */}
-      {hasWindows ? (
+      {isRunning ? (
         <DockHoverPreview
           manifest={manifest}
           windows={appWindows}
@@ -168,4 +173,6 @@ export const DockItem: React.FC<DockItemProps> = ({
       </motion.button>
     </div>
   );
-};
+});
+
+DockItem.displayName = 'DockItem';
