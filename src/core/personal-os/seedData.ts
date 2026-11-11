@@ -41,7 +41,7 @@ export const SEED_MISSIONS: Mission[] = [
   },
   {
     id: 'm-flowos',
-    title: 'Architect Flow OS v2 Personal Operating System',
+    title: 'Architect Onyx OS v2 Personal Operating System',
     tagline: 'Crafting the ultimate browser-based engineering workstation with zero-latency desktop ergonomics.',
     category: 'engineering',
     status: 'active',
@@ -60,7 +60,7 @@ export const SEED_MISSIONS: Mission[] = [
     skillIds: ['sk-ts', 'sk-react', 'sk-ui-eng'],
     dependencies: ['UI State Orchestration', 'IndexedDB Pipeline'],
     resources: [
-      { title: 'Flow OS GitHub Repository', url: 'https://github.com/Dhyanesh2603/MyOs', type: 'repo' },
+      { title: 'Onyx OS GitHub Repository', url: 'https://github.com/Dhyanesh2603/MyOs', type: 'repo' },
       { title: 'Linear UI Design Principles', url: 'https://linear.app/design', type: 'spec' },
     ],
   },
@@ -116,7 +116,7 @@ export const SEED_MISSIONS: Mission[] = [
 export const SEED_PROJECTS: Project[] = [
   {
     id: 'p-flowos',
-    name: 'Flow OS',
+    name: 'Onyx OS',
     tagline: 'Next-generation web desktop operating system with hardware-accelerated ergonomics.',
     description: 'A complete desktop OS in browser with a micro-kernel event bus, VFS, custom app sandboxing, acoustic feedback, and Personal OS command center.',
     status: 'active',
@@ -128,7 +128,7 @@ export const SEED_PROJECTS: Project[] = [
     milestones: [
       { id: 'pm-1', title: 'FlowBoard vector canvas & sticky cards', completed: true, dueDate: '2026-09-18' },
       { id: 'pm-2', title: 'Acoustic keyboard soundscape engine', completed: true, dueDate: '2026-09-19' },
-      { id: 'pm-3', title: 'Flow OS v2 Personal Operating System', completed: false, dueDate: '2026-09-22' },
+      { id: 'pm-3', title: 'Onyx OS v2 Personal Operating System', completed: false, dueDate: '2026-09-22' },
       { id: 'pm-4', title: 'Interactive vector Knowledge Graph', completed: false, dueDate: '2026-09-24' },
     ],
     knownBugs: [
@@ -136,7 +136,7 @@ export const SEED_PROJECTS: Project[] = [
       { id: 'kb-2', description: 'Window edge clipping when snapping across extreme ultrawide monitors (>3440px)', severity: 'moderate', status: 'open' },
     ],
     ideas: [
-      'Peer-to-peer WebRTC file sync between two FlowOS instances',
+      'Peer-to-peer WebRTC file sync between two Onyx OS instances',
       'Wasm compiled SQLite engine for queryable VFS tables',
       'Custom shader background generator using GLSL fragment scripts',
     ],
@@ -173,7 +173,7 @@ export const SEED_PROJECTS: Project[] = [
     ],
     ideas: [
       'Product Quantization (PQ) for 4x memory footprint reduction',
-      'Direct integration with Flow OS local Copilot assistant',
+      'Direct integration with Onyx OS local Copilot assistant',
     ],
     changelog: [
       { version: '0.3.0', date: '2026-09-08', notes: ['Implemented AVX-512 distance metric acceleration'] },
@@ -531,7 +531,7 @@ export const SEED_COMPANIES: CareerCompany[] = [
     location: 'Remote Global',
     jobUrl: 'https://linear.app/careers',
     resumeVersionUsed: 'Resume_v4_Frontend_Systems.pdf',
-    notes: 'Submitted tailored cover letter highlighting Flow OS architecture, keyboard shortcuts, and performance optimizations.',
+    notes: 'Submitted tailored cover letter highlighting Onyx OS architecture, keyboard shortcuts, and performance optimizations.',
     interviewRounds: [],
   },
   {
@@ -556,7 +556,7 @@ export const SEED_COMPANIES: CareerCompany[] = [
 export const SEED_DAILY_PLAN: DailyPlan = {
   date: new Date().toISOString().slice(0, 10),
   morningPriorities: [
-    { id: 'dp-1', text: 'Build Flow OS v2 Home Momentum & "What should I work on next?" engine', completed: true, tag: 'ENGINEERING' },
+    { id: 'dp-1', text: 'Build Onyx OS v2 Home Momentum & "What should I work on next?" engine', completed: true, tag: 'ENGINEERING' },
     { id: 'dp-2', text: 'Solve 2 Hard LeetCode Monotonic Stack questions', completed: true, tag: 'DSA' },
     { id: 'dp-3', text: 'Prepare B+ Tree Page Split writeup for Database Internals', completed: false, tag: 'ACADEMICS' },
   ],
@@ -587,10 +587,10 @@ export const SEED_TIMELINE: TimelineEvent[] = [
 export const SEED_KNOWLEDGE_NODES: KnowledgeNode[] = [
   // Missions
   { id: 'kn-m1', label: 'Placement Campaign', type: 'mission', details: 'Crack Tier-1 Product Engineering' },
-  { id: 'kn-m2', label: 'Flow OS v2', type: 'mission', details: 'Personal Operating System Workstation' },
+  { id: 'kn-m2', label: 'Onyx OS v2', type: 'mission', details: 'Personal Operating System Workstation' },
   { id: 'kn-m3', label: 'Semester VII Distinction', type: 'mission', details: 'Maintain >9.2 CGPA' },
   // Projects
-  { id: 'kn-p1', label: 'Flow OS Engine', type: 'project', details: 'Browser OS in React/TypeScript' },
+  { id: 'kn-p1', label: 'Onyx OS Engine', type: 'project', details: 'Browser OS in React/TypeScript' },
   { id: 'kn-p2', label: 'NeuralCache', type: 'project', details: 'Vector similarity retrieval in Rust' },
   { id: 'kn-p3', label: 'MockForge', type: 'project', details: 'Synthetic API generator in Go' },
   // Skills

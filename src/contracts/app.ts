@@ -4,7 +4,7 @@ import type { WindowConstraints, WindowId, WindowSize, ProcessId } from './windo
 export type { ProcessId };
 
 /**
- * FlowOS Application Registry & Process Contracts
+ * Onyx OS Application Registry & Process Contracts
  */
 
 export type AppCategory =

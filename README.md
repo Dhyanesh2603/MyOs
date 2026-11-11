@@ -1,18 +1,21 @@
-# FlowOS
+# Onyx OS
 
 A hardware-accelerated web desktop operating system built with React 19, TypeScript (strict mode), Tailwind CSS, Framer Motion, Web Audio API, and IndexedDB.
 
-FlowOS delivers authentic desktop ergonomics inside the browser, synthesizing the design restraint of modern interfaces, the latency optimization of native window compositors, and the technical depth of an engineering operating environment.
+- **Live Deployment:** [https://os-onyx.vercel.app](https://os-onyx.vercel.app)
+- **Repository:** [https://github.com/Dhyanesh2603/MyOs](https://github.com/Dhyanesh2603/MyOs)
+
+Onyx OS delivers authentic desktop ergonomics inside the browser, synthesizing the design restraint of modern interfaces, the latency optimization of native window compositors, and the technical depth of an engineering operating environment.
 
 ---
 
 ## Architectural Overview
 
-FlowOS is engineered around an asynchronous micro-kernel pattern inside the browser, decoupling window compositing, process scheduling, storage abstraction, and audio synthesis into independent subsystems.
+Onyx OS is engineered around an asynchronous micro-kernel pattern inside the browser, decoupling window compositing, process scheduling, storage abstraction, and audio synthesis into independent subsystems.
 
 ```
 +-----------------------------------------------------------------------+
-|                           FlowOS UI Shell                             |
+|                            Onyx UI Shell                              |
 |    Dynamic Island | Launchpad | Desktop Grid | Dock | Control Center  |
 +-----------------------------------+-----------------------------------+
                                     |
@@ -41,38 +44,45 @@ FlowOS is engineered around an asynchronous micro-kernel pattern inside the brow
 - **Auto-Arrange Grid:** Programmatically scans all active shortcuts and desktop files to calculate optimal column-major layout distribution based on dynamic viewport height.
 - **Global Deselection Engine:** A high-priority pointer capture listener deselects active desktop icons whenever a click occurs outside `[data-desktop-icon]` elements, providing authentic desktop selection behavior.
 - **Launchpad Drag-and-Drop Pinning:** Native HTML5 Drag and Drop pipeline transfers app bundles (`application/flowos-app-id`) directly from the Launchpad app drawer onto the desktop wallpaper.
-- **Quick-Pin Action:** Launchpad app cards feature both an inline plus button and a context menu entry to pin applications to the desktop in one click.
+- **App Management & Context Actions:** Desktop icons support context menus to open, remove from desktop, or inspect app details.
 
 ### 3. Dynamic Activity Island (Minimal Capsule)
 - **Detached Capsule Architecture:** Replaces legacy static menu bars with a floating, centered island pill inspired by modern hardware capsules.
 - **Unobtrusive Telemetry:** Houses system time, network connectivity status, battery percentage, active Pomodoro focus countdowns, and animated equalizer waves when audio is playing.
-- **Quick Hub Integration:** Clicking the Dynamic Island summons the Control Center glass panel without obscuring the desktop surface.
+- **Quick Hub Integration:** Clicking the Dynamic Island summons the solid Control Center panel without obscuring the desktop surface.
 
-### 4. Adaptive Icon Silhouette & Window Materiality
-- **Geometric Icon Morphing:** The desktop shell, dock, and launchpad adapt icon geometry dynamically according to user preferences:
-  - **Squircle:** Standard Apple iOS curvature (`rounded-[22.5%]`).
-  - **Circle:** Minimal geometric circle (`rounded-full`).
-  - **Rounded:** macOS Big Sur super-ellipse tile (`rounded-lg`).
-  - **Smooth:** Soft ergonomic pill silhouette (`rounded-2xl`).
-- **Dynamic Window Materials:**
-  - **Frosted Liquid Glass:** Backdrop blur with high-luminance specular borders and ambient light transmission.
-  - **Opaque Solid Matte:** Pure jet-black surface (`bg-[#0c0d12]`) designed for high-contrast viewing and zero GPU blur overhead.
-  - **Translucent Film:** Lightweight semi-transparent polymer tint with variable opacity slider ($50\% \to 100\%$).
+### 4. Solid High-Contrast Control Center (`ControlCenterShade`)
+- **Opaque Charcoal Canvas:** Features a 100% solid, pitch-dark charcoal background (`#101117`) eliminating glass blur washouts when opened over bright web pages.
+- **Essential Quick Toggles:** Houses core everyday utilities: Wi-Fi, Bluetooth, Host Bridge file drop, Focus Mode, Display Brightness slider, Master Volume slider, Keyboard Acoustics profile selector, and Ambient Soundscapes.
+- **Streamlined Preferences:** Decoupled cosmetic customization from everyday system toggles for rapid, distraction-free adjustments.
 
-### 5. Fluid Dock & Process Lifecycle Tracking
-- **Lifecycle Differentiation:** The dock distinguishes between active running windows, minimized windows, and closed applications.
+### 5. Smart Auto-Hiding Dock & Minimalist Monochrome Icons
+- **Nothing-Inspired Monochrome Iconography:** Features clean, high-contrast black-and-white icon silhouettes designed for minimal visual fatigue.
+- **Smart Bottom-Edge Reveal:** The dock automatically hides at the bottom viewport boundary, sliding smoothly into view only when the cursor reaches the bottom threshold.
+- **Process Lifecycle Tracking:**
   - **Minimized Windows:** Indicated by an amber status pip (`bg-amber-400/90`). Clicking a minimized dock item restores the window directly to the foreground.
   - **Terminated Applications:** Closing a window cleanly terminates its process ID, fully removing running indicator dots from the dock.
-- **Smart Auto-Hide:** Automatically slides below the viewport edge when overlapping active windows are present and reveals smoothly on bottom-edge hover.
 - **Aero Peek Hover:** Hovering over running dock icons renders miniature thumbnail cards and gently ghosts inactive windows (`opacity: 0.15`).
 
-### 6. Storage & Virtual File System (VFS)
-- **IndexedDB POSIX Abstraction:** Directory trees, file metadata, permissions, and binary blobs persist locally across browser sessions.
-- **Physical Host PC Mounting:** Connects real directories from the physical computer directly into the FlowOS VFS under `/device/{folderName}` via the W3C File System Access API.
-- **Host Bridge Drag-and-Drop:** Dragging files from the native operating system desktop directly onto FlowOS imports them into `/home/user/Desktop`. Right-clicking any VFS node provides instant physical download to the host machine.
+### 6. Personal OS: Unified Charcoal & Amber Engineering Suite
+- **Aesthetic Unification:** Built on an obsidian charcoal canvas (`#10121a`, `#0d0e14`) accented with warm amber badges (`text-amber-400`) and high-contrast white action controls across every sub-view.
+- **Algorithmic Studio:** Curated pattern breakdown (Two Pointers, Sliding Window, Fast & Slow Pointers, Monotonic Stack), difficulty metrics, and spaced repetition queues for technical interview mastery.
+- **Engineering Project Studio:** Architecture specifications, technology stack matrix, milestone roadmaps, bug and edge-case trackers, and live git diff loggers.
+- **Academics & Coursework:** Course management with minimum attendance requirement tracking, credit distribution calculators, and assignment submission deadlines.
+- **Career Roadmap:** Interview pipeline stages (Applied, Screen, Technical, Offer), recruiter notes, and compensation matrices.
+- **Daily Focus & Timeline:** Morning priorities, chronological time-blocked schedule, and integrated Pomodoro execution counter.
+
+### 7. Clean Iframe Web Browser
+- **Direct Embed Architecture:** Stripped of brittle search scrapers and query hacks. All valid protocols, domains, and queries load cleanly within a responsive `<iframe>` viewport.
+- **Safe Fallback Routing:** Standard search terms resolve directly to iframe-embeddable search engines (`https://www.google.com/search?igu=1&q=...`).
+
+### 8. Storage & Virtual File System (VFS)
+- **IndexedDB POSIX Abstraction:** Directory trees, file metadata, permissions, and binary blobs persist locally across browser sessions without requiring a database backend.
+- **Physical Host PC Mounting:** Connects real directories from the physical computer directly into the Onyx OS VFS under `/device/{folderName}` via the W3C File System Access API.
+- **Host Bridge Drag-and-Drop:** Dragging files from the native operating system desktop directly onto Onyx OS imports them into `/home/user/Desktop`. Right-clicking any VFS node provides instant physical download to the host machine.
 - **Batch Renamer Studio (`F2`):** Multi-file renaming engine supporting find-and-replace, regex patterns, prefix/suffix insertion, and sequential numbering with live diff preview.
 
-### 7. Procedural Web Audio Engine
+### 9. Procedural Web Audio Engine
 - **Zero Asset Synthesis:** Complete sound subsystem synthesized purely with the Web Audio API without downloading external audio files:
   - Procedural soundscapes: Gentle Rain, Campfire Crackle, White Noise, Deep Space Drone, Brown Noise ($1/f^2$), Server Room Hum, and 40 Hz Gamma Waves.
   - Acoustic keyboard profiles: Mechanical Thock, Nothing Micro-Tick, and 8-Bit Retro Arcade attached to global keystrokes.
@@ -86,10 +96,10 @@ FlowOS is engineered around an asynchronous micro-kernel pattern inside the brow
 | Application | Process ID | Category | Description |
 | :--- | :--- | :--- | :--- |
 | **Personal OS** | `personal-os` | Productivity | Engineering workstation featuring dynamic DSA problem tracking, algorithmic momentum engine, missions, project architecture studio, git diff viewer, and academic attendance monitors. |
-| **Browser** | `browser` | Productivity | Sandboxed multi-tab browser with direct iframe embed, Jina Reader engine bypass for header-restricted domains, and local file viewer. |
+| **Browser** | `browser` | Productivity | Multi-tab browser with direct iframe embed, quick bookmarks, and search normalization. |
 | **Files** | `file-explorer` | Utilities | POSIX file manager with Quick Look file previewer (`Spacebar`), W3C host folder mounting, breadcrumb navigation, and tree hierarchy. |
 | **Code Editor** | `code-editor` | Development | Monospaced editor with syntax highlighting, line numbers gutter, and integrated sandboxed WebWorker execution console. |
-| **Terminal** | `terminal` | Development | `flowsh` Unix pipeline shell supporting chained pipes (`|`), filters (`grep`, `wc`, `head`, `tail`, `sort`, `uniq`), `tree` visualizer, and Tab autocomplete. |
+| **Terminal** | `terminal` | Development | `onyxsh` Unix pipeline shell supporting chained pipes (`|`), filters (`grep`, `wc`, `head`, `tail`, `sort`, `uniq`), `tree` visualizer, and Tab autocomplete. |
 | **Settings** | `system-settings` | System | Centralized preferences studio controlling theme architecture, desktop grid snapping, icon silhouettes, window materiality, typography, and accessibility. |
 | **FlowBoard** | `flowboard` | Productivity | Infinite vector whiteboard canvas with tactile sticky cards, geometric process nodes, connecting bezier vectors, and doodle pen. |
 | **FlowShot** | `flowshot` | Productivity | Screen capture and markup studio featuring rectangular marquee cropping, arrows, text annotations, highlighters, and privacy blur tools. |
@@ -167,17 +177,44 @@ The development server initializes by default on `http://localhost:3000/`.
 npm run build
 ```
 
-FlowOS compiles with zero TypeScript errors under strict type checking (`strict: true`, `noUncheckedIndexedAccess: true`).
+Onyx OS compiles with zero TypeScript errors under strict type checking (`strict: true`, `noUncheckedIndexedAccess: true`).
+
+---
+
+## Hosting & Deployment
+
+Onyx OS is a static single-page application requiring no server-side database or compute backend. It deploys natively to Vercel, Netlify, or Cloudflare Pages.
+
+### Vercel Deployment
+A pre-configured [`vercel.json`](file:///d:/MyOs/vercel.json) file is included in the repository root:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+Import the repository directly into Vercel:
+[**Deploy Onyx OS on Vercel**](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDhyanesh2603%2FMyOs)
 
 ---
 
 ## Native Platform Deployment Roadmap
 
-FlowOS is architected with a decoupled display, state, and subsystem topology. Below is the technical specification for deploying FlowOS as a native desktop environment or standalone operating system on physical hardware.
+Onyx OS is architected with a decoupled display, state, and subsystem topology. Below is the technical specification for deploying Onyx OS as a native desktop environment or standalone operating system on physical hardware.
 
 ```
 +------------------------------------------------------------------------+
-|                        FlowOS UI & Window Shell                        |
+|                        Onyx UI & Window Shell                          |
 |                (React 19 + Framer Motion + Tailwind CSS)               |
 +-----------------------------------+------------------------------------+
                                     |
@@ -197,11 +234,11 @@ FlowOS is architected with a decoupled display, state, and subsystem topology. B
                                                            v
                                           +-------------------------------+
                                           |      TIER 3: BARE-METAL OS    |
-                                          |     FlowOS Linux Distribution |
+                                          |     Onyx Linux Distribution   |
                                           +-------------------------------+
                                           | - Linux Kernel LTS (x86_64)   |
                                           | - Minimal init (BusyBox/Alpine)|
-                                          | - Direct boot to FlowOS shell |
+                                          | - Direct boot to Onyx shell   |
                                           | - Instant 3-second cold boot  |
                                           +-------------------------------+
 ```
@@ -209,19 +246,19 @@ FlowOS is architected with a decoupled display, state, and subsystem topology. B
 ### Architectural Tiers
 
 1. **Tier 1: Native Desktop Shell (Tauri v2 + Rust Bridge)**
-   - Package FlowOS into a lightweight desktop runtime powered by Tauri v2 and native system webviews (WebView2 on Windows, WebKitGTK on Linux).
-   - Windows Shell Replacement: Configure Windows Registry key `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Shell = "C:\FlowOS\flowos.exe"` to boot FlowOS directly instead of `explorer.exe`.
-   - Real Terminal IO: Bridge `flowsh` directly to Windows PowerShell or Linux bash via Rust PTY bindings (`portable-pty`).
+   - Package Onyx OS into a lightweight desktop runtime powered by Tauri v2 and native system webviews (WebView2 on Windows, WebKitGTK on Linux).
+   - Windows Shell Replacement: Configure Windows Registry key `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Shell = "C:\OnyxOS\onyx.exe"` to boot Onyx OS directly instead of `explorer.exe`.
+   - Real Terminal IO: Bridge `onyxsh` directly to Windows PowerShell or Linux bash via Rust PTY bindings (`portable-pty`).
    - Memory footprint: Approximately 35 MB binary, 80 MB idle RAM.
 
 2. **Tier 2: Linux Wayland Compositor**
-   - FlowOS operates as a Wayland Compositor utilizing Rust Smithay or C wlroots.
-   - Intercepts native Linux GUI applications (`code`, `chrome`, `alacritty`) and paints surfaces inside FlowOS DOM window frames.
+   - Onyx OS operates as a Wayland Compositor utilizing Rust Smithay or C wlroots.
+   - Intercepts native Linux GUI applications (`code`, `chrome`, `alacritty`) and paints surfaces inside Onyx OS DOM window frames.
    - Hardware integration: D-Bus bindings for NetworkManager, BlueZ Bluetooth, and PipeWire audio.
 
 3. **Tier 3: Standalone Bare-Metal Operating System**
    - Independent bootable Linux distribution based on an LTS kernel and minimal Alpine root filesystem.
-   - Boot chain: UEFI -> Linux Kernel -> Minimal init -> Direct KMS/DRM rendering of the FlowOS shell.
+   - Boot chain: UEFI -> Linux Kernel -> Minimal init -> Direct KMS/DRM rendering of the Onyx OS shell.
    - Boots directly from hardware initialization in approximately 3 seconds without legacy desktop environments.
 
 ---

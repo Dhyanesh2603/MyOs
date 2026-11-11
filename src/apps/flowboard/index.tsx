@@ -546,7 +546,7 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
       ctx.font = 'bold 14px monospace';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'bottom';
-      ctx.fillText('FLOWBOARD CANVAS • FLOWOS', canvas.width - 24, canvas.height - 20);
+      ctx.fillText('FLOWBOARD CANVAS • ONYX OS', canvas.width - 24, canvas.height - 20);
 
       const dataUrl = canvas.toDataURL('image/png');
       const filename = `FlowBoard_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.png`;

@@ -42,7 +42,7 @@ export const WidgetDrawer: React.FC = () => {
                 Desktop Widgets Gallery
               </h2>
               <p className="text-[11px] text-content-tertiary">
-                Choose tactile widgets to pin and position anywhere on your FlowOS desktop.
+                Choose tactile widgets to pin and position anywhere on your Onyx desktop.
               </p>
             </div>
             <div className="flex items-center gap-2">

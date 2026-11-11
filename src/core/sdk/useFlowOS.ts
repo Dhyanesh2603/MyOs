@@ -6,7 +6,7 @@ import { useThemeStore } from '@core/theme/themeStore';
 import type { ToastOptions } from '@contracts/notification';
 
 /**
- * FlowOS Application SDK
+ * Onyx OS Application SDK
  * Universal hook providing decoupled access to all OS subsystems.
  */
 export function useFlowOS() {
@@ -51,3 +51,5 @@ export function useFlowOS() {
     },
   };
 }
+
+export const useOnyxOS = useFlowOS;

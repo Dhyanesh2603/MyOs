@@ -1,5 +1,5 @@
 /**
- * Web Audio Engine for FlowOS: Supports both Procedural Synthesis and Real Audio Streams / Files
+ * Web Audio Engine for Onyx OS: Supports both Procedural Synthesis and Real Audio Streams / Files
  */
 
 class AudioEngine {

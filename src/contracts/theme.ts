@@ -1,5 +1,5 @@
 /**
- * FlowOS Theme & Personalization Contracts
+ * Onyx OS Theme & Personalization Contracts
  */
 
 export type ThemeId = 'dark' | 'light' | 'high-contrast';

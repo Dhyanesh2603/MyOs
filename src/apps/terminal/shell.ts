@@ -13,10 +13,10 @@ export interface ShellResult {
 const envVars: Record<string, string> = {
   USER: 'user',
   HOME: '/home/user',
-  SHELL: '/bin/flowsh',
+  SHELL: '/bin/onyxsh',
   PATH: '/bin:/usr/bin:/usr/local/bin',
   TERM: 'xterm-256color',
-  OS: 'FlowOS',
+  OS: 'Onyx OS',
   ARCH: 'x86_64-synthetic-wasm',
   LANG: 'en_US.UTF-8',
   EDITOR: 'code-editor',
@@ -317,7 +317,7 @@ export async function executeCommand(
     case 'help':
       return {
         output: [
-          'FlowOS Shell (flowsh) v0.5.0 — POSIX & Developer Suite',
+          'Onyx OS Shell (onyxsh) v2.0.0 — POSIX & Developer Suite',
           '────────────────────────────────────────────────────────',
           'File System & Navigation:',
           '  pwd                     Print current working directory',
@@ -339,7 +339,7 @@ export async function executeCommand(
           '  npm [list|install|run]  Package manager commands',
           '  eval <javascript>       Direct V8 JavaScript evaluation',
           '  run <script.js>         Execute file with runtime console logs',
-          '  neofetch / fastfetch    Display FlowOS system information & ASCII art',
+          '  neofetch / fastfetch    Display Onyx OS system information & ASCII art',
           '',
           'Applications & GUI Integration:',
           '  open <path|url|-a app>  Open files, directories, apps, or websites',
@@ -372,15 +372,15 @@ export async function executeCommand(
       return { output: envVars['USER'] || 'user' };
 
     case 'hostname':
-      return { output: 'flowos-desktop' };
+      return { output: 'onyx-desktop' };
 
     case 'uname': {
       if (args[0] === '-a' || args[0] === '-all') {
         return {
-          output: `FlowOS flowos-desktop 6.10.0-flow #1 SMP PREEMPT 2026 x86_64 synthetic-wasm GNU/Linux`,
+          output: `OnyxOS onyx-desktop 6.10.0-onyx #1 SMP PREEMPT 2026 x86_64 synthetic-wasm GNU/Linux`,
         };
       }
-      return { output: 'FlowOS' };
+      return { output: 'Onyx OS' };
     }
 
     case 'date':
@@ -443,15 +443,15 @@ export async function executeCommand(
       const mins = Math.max(1, Math.floor(ms / 60000));
       return {
         output: [
-          '        /\\          user@flowos-desktop',
+          '        /\\          user@onyx-desktop',
           '       /  \\         -------------------',
-          '      / /\\ \\        OS: FlowOS 2.4.0 (Flagship Edition)',
-          '     / /  \\ \\       Kernel: 6.10.0-flow (synthetic-wasm)',
+          '      / /\\ \\        OS: Onyx OS 2.0 (Charcoal Edition)',
+          '     / /  \\ \\       Kernel: 6.10.0-onyx (synthetic-wasm)',
           `    / /    \\ \\      Uptime: ${mins} min(s)`,
-          '   / /______\\ \\     Shell: flowsh 0.5.0 (zsh-mode)',
+          '   / /______\\ \\     Shell: onyxsh 2.0.0 (zsh-mode)',
           '  / /________\\ \\    Resolution: 1920x1080 (Retina Display)',
-          ' /_/          \\_\\   Theme: macOS Sequoia Dark / Obsidian Titanium',
-          '                    Icons: Apple iOS 18 Squircle Icon System',
+          ' /_/          \\_\\   Theme: Pitch Charcoal / Onyx Dark',
+          '                    Icons: Monochrome Minimalist Dot Matrix',
           '                    CPU: Synthetic Virtual Core (8) @ 3.4 GHz',
           '                    Memory: 840 MiB / 4096 MiB (20%)',
           '                    Disk: 1.4 GiB / 10.0 GiB (IndexedDB POSIX)',
@@ -481,7 +481,7 @@ export async function executeCommand(
       }
 
       if (sub === '--version' || sub === 'version') {
-        return { output: 'git version 2.45.2 (FlowOS Edition)' };
+        return { output: 'git version 2.45.2 (Onyx OS Edition)' };
       }
 
       if (sub === 'status') {
@@ -511,7 +511,7 @@ export async function executeCommand(
           output: gitState.commits
             .map(
               (c) =>
-                `commit ${c.hash}7a98b2c4e1f8d3a7\nAuthor: FlowOS User <user@flowos.dev>\nDate:   ${c.date}\n\n    ${c.msg}\n`
+                `commit ${c.hash}7a98b2c4e1f8d3a7\nAuthor: Onyx OS User <user@onyxos.dev>\nDate:   ${c.date}\n\n    ${c.msg}\n`
             )
             .join('\n'),
         };
@@ -549,7 +549,7 @@ export async function executeCommand(
     case 'python3':
     case 'py': {
       if (args[0] === '--version' || args[0] === '-v') {
-        return { output: 'Python 3.12.4 (FlowOS Emulated Subsystem, Jul 2026)' };
+        return { output: 'Python 3.12.4 (Onyx OS Emulated Subsystem, Jul 2026)' };
       }
 
       if (args[0] === '-c') {
@@ -582,8 +582,8 @@ export async function executeCommand(
 
       return {
         output: [
-          'Python 3.12.4 (tags/v3.12.4:d141571, FlowOS Core)',
-          '[Clang 16.0.0 (synthetic-wasm)] on flowos',
+          'Python 3.12.4 (tags/v3.12.4:d141571, Onyx OS Core)',
+          '[Clang 16.0.0 (synthetic-wasm)] on onyxos',
           'Type "help", "copyright", "credits" or "license" for more information.',
           '>>> (Run with -c "code" or "python script.py" for batch execution)',
         ].join('\n'),
@@ -600,7 +600,7 @@ export async function executeCommand(
       if (sub === 'list' || sub === 'ls') {
         return {
           output: [
-            'flow-os@2.4.0 /home/user',
+            'onyx-os@2.0.0 /home/user',
             '├── react@19.0.0',
             '├── typescript@5.7.3',
             '├── tailwindcss@3.4.17',
@@ -614,7 +614,7 @@ export async function executeCommand(
       if (sub === 'run') {
         const script = args[1] || 'dev';
         return {
-          output: `> flow-os@2.4.0 ${script}\n> vite\n\n  VITE v6.4.3  ready in 420 ms\n  ➜  Local:   http://localhost:3000/`,
+          output: `> onyx-os@2.0.0 ${script}\n> vite\n\n  VITE v6.4.3  ready in 420 ms\n  ➜  Local:   http://localhost:3000/`,
         };
       }
 
@@ -817,7 +817,7 @@ export async function executeCommand(
         ls: 'LS(1) — List directory contents\n\nSYNOPSIS\n    ls [-l] [-a] [path]\n\nDESCRIPTION\n    List information about files in the target directory (the current directory by default).',
         cd: 'CD(1) — Change directory\n\nSYNOPSIS\n    cd [directory]\n\nDESCRIPTION\n    Change the current working directory to directory. Supports ~, .., -, and full paths.',
         cat: 'CAT(1) — Concatenate and print files\n\nSYNOPSIS\n    cat [-n] [file ...]\n\nDESCRIPTION\n    The cat utility reads files sequentially, writing them to standard output.',
-        git: 'GIT(1) — Fast version control system\n\nSYNOPSIS\n    git [status | branch | log | add | commit | diff]\n\nDESCRIPTION\n    Manage branch commits and project history inside FlowOS.',
+        git: 'GIT(1) — Fast version control system\n\nSYNOPSIS\n    git [status | branch | log | add | commit | diff]\n\nDESCRIPTION\n    Manage branch commits and project history inside Onyx OS.',
         python: 'PYTHON(1) — Python programming language interpreter\n\nSYNOPSIS\n    python [-c "code"] [script.py]\n\nDESCRIPTION\n    Execute Python mathematical expressions, algorithms, and scripts.',
         curl: 'CURL(1) — Transfer data from or to a server\n\nSYNOPSIS\n    curl [url]\n\nDESCRIPTION\n    Fetch text, documents, or JSON APIs from external web destinations.',
       };
@@ -1238,7 +1238,7 @@ export async function executeCommand(
 
     default:
       return {
-        output: `flowsh: command not found: ${command}. Type 'help' for available commands.`,
+        output: `onyxsh: command not found: ${command}. Type 'help' for available commands.`,
       };
   }
 }

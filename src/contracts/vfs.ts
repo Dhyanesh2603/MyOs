@@ -1,5 +1,5 @@
 /**
- * FlowOS Virtual File System (VFS) Contracts
+ * Onyx OS Virtual File System (VFS) Contracts
  */
 
 export type INodeType = 'file' | 'directory';

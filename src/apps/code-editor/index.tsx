@@ -80,10 +80,10 @@ export const CodeEditorApp: React.FC<AppProps> = ({ windowId, processId }) => {
     } else {
       // Default boilerplate if new file
       const defaultContent = filePath.endsWith('.json')
-        ? `{\n  "name": "flow-app",\n  "version": "1.0.0",\n  "private": true,\n  "scripts": {\n    "build": "flow-compiler"\n  }\n}`
+        ? `{\n  "name": "onyx-app",\n  "version": "1.0.0",\n  "private": true,\n  "scripts": {\n    "build": "onyx-compiler"\n  }\n}`
         : filePath.endsWith('.js') || filePath.endsWith('.ts')
-        ? `/**\n * FlowOS Script Execution Engine\n * File: ${filePath}\n */\n\nfunction calculateMetrics() {\n  const startTime = Date.now();\n  const numbers = [12, 45, 68, 23, 89, 91, 14];\n  const sum = numbers.reduce((a, b) => a + b, 0);\n  const avg = Math.round(sum / numbers.length);\n\n  console.log("Processing array:", numbers);\n  console.info("Sum calculated:", sum);\n  console.info("Average:", avg);\n\n  return { sum, avg, count: numbers.length, duration: Date.now() - startTime };\n}\n\ncalculateMetrics();\n`
-        : `// FlowOS Source File: ${filePath}\n`;
+        ? `/**\n * Onyx OS Script Execution Engine\n * File: ${filePath}\n */\n\nfunction calculateMetrics() {\n  const startTime = Date.now();\n  const numbers = [12, 45, 68, 23, 89, 91, 14];\n  const sum = numbers.reduce((a, b) => a + b, 0);\n  const avg = Math.round(sum / numbers.length);\n\n  console.log("Processing array:", numbers);\n  console.info("Sum calculated:", sum);\n  console.info("Average:", avg);\n\n  return { sum, avg, count: numbers.length, duration: Date.now() - startTime };\n}\n\ncalculateMetrics();\n`
+        : `// Onyx OS Source File: ${filePath}\n`;
 
       setContent(defaultContent);
       setIsSaved(false);

@@ -322,7 +322,7 @@ export const KnowledgeGraphView: React.FC = () => {
           <Network className="h-12 w-12 text-neutral-600 mb-4" />
           <h3 className="text-base font-medium text-white">Knowledge Graph Empty</h3>
           <p className="text-xs text-neutral-400 mt-1 max-w-md">
-            As you define engineering campaigns, software projects, skills, and university coursework, FlowOS automatically connects and plots their relational graph here.
+            As you define engineering campaigns, software projects, skills, and university coursework, Onyx OS automatically connects and plots their relational graph here.
           </p>
           <div className="mt-5 flex items-center gap-3">
             <button

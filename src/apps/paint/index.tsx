@@ -173,7 +173,7 @@ export const PaintApp: React.FC<AppProps> = () => {
       soundEngine.playChime();
       notify({
         title: 'Drawing Saved to Pictures',
-        message: `Saved as '${targetPath}' in FlowOS VFS.`,
+        message: `Saved as '${targetPath}' in Onyx OS VFS.`,
         type: 'success',
       });
     } catch (err) {
@@ -325,7 +325,7 @@ export const PaintApp: React.FC<AppProps> = () => {
 
           <button
             onClick={handleSaveToVFS}
-            title="Save to FlowOS Pictures"
+            title="Save to Onyx OS Pictures"
             className={`flex items-center gap-1 rounded-lg border px-3 py-1 font-mono text-[10px] font-semibold transition-all shadow-sm cursor-pointer ${
               isSaved
                 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'

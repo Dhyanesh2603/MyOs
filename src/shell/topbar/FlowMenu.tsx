@@ -63,7 +63,7 @@ export const FlowMenu: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <Info className="h-3.5 w-3.5" />
-              <span>About FlowOS</span>
+              <span>About Onyx OS</span>
             </div>
             <span className="font-mono text-[9px] opacity-70">v0.2</span>
           </button>
@@ -113,7 +113,7 @@ export const FlowMenu: React.FC = () => {
             className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
           >
             <DownloadCloud className="h-3.5 w-3.5" />
-            <span>Export System Image (.flowos)</span>
+            <span>Export System Image (.onyx)</span>
           </button>
 
           {/* Restore System Image */}
@@ -152,7 +152,7 @@ export const FlowMenu: React.FC = () => {
             className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
           >
             <RotateCw className="h-3.5 w-3.5" />
-            <span>Restart FlowOS...</span>
+            <span>Restart Onyx OS...</span>
           </button>
         </div>
       )}
@@ -161,7 +161,7 @@ export const FlowMenu: React.FC = () => {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".flowos,.json"
+        accept=".onyx,.flowos,.json"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];

@@ -50,7 +50,7 @@ export const App: React.FC = () => {
 
     const timer = setTimeout(() => {
       useNotificationStore.getState().notify({
-        title: 'FlowOS Initialized',
+        title: 'Onyx OS Initialized',
         message: 'All kernel subsystems operational. Press Ctrl+K for Spotlight.',
         type: 'success',
       });

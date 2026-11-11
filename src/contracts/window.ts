@@ -1,5 +1,5 @@
 /**
- * FlowOS Window Management Contracts
+ * Onyx OS Window Management Contracts
  */
 
 export type WindowId = string;

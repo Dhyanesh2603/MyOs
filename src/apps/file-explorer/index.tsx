@@ -119,7 +119,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
     const name = window.prompt('Enter file name:', 'untitled.txt');
     if (!name?.trim()) return;
     const path = normalizePath(`${currentPath}/${name.trim()}`);
-    await writeFile(path, 'Created in FlowOS File Explorer.');
+    await writeFile(path, 'Created in Onyx OS File Explorer.');
   };
 
   const handleDelete = async (path: string) => {
@@ -250,7 +250,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
             <button
               onClick={handleMountLocalFolder}
               disabled={isMounting}
-              title="Grant FlowOS access to view and browse actual files from your computer"
+              title="Grant Onyx OS access to view and browse actual files from your computer"
               className="flex w-full items-center justify-between rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-sm my-1 cursor-pointer"
             >
               <span className="flex items-center gap-1.5 truncate">
@@ -485,7 +485,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                 <Laptop className="h-4 w-4 text-emerald-400 shrink-0" />
                 <div>
                   <span className="font-semibold text-white">Physical PC Storage:</span>{' '}
-                  <span className="text-neutral-300">Showing actual files from your computer synced into FlowOS.</span>
+                  <span className="text-neutral-300">Showing actual files from your computer synced into Onyx OS.</span>
                 </div>
               </div>
               <button
@@ -505,7 +505,7 @@ const FileExplorerApp: React.FC<AppProps> = ({ windowId }) => {
                 </div>
                 <h3 className="text-sm font-semibold text-white">Connect Device Storage</h3>
                 <p className="text-xs text-neutral-400 max-w-sm">
-                  Grant FlowOS access to browse and open actual folders and files from your real PC.
+                  Grant Onyx OS access to browse and open actual folders and files from your real PC.
                 </p>
                 <button
                   onClick={handleMountLocalFolder}

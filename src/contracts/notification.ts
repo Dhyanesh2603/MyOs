@@ -1,5 +1,5 @@
 /**
- * FlowOS Notification Contracts
+ * Onyx OS Notification Contracts
  */
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';

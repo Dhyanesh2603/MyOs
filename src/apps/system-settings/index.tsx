@@ -128,7 +128,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             }`}
           >
             <Info className="h-3.5 w-3.5" />
-            About FlowOS
+            About Onyx OS
           </button>
         </div>
 
@@ -616,7 +616,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
         {activeTab === 'about' && (
           <div className="space-y-4 text-xs text-neutral-300 leading-relaxed">
             <div>
-              <h3 className="text-sm font-bold tracking-tight text-white">FlowOS v0.2.0</h3>
+              <h3 className="text-sm font-bold tracking-tight text-white">Onyx OS v2.0</h3>
               <p className="text-[11px] text-neutral-400 font-mono mt-0.5">
                 Artisanal Web Operating System Architecture
               </p>
@@ -641,7 +641,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
 export const settingsManifest: AppManifest = {
   id: 'system-settings',
   name: 'Settings',
-  description: 'Customize FlowOS preferences, appearance, window physics, and accessibility.',
+  description: 'Customize Onyx OS preferences, appearance, window physics, and accessibility.',
   category: 'system',
   icon: SettingsIcon,
   defaultSize: { width: 680, height: 500 },

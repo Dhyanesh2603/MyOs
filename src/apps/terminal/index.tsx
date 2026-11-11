@@ -35,9 +35,9 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
   const [blocks, setBlocks] = useState<TerminalBlock[]>([
     {
       id: 'block-welcome',
-      command: 'flowsh --version',
+      command: 'onyxsh --version',
       output:
-        'FlowOS Warp Terminal (flowsh) v0.2.0-pro\nArchitecture: x86_64-synthetic-wasm\nVirtual File System: IndexedDB (POSIX Compliant)\nType "help" to view all available commands.',
+        'Onyx OS Warp Terminal (onyxsh) v2.0-pro\nArchitecture: x86_64-synthetic-wasm\nVirtual File System: IndexedDB (POSIX Compliant)\nType "help" to view all available commands.',
       cwd: '/home/user',
       timestamp: new Date().toLocaleTimeString('en-US', { hour12: false }),
       durationMs: 1,
@@ -177,7 +177,7 @@ const TerminalApp: React.FC<AppProps> = ({ windowId }) => {
       <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0e1017] px-3.5 py-2 font-mono text-[10px] text-neutral-400 select-none">
         <div className="flex items-center gap-2">
           <TerminalIcon className="h-3.5 w-3.5 text-white" />
-          <span className="text-white font-semibold">flowsh</span>
+          <span className="text-white font-semibold">onyxsh</span>
           <span className="text-white/20">//</span>
           <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

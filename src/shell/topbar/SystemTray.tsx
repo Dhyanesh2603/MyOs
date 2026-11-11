@@ -156,7 +156,7 @@ export const SystemTray: React.FC<SystemTrayProps> = ({ direction = 'up' }) => {
           soundEngine.playClick();
           useCopilotStore.getState().toggleCopilot();
         }}
-        title="FlowOS Copilot (Ctrl+J)"
+        title="Onyx Copilot (Ctrl+J)"
         className="rounded-md p-1.5 text-content-secondary hover:bg-surface-subtle hover:text-accent-primary transition-colors"
       >
         <Sparkles className="h-3.5 w-3.5" />
@@ -197,7 +197,7 @@ export const SystemTray: React.FC<SystemTrayProps> = ({ direction = 'up' }) => {
                 <CalendarIcon className="h-4 w-4 text-accent-primary" />
                 <span className="font-semibold text-content-primary">{currentMonth}</span>
               </div>
-              <span className="font-mono text-[10px] text-content-tertiary">FlowOS Calendar</span>
+              <span className="font-mono text-[10px] text-content-tertiary">Onyx Calendar</span>
             </div>
 
             {/* Days of week header */}

@@ -109,7 +109,7 @@ export const PersonalOsApp: React.FC<AppProps> = () => {
 export const personalOsManifest: AppManifest = {
   id: 'personal-os',
   name: 'Personal OS',
-  description: 'Flow OS v2 engineering command hub answering "What should I work on next?" with missions, projects, and academics.',
+  description: 'Onyx OS v2 engineering command hub answering "What should I work on next?" with missions, projects, and academics.',
   category: 'productivity',
   icon: Compass,
   defaultSize: { width: 1180, height: 740 },
