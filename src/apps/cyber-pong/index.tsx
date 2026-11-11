@@ -674,7 +674,7 @@ export const cyberPongManifest: AppManifest = {
   id: 'cyber-pong',
   name: 'Onyx Pong',
   description: 'Fast-paced 2-player multiplayer arcade pong with local split-keyboard, AI bot, and AirBridge P2P sync.',
-  category: 'productivity',
+  category: 'games',
   icon: Gamepad2,
   defaultSize: { width: 720, height: 530 },
   constraints: { minWidth: 500, minHeight: 400, maxWidth: 1200, maxHeight: 900 },

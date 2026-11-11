@@ -12,7 +12,8 @@ export type AppCategory =
   | 'productivity'
   | 'utilities'
   | 'media'
-  | 'development';
+  | 'development'
+  | 'games';
 
 export type AppPermission =
   | 'vfs:read'

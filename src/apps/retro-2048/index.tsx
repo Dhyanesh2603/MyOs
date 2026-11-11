@@ -516,7 +516,7 @@ export const flow2048Manifest: AppManifest = {
   id: 'retro-2048',
   name: 'Onyx 2048',
   description: 'Tactile 4x4 sliding tile numerical puzzle with procedural Web Audio feedback.',
-  category: 'utilities',
+  category: 'games',
   icon: Gamepad2,
   defaultSize: { width: 380, height: 530 },
   constraints: { minWidth: 320, minHeight: 460, maxWidth: 500, maxHeight: 700 },

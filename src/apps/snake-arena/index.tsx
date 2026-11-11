@@ -745,7 +745,7 @@ export const snakeArenaManifest: AppManifest = {
   id: 'snake-arena',
   name: 'Onyx Snake Arena',
   description: '2-Player Tron lightcycle snake grid battle with local split controls, AI bot, and AirBridge P2P sync.',
-  category: 'productivity',
+  category: 'games',
   icon: Gamepad,
   defaultSize: { width: 720, height: 550 },
   constraints: { minWidth: 500, minHeight: 400, maxWidth: 1200, maxHeight: 900 },

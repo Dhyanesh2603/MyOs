@@ -684,7 +684,7 @@ export const paintManifest: AppManifest = {
   id: 'paint',
   name: 'Onyx Paint',
   description: 'Full-page tactile drawing and sketching studio with geometric shapes, flood fill, and precision cursor tracking.',
-  category: 'productivity',
+  category: 'media',
   icon: Palette,
   defaultSize: { width: 840, height: 600 },
   constraints: { minWidth: 480, minHeight: 360, maxWidth: 1800, maxHeight: 1200 },

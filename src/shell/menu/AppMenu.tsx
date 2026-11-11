@@ -110,15 +110,25 @@ export const AppMenu: React.FC = () => {
 
       if (selectedCategory === 'games') {
         return (
-          app.id.startsWith('flow-') ||
-          app.id.includes('game') ||
-          app.id.includes('pong') ||
-          app.id.includes('snake') ||
-          app.id.includes('connect') ||
-          app.id.includes('2048') ||
-          app.id.includes('sweeper') ||
-          (app.category === 'utilities' && (app.id.includes('2048') || app.id.includes('sweeper')))
+          app.category === 'games' ||
+          app.id === 'cyber-pong' ||
+          app.id === 'snake-arena' ||
+          app.id === 'connect-four' ||
+          app.id === 'retro-2048' ||
+          app.id === 'retro-sweeper'
         );
+      }
+
+      // Explicitly prevent any game from appearing under productivity, utilities, or other non-game categories
+      if (
+        app.category === 'games' ||
+        app.id === 'cyber-pong' ||
+        app.id === 'snake-arena' ||
+        app.id === 'connect-four' ||
+        app.id === 'retro-2048' ||
+        app.id === 'retro-sweeper'
+      ) {
+        return false;
       }
 
       return app.category === selectedCategory;

@@ -308,7 +308,7 @@ export const flowSweeperManifest: AppManifest = {
   id: 'retro-sweeper',
   name: 'Onyx Sweeper',
   description: 'Minimalist tactile Minesweeper with classic logic, safe first clicks, and clean geometry.',
-  category: 'utilities',
+  category: 'games',
   icon: Bomb,
   defaultSize: { width: 340, height: 440 },
   constraints: { minWidth: 300, minHeight: 400, maxWidth: 460, maxHeight: 600 },

@@ -613,7 +613,7 @@ export const connectFourManifest: AppManifest = {
   id: 'connect-four',
   name: 'Onyx Connect 4',
   description: 'Tactical 2-player multiplayer gravity grid with pass-and-play, Minimax AI bot, and AirBridge P2P sync.',
-  category: 'productivity',
+  category: 'games',
   icon: CircleDot,
   defaultSize: { width: 680, height: 580 },
   constraints: { minWidth: 480, minHeight: 420, maxWidth: 1000, maxHeight: 900 },
