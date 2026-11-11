@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Flag, Bomb, Timer } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { soundEngine } from '@core/audio/soundEngine';
@@ -239,7 +240,7 @@ export const FlowSweeperApp: React.FC<AppProps> = () => {
       </div>
 
       {/* Grid surface */}
-      <div className="my-auto rounded-2xl border border-border-subtle bg-surface-card/60 p-2 shadow-inner">
+      <motion.div animate={status === "lost" ? { x: [-6, 6, -5, 5, -2, 2, 0] } : undefined} transition={{ duration: 0.4 }} className="my-auto rounded-2xl border border-border-subtle bg-surface-card/60 p-2 shadow-inner">
         <div
           className="grid gap-1"
           style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
@@ -269,21 +270,30 @@ export const FlowSweeperApp: React.FC<AppProps> = () => {
                 >
                   {isCellRevealed ? (
                     cell.isMine ? (
-                      <Bomb className="h-3.5 w-3.5 text-rose-400" />
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 20 }}>
+                        <Bomb className="h-3.5 w-3.5 text-rose-400" />
+                      </motion.div>
                     ) : cell.neighborMines > 0 ? (
-                      <span className={getNumberColor(cell.neighborMines)}>
+                      <motion.span
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
+                        className={getNumberColor(cell.neighborMines)}
+                      >
                         {cell.neighborMines}
-                      </span>
+                      </motion.span>
                     ) : null
                   ) : cell.isFlagged ? (
-                    <Flag className="h-3.5 w-3.5 text-amber-400 fill-amber-400/20" />
+                    <motion.div initial={{ scale: 0, y: -6 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', stiffness: 500, damping: 20 }}>
+                      <Flag className="h-3.5 w-3.5 text-amber-400 fill-amber-400/20" />
+                    </motion.div>
                   ) : null}
                 </button>
               );
             })
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Footer info */}
       <div className="flex items-center justify-between w-full max-w-[280px] font-mono text-[9px] text-content-tertiary">
@@ -296,7 +306,7 @@ export const FlowSweeperApp: React.FC<AppProps> = () => {
 
 export const flowSweeperManifest: AppManifest = {
   id: 'retro-sweeper',
-  name: 'FlowSweeper',
+  name: 'Onyx Sweeper',
   description: 'Minimalist tactile Minesweeper with classic logic, safe first clicks, and clean geometry.',
   category: 'utilities',
   icon: Bomb,

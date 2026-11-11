@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import {
   CircleDot,
   Users,
@@ -519,8 +520,8 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
             ))}
           </div>
 
-          {/* Blue Vertical Rack */}
-          <div className="p-3.5 rounded-2xl bg-blue-900/40 border-2 border-blue-500/40 shadow-[0_10px_35px_rgba(30,58,138,0.3)] backdrop-blur">
+          {/* Tactile Rack */}
+          <div className="p-3.5 rounded-2xl bg-[#12141c] border-2 border-white/[0.12] shadow-[0_12px_45px_rgba(0,0,0,0.85)]">
             <div className="grid grid-cols-7 gap-2.5">
               {board.map((row, r) =>
                 row.map((cell, c) => {
@@ -532,18 +533,44 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
                       onMouseEnter={() => setHoverCol(c)}
                       onMouseLeave={() => setHoverCol(null)}
                       disabled={board[0]?.[c] !== null || !!winInfo || isDraw}
-                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#070b14] border border-blue-400/20 flex items-center justify-center transition-all cursor-pointer relative"
+                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#08090f] border border-white/[0.08] flex items-center justify-center transition-all cursor-pointer relative overflow-hidden"
                     >
                       {cell === 1 && (
-                        <div
-                          className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-tr from-rose-600 to-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.7)] ${
+                        <motion.div
+                          initial={{ y: -(r + 1) * 52 - 30, scale: 0.85, opacity: 0.6 }}
+                          animate={{
+                            y: 0,
+                            scale: isWinningCell ? [1, 1.18, 1] : 1,
+                            opacity: 1,
+                          }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 340,
+                            damping: 18,
+                            mass: 0.75,
+                            scale: isWinningCell ? { repeat: Infinity, duration: 1.2 } : undefined,
+                          }}
+                          className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-tr from-rose-600 via-rose-500 to-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.7)] ${
                             isWinningCell ? 'ring-4 ring-white animate-pulse' : ''
                           }`}
                         />
                       )}
                       {cell === 2 && (
-                        <div
-                          className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 shadow-[0_0_12px_rgba(251,191,36,0.7)] ${
+                        <motion.div
+                          initial={{ y: -(r + 1) * 52 - 30, scale: 0.85, opacity: 0.6 }}
+                          animate={{
+                            y: 0,
+                            scale: isWinningCell ? [1, 1.18, 1] : 1,
+                            opacity: 1,
+                          }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 340,
+                            damping: 18,
+                            mass: 0.75,
+                            scale: isWinningCell ? { repeat: Infinity, duration: 1.2 } : undefined,
+                          }}
+                          className={`h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.7)] ${
                             isWinningCell ? 'ring-4 ring-white animate-pulse' : ''
                           }`}
                         />

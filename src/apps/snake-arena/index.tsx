@@ -82,6 +82,7 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
     food: { x: 16, y: 11 } as Point,
     specialFood: null as (Point & { type: 'speed' | 'bomb' }) | null,
     gameOver: false,
+    particles: [] as { x: number; y: number; vx: number; vy: number; color: string; life: number }[],
   });
 
   const triggerSound = useCallback((freq: number, type: OscillatorType = 'sine', dur = 0.08) => {
@@ -351,6 +352,22 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
         if (p1Dead || p2Dead) {
           s.gameOver = true;
           triggerSound(150, 'sawtooth', 0.3);
+          const cellW = (canvasRef.current?.width || 640) / GRID_COLS;
+          const cellH = (canvasRef.current?.height || 440) / GRID_ROWS;
+          const deadPt = p1Dead ? h1 : h2;
+          const sparkColor = p1Dead ? '#38bdf8' : '#f59e0b';
+          for (let i = 0; i < 24; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 4 + 1;
+            s.particles.push({
+              x: deadPt.x * cellW + cellW / 2,
+              y: deadPt.y * cellH + cellH / 2,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              color: sparkColor,
+              life: 1,
+            });
+          }
 
           if (p1Dead && p2Dead) {
             setRoundWinner('Draw / Mutual Collision!');
@@ -383,6 +400,18 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
         // Food Check P1
         if (h1.x === s.food.x && h1.y === s.food.y) {
           triggerSound(580, 'sine', 0.1);
+          const cellW = (canvasRef.current?.width || 640) / GRID_COLS;
+          const cellH = (canvasRef.current?.height || 440) / GRID_ROWS;
+          for (let i = 0; i < 14; i++) {
+            s.particles.push({
+              x: s.food.x * cellW + cellW / 2,
+              y: s.food.y * cellH + cellH / 2,
+              vx: (Math.random() - 0.5) * 4,
+              vy: (Math.random() - 0.5) * 4,
+              color: '#38bdf8',
+              life: 1,
+            });
+          }
           spawnFood();
         } else {
           s.p1.pop();
@@ -391,6 +420,18 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
         // Food Check P2
         if (h2.x === s.food.x && h2.y === s.food.y) {
           triggerSound(580, 'sine', 0.1);
+          const cellW = (canvasRef.current?.width || 640) / GRID_COLS;
+          const cellH = (canvasRef.current?.height || 440) / GRID_ROWS;
+          for (let i = 0; i < 14; i++) {
+            s.particles.push({
+              x: s.food.x * cellW + cellW / 2,
+              y: s.food.y * cellH + cellH / 2,
+              vx: (Math.random() - 0.5) * 4,
+              vy: (Math.random() - 0.5) * 4,
+              color: '#f59e0b',
+              life: 1,
+            });
+          }
           spawnFood();
         } else {
           s.p2.pop();
@@ -437,29 +478,77 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
             ctx.stroke();
           }
 
-          // Food (Crisp apple orb)
-          ctx.fillStyle = '#22c55e';
+          // Pulsing Food with Neon Aura Ring
+          const pulse = Math.sin(Date.now() / 180) * (cellW * 0.1);
+          ctx.strokeStyle = 'rgba(34, 197, 94, 0.45)';
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.arc(
             s.food.x * cellW + cellW / 2,
             s.food.y * cellH + cellH / 2,
-            cellW * 0.38,
+            cellW * 0.44 + pulse,
+            0,
+            Math.PI * 2
+          );
+          ctx.stroke();
+
+          ctx.fillStyle = '#22c55e';
+          ctx.shadowColor = '#22c55e';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(
+            s.food.x * cellW + cellW / 2,
+            s.food.y * cellH + cellH / 2,
+            cellW * 0.36,
             0,
             Math.PI * 2
           );
           ctx.fill();
 
-          // Render Player 1 (Crisp Cyan Lightcycle)
+          // Render Player 1 (Glowing Cyan Lightcycle)
           s.p1.forEach((pt, idx) => {
             ctx.fillStyle = idx === 0 ? '#ffffff' : '#38bdf8';
-            ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = idx === 0 ? 12 : 6;
+            if (ctx.roundRect) {
+              ctx.beginPath();
+              ctx.roundRect(pt.x * cellW + 1.5, pt.y * cellH + 1.5, cellW - 3, cellH - 3, 3);
+              ctx.fill();
+            } else {
+              ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
+            }
           });
 
-          // Render Player 2 (Crisp Amber Lightcycle)
+          // Render Player 2 (Glowing Amber Lightcycle)
           s.p2.forEach((pt, idx) => {
             ctx.fillStyle = idx === 0 ? '#ffffff' : '#f59e0b';
-            ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
+            ctx.shadowColor = '#f59e0b';
+            ctx.shadowBlur = idx === 0 ? 12 : 6;
+            if (ctx.roundRect) {
+              ctx.beginPath();
+              ctx.roundRect(pt.x * cellW + 1.5, pt.y * cellH + 1.5, cellW - 3, cellH - 3, 3);
+              ctx.fill();
+            } else {
+              ctx.fillRect(pt.x * cellW + 1, pt.y * cellH + 1, cellW - 2, cellH - 2);
+            }
           });
+
+          // Render Neon Sparkle Particles
+          for (let i = s.particles.length - 1; i >= 0; i--) {
+            const p = s.particles[i]!;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.04;
+            if (p.life <= 0) {
+              s.particles.splice(i, 1);
+            } else {
+              ctx.fillStyle = p.color;
+              ctx.shadowColor = p.color;
+              ctx.shadowBlur = 8;
+              ctx.fillRect(p.x, p.y, 3, 3);
+            }
+          }
+          ctx.shadowBlur = 0;
         }
       }
     }, 110); // ~9 FPS grid speed
@@ -654,7 +743,7 @@ export const SnakeArenaApp: React.FC<AppProps> = () => {
 
 export const snakeArenaManifest: AppManifest = {
   id: 'snake-arena',
-  name: 'Snake Arena',
+  name: 'Onyx Snake Arena',
   description: '2-Player Tron lightcycle snake grid battle with local split controls, AI bot, and AirBridge P2P sync.',
   category: 'productivity',
   icon: Gamepad,

@@ -78,6 +78,9 @@ export const CyberPongApp: React.FC<AppProps> = () => {
       down: false,
     },
     particles: [] as { x: number; y: number; vx: number; vy: number; life: number; color: string }[],
+    ballTrail: [] as { x: number; y: number }[],
+    p1Squash: 1,
+    p2Squash: 1,
   });
 
   const triggerSound = useCallback((freq: number, type: OscillatorType = 'sine', dur = 0.08) => {
@@ -282,6 +285,17 @@ export const CyberPongApp: React.FC<AppProps> = () => {
               const deltaY = s.ballY - (s.p2Y + s.paddleHeight / 2);
               s.ballVy = deltaY * 0.22;
               triggerSound(540, 'sine', 0.08);
+              s.p2Squash = 1.3;
+              for (let i = 0; i < 12; i++) {
+                s.particles.push({
+                  x: s.ballX,
+                  y: s.ballY,
+                  vx: -(Math.random() * 4 + 1.5),
+                  vy: (Math.random() - 0.5) * 5,
+                  life: 1,
+                  color: '#f43f5e',
+                });
+              }
 
               for (let i = 0; i < 6; i++) {
                 s.particles.push({
@@ -358,17 +372,56 @@ export const CyberPongApp: React.FC<AppProps> = () => {
           ctx.arc(s.canvasWidth / 2, s.canvasHeight / 2, 50, 0, Math.PI * 2);
           ctx.stroke();
 
-          // Render Paddle 1 (Cyan)
+          // Smoothly decay squash
+          s.p1Squash += (1 - s.p1Squash) * 0.15;
+          s.p2Squash += (1 - s.p2Squash) * 0.15;
+
+          // Render Paddle 1 (Cyan) with tactile squash response
           ctx.fillStyle = '#38bdf8';
           ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 12;
-          ctx.fillRect(25, s.p1Y, s.paddleWidth, s.paddleHeight);
+          ctx.shadowBlur = 14;
+          const p1W = s.paddleWidth * (2 - s.p1Squash);
+          const p1H = s.paddleHeight * s.p1Squash;
+          const p1YOffset = (s.paddleHeight - p1H) / 2;
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(25 - (p1W - s.paddleWidth) / 2, s.p1Y + p1YOffset, p1W, p1H, 5);
+            ctx.fill();
+          } else {
+            ctx.fillRect(25, s.p1Y, s.paddleWidth, s.paddleHeight);
+          }
 
-          // Render Paddle 2 (Rose)
+          // Render Paddle 2 (Rose) with tactile squash response
           ctx.fillStyle = '#f43f5e';
           ctx.shadowColor = '#f43f5e';
-          ctx.shadowBlur = 12;
-          ctx.fillRect(s.canvasWidth - 25 - s.paddleWidth, s.p2Y, s.paddleWidth, s.paddleHeight);
+          ctx.shadowBlur = 14;
+          const p2W = s.paddleWidth * (2 - s.p2Squash);
+          const p2H = s.paddleHeight * s.p2Squash;
+          const p2YOffset = (s.paddleHeight - p2H) / 2;
+          const p2X = s.canvasWidth - 25 - s.paddleWidth - (p2W - s.paddleWidth) / 2;
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(p2X, s.p2Y + p2YOffset, p2W, p2H, 5);
+            ctx.fill();
+          } else {
+            ctx.fillRect(s.canvasWidth - 25 - s.paddleWidth, s.p2Y, s.paddleWidth, s.paddleHeight);
+          }
+
+          // Update & Render Glowing Ball Motion Trail
+          s.ballTrail.unshift({ x: s.ballX, y: s.ballY });
+          if (s.ballTrail.length > 10) s.ballTrail.pop();
+
+          for (let i = s.ballTrail.length - 1; i >= 0; i--) {
+            const pt = s.ballTrail[i]!;
+            const progress = 1 - i / s.ballTrail.length;
+            const r = s.ballRadius * (0.3 + progress * 0.7);
+            ctx.fillStyle = `rgba(56, 189, 248, ${progress * 0.35})`;
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 8 * progress;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
 
           // Render Particles
           for (let i = s.particles.length - 1; i >= 0; i--) {
@@ -619,7 +672,7 @@ export const CyberPongApp: React.FC<AppProps> = () => {
 
 export const cyberPongManifest: AppManifest = {
   id: 'cyber-pong',
-  name: 'CyberPong',
+  name: 'Onyx Pong',
   description: 'Fast-paced 2-player multiplayer arcade pong with local split-keyboard, AI bot, and AirBridge P2P sync.',
   category: 'productivity',
   icon: Gamepad2,
