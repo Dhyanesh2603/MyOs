@@ -17,7 +17,7 @@ const SHAPE_CLASSES: Record<string, string> = {
 /**
  * Universal Nothing OS Monochrome App Icon Tile Wrapper
  * Features Nothing's iconic dark obsidian matte background, hairline specular rim,
- * subtle inner border, and stark monochrome iconography with signature red micro-accents.
+ * subtle inner border, and pure monochromatic iconography with bespoke titanium and frosted white accents.
  */
 const IosSquircle: React.FC<{
   children: React.ReactNode;
@@ -58,7 +58,7 @@ export const IosSafariIcon: React.FC<IosIconProps> = ({ className = 'w-full h-fu
       <ellipse cx="50" cy="50" rx="18" ry="38" strokeWidth="2" strokeDasharray="3 2" />
       <line x1="12" y1="50" x2="88" y2="50" strokeWidth="2" />
       <line x1="50" y1="12" x2="50" y2="88" strokeWidth="2" />
-      <circle cx="50" cy="50" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="3" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -73,7 +73,7 @@ export const IosFilesIcon: React.FC<IosIconProps> = ({ className = 'w-full h-ful
       />
       <line x1="28" y1="52" x2="56" y2="52" strokeWidth="2" strokeLinecap="round" />
       <line x1="28" y1="62" x2="72" y2="62" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 3" />
-      <circle cx="70" cy="30" r="3" fill="#d71921" stroke="none" />
+      <circle cx="70" cy="30" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -96,7 +96,7 @@ export const IosSettingsIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
         />
       ))}
       <circle cx="50" cy="50" r="14" strokeWidth="2" strokeDasharray="2 2" />
-      <circle cx="50" cy="50" r="5" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="4.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -110,7 +110,7 @@ export const IosMusicIcon: React.FC<IosIconProps> = ({ className = 'w-full h-ful
         strokeWidth="2.5"
         fill="currentColor"
       />
-      <circle cx="70" cy="22" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="70" cy="22" r="3" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -121,7 +121,7 @@ export const IosTerminalIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
     <svg viewBox="0 0 100 100" className="h-full w-full" fill="none">
       <rect x="14" y="16" width="72" height="68" rx="8" stroke="currentColor" strokeWidth="2" />
       <line x1="14" y1="30" x2="86" y2="30" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.4" />
-      <circle cx="24" cy="23" r="2.5" fill="#d71921" />
+      <circle cx="24" cy="23" r="2.5" fill="currentColor" fillOpacity="0.8" />
       <circle cx="32" cy="23" r="2.5" fill="currentColor" fillOpacity="0.4" />
       <circle cx="40" cy="23" r="2.5" fill="currentColor" fillOpacity="0.4" />
       <path d="M26 44 L40 54 L26 64" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
@@ -139,7 +139,7 @@ export const IosNotesIcon: React.FC<IosIconProps> = ({ className = 'w-full h-ful
       <line x1="32" y1="46" x2="68" y2="46" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 3" />
       <line x1="32" y1="56" x2="68" y2="56" strokeWidth="2" strokeLinecap="round" />
       <line x1="32" y1="66" x2="58" y2="66" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="68" cy="34" r="3" fill="#d71921" stroke="none" />
+      <circle cx="68" cy="34" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -150,7 +150,7 @@ export const IosCalculatorIcon: React.FC<IosIconProps> = ({ className = 'w-full 
     <svg viewBox="0 0 100 100" className="h-full w-full" fill="none" stroke="currentColor">
       <rect x="18" y="16" width="64" height="68" rx="8" strokeWidth="2" />
       <rect x="26" y="24" width="48" height="16" rx="3" fill="currentColor" fillOpacity="0.12" strokeWidth="1.5" />
-      <circle cx="66" cy="32" r="2.5" fill="#d71921" stroke="none" />
+      <circle cx="66" cy="32" r="2" fill="#ffffff" stroke="none" />
       <circle cx="34" cy="52" r="4" fill="currentColor" stroke="none" />
       <circle cx="50" cy="52" r="4" fill="currentColor" stroke="none" />
       <circle cx="66" cy="52" r="4" fill="currentColor" stroke="none" />
@@ -172,7 +172,7 @@ export const IosActivityIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="74" cy="50" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="74" cy="50" r="3" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -184,7 +184,7 @@ export const IosCodeIcon: React.FC<IosIconProps> = ({ className = 'w-full h-full
       <path d="M36 32 L18 50 L36 68" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M64 32 L82 50 L64 68" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       <line x1="56" y1="26" x2="44" y2="74" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="50" cy="50" r="3" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -200,7 +200,7 @@ export const IosPaintIcon: React.FC<IosIconProps> = ({ className = 'w-full h-ful
       <circle cx="32" cy="40" r="3.5" fill="currentColor" stroke="none" />
       <circle cx="48" cy="32" r="3.5" fill="currentColor" stroke="none" />
       <circle cx="64" cy="40" r="3.5" fill="currentColor" stroke="none" />
-      <circle cx="36" cy="60" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="36" cy="60" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -222,7 +222,7 @@ export const IosPhotosIcon: React.FC<IosIconProps> = ({ className = 'w-full h-fu
         />
       ))}
       <circle cx="50" cy="50" r="14" strokeWidth="2" />
-      <circle cx="50" cy="50" r="4" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="3.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -236,7 +236,7 @@ export const IosFlowshotIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
       <path d="M18 66 L18 80 L34 80" strokeWidth="3" strokeLinecap="round" />
       <path d="M66 80 L82 80 L82 66" strokeWidth="3" strokeLinecap="round" />
       <circle cx="50" cy="50" r="16" strokeWidth="2" strokeDasharray="3 3" />
-      <circle cx="50" cy="50" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="3" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -249,7 +249,7 @@ export const IosAppStoreIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
       <line x1="50" y1="18" x2="50" y2="82" strokeWidth="2" />
       <line x1="50" y1="50" x2="82" y2="34" strokeWidth="2" />
       <line x1="50" y1="50" x2="18" y2="34" strokeWidth="2" />
-      <circle cx="50" cy="50" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="3" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -264,7 +264,7 @@ export const IosRetro2048Icon: React.FC<IosIconProps> = ({ className = 'w-full h
       <text x="34" y="42" fill="currentColor" fontSize="18" fontFamily="monospace" fontWeight="bold" textAnchor="middle">2</text>
       <text x="66" y="42" fill="currentColor" fontSize="18" fontFamily="monospace" fontWeight="bold" textAnchor="middle">0</text>
       <text x="34" y="74" fill="currentColor" fontSize="18" fontFamily="monospace" fontWeight="bold" textAnchor="middle">4</text>
-      <text x="66" y="74" fill="#d71921" fontSize="18" fontFamily="monospace" fontWeight="bold" textAnchor="middle">8</text>
+      <text x="66" y="74" fill="#ffffff" fontSize="18" fontFamily="monospace" fontWeight="bold" textAnchor="middle">8</text>
     </svg>
   </IosSquircle>
 );
@@ -287,7 +287,7 @@ export const IosRetroSweeperIcon: React.FC<IosIconProps> = ({ className = 'w-ful
           transform={`rotate(${deg} 50 50)`}
         />
       ))}
-      <circle cx="50" cy="50" r="3" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -300,7 +300,7 @@ export const IosSynthIcon: React.FC<IosIconProps> = ({ className = 'w-full h-ful
       <line x1="16" y1="46" x2="84" y2="46" strokeWidth="1.5" />
       <circle cx="32" cy="35" r="4.5" fill="currentColor" stroke="none" />
       <circle cx="50" cy="35" r="4.5" fill="currentColor" stroke="none" />
-      <circle cx="68" cy="35" r="4.5" fill="#d71921" stroke="none" />
+      <circle cx="68" cy="35" r="4.5" fill="#ffffff" stroke="none" />
       {[26, 36, 46, 56, 64, 74].map((x) => (
         <line key={x} x1={x} y1="46" x2={x} y2="76" strokeWidth="1.5" />
       ))}
@@ -316,7 +316,7 @@ export const IosCameraIcon: React.FC<IosIconProps> = ({ className = 'w-full h-fu
       <path d="M38 26 L44 18 L56 18 L62 26 Z" strokeWidth="2" fill="currentColor" fillOpacity="0.2" />
       <circle cx="50" cy="52" r="18" strokeWidth="2.5" />
       <circle cx="50" cy="52" r="10" fill="currentColor" fillOpacity="0.3" strokeWidth="1.5" />
-      <circle cx="72" cy="36" r="3" fill="#d71921" stroke="none" />
+      <circle cx="72" cy="36" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -330,7 +330,7 @@ export const IosFlowtapeIcon: React.FC<IosIconProps> = ({ className = 'w-full h-
       <circle cx="40" cy="44" r="5" strokeWidth="2" />
       <circle cx="60" cy="44" r="5" strokeWidth="2" />
       <line x1="40" y1="44" x2="60" y2="44" strokeWidth="1" strokeDasharray="1 2" />
-      <circle cx="74" cy="32" r="2.5" fill="#d71921" stroke="none" />
+      <circle cx="74" cy="32" r="2.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -342,7 +342,7 @@ export const IosFlowboardIcon: React.FC<IosIconProps> = ({ className = 'w-full h
       <rect x="20" y="20" width="24" height="24" rx="4" strokeWidth="2" />
       <rect x="56" y="56" width="24" height="24" rx="4" strokeWidth="2" />
       <path d="M44 32 C56 32, 56 68, 56 68" strokeWidth="2" strokeDasharray="3 2" />
-      <circle cx="32" cy="32" r="3" fill="#d71921" stroke="none" />
+      <circle cx="32" cy="32" r="3" fill="#ffffff" stroke="none" />
       <circle cx="68" cy="68" r="3" fill="currentColor" stroke="none" />
     </svg>
   </IosSquircle>
@@ -356,7 +356,7 @@ export const IosCyberPongIcon: React.FC<IosIconProps> = ({ className = 'w-full h
       <line x1="50" y1="18" x2="50" y2="82" strokeWidth="1.5" strokeDasharray="4 3" />
       <rect x="24" y="38" width="5" height="24" rx="2" fill="currentColor" />
       <rect x="71" y="44" width="5" height="24" rx="2" fill="currentColor" />
-      <circle cx="42" cy="48" r="3.5" fill="#d71921" stroke="none" />
+      <circle cx="42" cy="48" r="3.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -372,7 +372,7 @@ export const IosSnakeArenaIcon: React.FC<IosIconProps> = ({ className = 'w-full 
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="72" cy="56" r="4" fill="#d71921" stroke="none" />
+      <circle cx="72" cy="56" r="3.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -389,7 +389,7 @@ export const IosConnectFourIcon: React.FC<IosIconProps> = ({ className = 'w-full
             cx={x}
             cy={y}
             r="4"
-            fill={x === 57 && y === 45 ? '#d71921' : 'currentColor'}
+            fill={x === 57 && y === 45 ? '#ffffff' : 'currentColor'}
             fillOpacity={x === 57 && y === 45 ? 1 : (x + y) % 2 === 0 ? 0.9 : 0.25}
             stroke="none"
           />
@@ -416,7 +416,7 @@ export const IosPersonalOsIcon: React.FC<IosIconProps> = ({ className = 'w-full 
           stroke="none"
         />
       ))}
-      <circle cx="50" cy="50" r="5" fill="#d71921" stroke="none" />
+      <circle cx="50" cy="50" r="4.5" fill="#ffffff" stroke="none" />
     </svg>
   </IosSquircle>
 );
@@ -485,7 +485,7 @@ export const IosAppIcon: React.FC<IosIconProps> = ({ appId, className = 'w-full 
       <svg viewBox="0 0 100 100" className="h-full w-full" fill="none" stroke="currentColor">
         <rect x="22" y="22" width="56" height="56" rx="12" strokeWidth="2.5" />
         <circle cx="50" cy="50" r="8" fill="currentColor" stroke="none" />
-        <circle cx="68" cy="32" r="3" fill="#d71921" stroke="none" />
+        <circle cx="68" cy="32" r="3" fill="#ffffff" stroke="none" />
       </svg>
     </IosSquircle>
   );

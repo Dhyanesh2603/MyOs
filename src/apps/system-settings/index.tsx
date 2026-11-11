@@ -15,6 +15,7 @@ import {
   Shapes,
   Sparkles,
   RotateCcw,
+  PanelBottom,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import type { ThemeId, AccentColorId, IconShape, WindowMaterial } from '@contracts/theme';
@@ -22,6 +23,7 @@ import { useThemeStore, ACCENT_COLORS } from '@core/theme/themeStore';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
+import { useDockStore, type DockAutoHideMode } from '@shell/dock/dockStore';
 
 type SettingsTab = 'appearance' | 'desktop' | 'geometry' | 'accessibility' | 'about';
 
@@ -56,6 +58,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const setLayoutMode = useDesktopStore((state) => state.setLayoutMode);
   const autoArrangeGrid = useDesktopStore((state) => state.autoArrangeGrid);
   const shortcuts = useDesktopStore((state) => state.shortcuts);
+  const autoHideMode = useDockStore((state) => state.autoHideMode);
+  const setAutoHideMode = useDockStore((state) => state.setAutoHideMode);
 
   return (
     <div className="flex h-full w-full bg-[#0a0b10] text-neutral-100 select-none">
@@ -470,6 +474,40 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                       />
                       <span className="text-xs font-semibold text-white">{shape.label}</span>
                       <span className="font-mono text-[9px] text-neutral-400 mt-0.5">{shape.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Dock Auto-Hide & Behavior */}
+            <div className="border-t border-white/[0.08] pt-5">
+              <div className="flex items-center gap-2">
+                <PanelBottom className="h-4 w-4 text-cyan-400" />
+                <h3 className="text-xs font-bold tracking-tight text-white uppercase tracking-wider">Dock & Taskbar Visibility</h3>
+              </div>
+              <p className="text-[11px] text-neutral-400 mt-0.5">
+                Configure when the bottom application dock appears on the screen.
+              </p>
+              <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {[
+                  { id: 'always', label: 'Bottom Hot-Edge', desc: 'Hidden until cursor hits bottom (Default)' },
+                  { id: 'smart', label: 'Smart Auto-Hide', desc: 'Hides when overlapping windows' },
+                  { id: 'never', label: 'Always Visible', desc: 'Pinned permanently at bottom' },
+                ].map((item) => {
+                  const isSelected = autoHideMode === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setAutoHideMode(item.id as DockAutoHideMode)}
+                      className={`flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-white/40 bg-white/10 ring-1 ring-white/30 text-white shadow-md'
+                          : 'border-white/10 bg-[#12141c] text-neutral-400 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-xs font-semibold text-white">{item.label}</span>
+                      <span className="font-mono text-[9px] text-neutral-400 mt-1">{item.desc}</span>
                     </button>
                   );
                 })}

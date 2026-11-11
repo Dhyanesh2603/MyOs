@@ -59,8 +59,8 @@ export const Dock: React.FC<DockProps> = ({
     }
 
     const handlePointerMove = (e: PointerEvent) => {
-      const isAtBottomEdge = e.clientY >= window.innerHeight - 8;
-      const isOverDock = dockRef.current?.contains(e.target as Node) ?? false;
+      const isAtBottomEdge = e.clientY >= window.innerHeight - 14;
+      const isOverDock = e.target instanceof Node ? (dockRef.current?.contains(e.target) ?? false) : false;
 
       if (isAtBottomEdge || isOverDock) {
         clearHideTimer();
@@ -72,7 +72,7 @@ export const Dock: React.FC<DockProps> = ({
           hideTimerRef.current = window.setTimeout(() => {
             setIsDockRevealed(false);
             hideTimerRef.current = null;
-          }, 280);
+          }, 360);
         }
       }
     };
@@ -94,7 +94,7 @@ export const Dock: React.FC<DockProps> = ({
       hideTimerRef.current = window.setTimeout(() => {
         setIsDockRevealed(false);
         hideTimerRef.current = null;
-      }, 280);
+      }, 360);
     }
   };
 
@@ -152,7 +152,7 @@ export const Dock: React.FC<DockProps> = ({
       {isAutoHideActive && (
         <div
           data-dock-trigger="true"
-          className="fixed bottom-0 left-0 right-0 h-2.5 z-[490] pointer-events-auto cursor-default"
+          className="fixed bottom-0 left-0 right-0 h-3.5 z-[490] pointer-events-auto cursor-default"
           onMouseEnter={() => {
             clearHideTimer();
             setIsDockRevealed(true);
