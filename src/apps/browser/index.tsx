@@ -13,7 +13,6 @@ import {
   Bookmark,
   FolderOpen,
   Laptop,
-  Play,
   FileCode,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
@@ -36,47 +35,14 @@ const DEFAULT_HOME_URL = 'https://www.google.com/webhp?igu=1';
 
 const DEFAULT_BOOKMARKS = [
   { name: 'Google', url: 'https://www.google.com/webhp?igu=1' },
-  { name: 'YouTube', url: 'https://www.youtube.com/embed' },
-  { name: 'Wikipedia', url: 'https://en.m.wikipedia.org/wiki/Operating_system' },
   { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/' },
   { name: 'Hacker News', url: 'https://news.ycombinator.com' },
   { name: 'Localhost:3000', url: 'http://localhost:3000' },
 ];
 
 /**
- * Parses and extracts a YouTube video ID from various URL formats.
- */
-function extractYouTubeVideoId(input: string): string | null {
-  try {
-    const raw = input.trim();
-    if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) {
-      return raw;
-    }
-    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
-    if (url.hostname.includes('youtube.com')) {
-      const v = url.searchParams.get('v');
-      if (v && v.length === 11) return v;
-      if (url.pathname.startsWith('/embed/')) {
-        return url.pathname.split('/')[2]?.slice(0, 11) || null;
-      }
-      if (url.pathname.startsWith('/shorts/')) {
-        return url.pathname.split('/')[2]?.slice(0, 11) || null;
-      }
-      if (url.pathname.startsWith('/v/')) {
-        return url.pathname.split('/')[2]?.slice(0, 11) || null;
-      }
-    } else if (url.hostname.includes('youtu.be')) {
-      const id = url.pathname.replace(/^\//, '').slice(0, 11);
-      if (id.length === 11) return id;
-    }
-  } catch {
-    // Ignore invalid URL
-  }
-  return null;
-}
-
-/**
  * Normalizes input text into a direct embeddable URL for the iframe.
+ * No hardcoded website special-casing; straightforward URL resolution.
  */
 function normalizeUrl(input: string): { url: string; title: string } {
   const trimmed = input.trim();
@@ -84,92 +50,11 @@ function normalizeUrl(input: string): { url: string; title: string } {
     return { url: DEFAULT_HOME_URL, title: 'Google' };
   }
 
-  // 1. YouTube Video (watch?v=, youtu.be/, shorts/)
-  const ytVideoId = extractYouTubeVideoId(trimmed);
-  if (ytVideoId) {
-    return {
-      url: `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&enablejsapi=1&rel=0`,
-      title: 'YouTube Player',
-    };
-  }
-
-  // 2. YouTube Home / General
-  if (
-    trimmed.toLowerCase() === 'youtube' ||
-    trimmed.toLowerCase() === 'yt' ||
-    trimmed === 'flow://youtube' ||
-    trimmed.startsWith('youtube.com') ||
-    trimmed.startsWith('www.youtube.com') ||
-    trimmed.startsWith('https://youtube.com') ||
-    trimmed.startsWith('https://www.youtube.com') ||
-    trimmed.startsWith('http://youtube.com') ||
-    trimmed.startsWith('http://www.youtube.com')
-  ) {
-    try {
-      const parsed = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed}`);
-      const query = parsed.searchParams.get('search_query');
-      if (query) {
-        return {
-          url: `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}`,
-          title: `YouTube - ${query}`,
-        };
-      }
-    } catch {}
-    return {
-      url: 'https://www.youtube.com/embed',
-      title: 'YouTube',
-    };
-  }
-
-  // 3. Google Home or Search
-  if (
-    trimmed.toLowerCase() === 'google' ||
-    trimmed.startsWith('google.com') ||
-    trimmed.startsWith('www.google.com') ||
-    trimmed.startsWith('https://google.com') ||
-    trimmed.startsWith('https://www.google.com') ||
-    trimmed.startsWith('http://google.com') ||
-    trimmed.startsWith('http://www.google.com')
-  ) {
-    try {
-      const parsed = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed}`);
-      parsed.searchParams.set('igu', '1');
-      if (!parsed.pathname || parsed.pathname === '/') {
-        parsed.pathname = '/webhp';
-      }
-      return {
-        url: parsed.toString(),
-        title: parsed.searchParams.get('q') ? `${parsed.searchParams.get('q')} - Google Search` : 'Google',
-      };
-    } catch {}
-    return { url: DEFAULT_HOME_URL, title: 'Google' };
-  }
-
-  // 4. DuckDuckGo
-  if (
-    trimmed.toLowerCase() === 'duckduckgo' ||
-    trimmed.startsWith('duckduckgo.com') ||
-    trimmed.startsWith('https://duckduckgo.com')
-  ) {
-    return {
-      url: 'https://html.duckduckgo.com/html/',
-      title: 'DuckDuckGo',
-    };
-  }
-
-  // 5. Wikipedia
-  if (trimmed.toLowerCase() === 'wikipedia') {
-    return {
-      url: 'https://en.m.wikipedia.org',
-      title: 'Wikipedia',
-    };
-  }
-
-  // 6. Direct Protocol (http:// or https://)
+  // 1. Direct Protocol (http:// or https://)
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     try {
       const parsed = new URL(trimmed);
-      if (parsed.hostname.includes('google.')) {
+      if (parsed.hostname.includes('google.') && !parsed.searchParams.has('igu')) {
         parsed.searchParams.set('igu', '1');
         return {
           url: parsed.toString(),
@@ -185,7 +70,7 @@ function normalizeUrl(input: string): { url: string; title: string } {
     }
   }
 
-  // 7. Domain without protocol (e.g. news.ycombinator.com, github.com, localhost:3000)
+  // 2. Domain without protocol (e.g. news.ycombinator.com, github.com, etc.)
   if (
     trimmed.includes('.') &&
     !trimmed.includes(' ') &&
@@ -197,7 +82,7 @@ function normalizeUrl(input: string): { url: string; title: string } {
     };
   }
 
-  // 8. Localhost without protocol
+  // 3. Localhost without protocol
   if (trimmed.startsWith('localhost:') || trimmed.startsWith('127.0.0.1:')) {
     return {
       url: `http://${trimmed}`,
@@ -205,7 +90,7 @@ function normalizeUrl(input: string): { url: string; title: string } {
     };
   }
 
-  // 9. Otherwise, treat as search query in Google (igu=1 for iframe support)
+  // 4. Otherwise, treat as search query in Google (with igu=1 for iframe embedding)
   return {
     url: `https://www.google.com/search?igu=1&q=${encodeURIComponent(trimmed)}`,
     title: `${trimmed} - Google Search`,
@@ -243,7 +128,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // VFS & Device Storage stores
+  // Device Storage mounted folders
   const mountedFolders = useDeviceStorageStore((s) => s.mountedFolders);
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0]!;
@@ -510,9 +395,6 @@ export const BrowserApp: React.FC<AppProps> = () => {
       <div className="flex h-10 items-center border-b border-white/[0.08] bg-[#0f1118] px-2.5 gap-1.5 overflow-x-auto scrollbar-none no-scrollbar">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
-          const isYouTubeTab =
-            tab.url.includes('youtube.com/embed') ||
-            tab.url.includes('youtube-nocookie.com');
           return (
             <div
               key={tab.id}
@@ -524,10 +406,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
               }`}
             >
               <div className="flex items-center gap-2 truncate">
-                {isYouTubeTab ? (
-                  <Play className="h-3 w-3 shrink-0 text-red-500 fill-red-500" />
-                ) : tab.url.startsWith('file:///') ? (
-                  <FileCode className="h-3 w-3 shrink-0 text-emerald-400" />
+                {tab.url.startsWith('file:///') ? (
+                  <FileCode className="h-3 w-3 shrink-0 text-white/80" />
                 ) : (
                   <Globe className="h-3 w-3 shrink-0 text-white/80" />
                 )}
@@ -608,11 +488,9 @@ export const BrowserApp: React.FC<AppProps> = () => {
         >
           <div className="flex items-center gap-1.5 text-neutral-400 mr-2 shrink-0">
             {inputUrl.startsWith('https://') ? (
-              <Lock className="h-3 w-3 text-emerald-400" />
-            ) : inputUrl.includes('youtube') ? (
-              <Play className="h-3 w-3 text-red-500 fill-red-500" />
+              <Lock className="h-3 w-3 text-white/80" />
             ) : inputUrl.startsWith('file:///') ? (
-              <FileCode className="h-3 w-3 text-emerald-400" />
+              <FileCode className="h-3 w-3 text-white/80" />
             ) : (
               <Search className="h-3 w-3" />
             )}
@@ -621,7 +499,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            placeholder="Search Google, enter any URL, or YouTube link..."
+            placeholder="Enter any URL or search terms..."
             className="w-full bg-transparent font-sans text-xs text-white placeholder:text-neutral-500 focus:outline-none"
           />
         </form>
@@ -659,9 +537,6 @@ export const BrowserApp: React.FC<AppProps> = () => {
             onClick={() => handleNavigate(bm.url)}
             className="flex items-center gap-1 rounded-md px-2 py-0.5 hover:bg-white/[0.05] hover:text-white transition-colors font-medium whitespace-nowrap cursor-pointer"
           >
-            {bm.name === 'YouTube' ? (
-              <Play className="h-2.5 w-2.5 fill-red-500 text-red-500" />
-            ) : null}
             <span>{bm.name}</span>
           </button>
         ))}
@@ -669,8 +544,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
         {/* Mounted Device Shortcut in Bookmarks */}
         {mountedFolders.length > 0 && (
           <div className="flex items-center gap-1 ml-auto pl-2 border-l border-white/10">
-            <Laptop className="h-3 w-3 text-emerald-400" />
-            <span className="text-[10px] text-emerald-400 font-medium truncate max-w-[120px]">
+            <Laptop className="h-3 w-3 text-white/80" />
+            <span className="text-[10px] text-white/80 font-medium truncate max-w-[120px]">
               {mountedFolders[0]?.name}
             </span>
           </div>
@@ -698,7 +573,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
         {/* Subtle loading spinner overlay when switching tabs or navigating */}
         {activeTab.isLoading && (
           <div className="absolute top-2 right-2 pointer-events-none flex items-center gap-1.5 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-1 text-[10px] text-white border border-white/10 shadow-lg">
-            <RotateCw className="h-3 w-3 animate-spin text-cyan-400" />
+            <RotateCw className="h-3 w-3 animate-spin text-white" />
             <span>Loading...</span>
           </div>
         )}
@@ -710,7 +585,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 export const browserManifest: AppManifest = {
   id: 'browser',
   name: 'Browser',
-  description: 'Sandboxed web browser with direct iframe embed for all URLs, YouTube player, and local storage.',
+  description: 'Sandboxed web browser with direct iframe embed for all URLs and local storage.',
   category: 'productivity',
   icon: Globe,
   defaultSize: { width: 880, height: 600 },
