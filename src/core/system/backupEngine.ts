@@ -8,7 +8,7 @@ import { useClipboardStore } from '@core/clipboard/clipboardStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { soundEngine } from '@core/audio/soundEngine';
 
-export interface FlowOSSystemImage {
+export interface OnyxOSSystemImage {
   version: string;
   exportedAt: number;
   vfsFiles: Record<string, string>;
@@ -18,6 +18,8 @@ export interface FlowOSSystemImage {
   widgets: any[];
   clipboard: any[];
 }
+
+export type FlowOSSystemImage = OnyxOSSystemImage;
 
 export async function exportSystemImage(): Promise<void> {
   try {
@@ -54,7 +56,7 @@ export async function exportSystemImage(): Promise<void> {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `onyx-system-image-${new Date().toISOString().slice(0, 10)}.flowos`;
+    a.download = `onyx-system-image-${new Date().toISOString().slice(0, 10)}.onyx`;
     a.click();
     URL.revokeObjectURL(url);
 

@@ -77,7 +77,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
 
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('FLOWSHOT MARKUP STUDIO', 40, 60);
+      ctx.fillText('ONYXSHOT MARKUP STUDIO', 40, 60);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.font = '12px monospace';
       ctx.fillText('Take a screenshot to begin annotation, or draw right here.', 40, 90);
@@ -217,7 +217,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dataUrl = canvas.toDataURL('image/png');
-    const filename = `/home/user/Pictures/flowshot-${Date.now()}.png`;
+    const filename = `/home/user/Pictures/onyxshot-${Date.now()}.png`;
     await writeFile(filename, dataUrl);
     setIsSaved(true);
     soundEngine.playSnap();
@@ -257,7 +257,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
     if (!canvas) return;
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = `flowshot-${Date.now()}.png`;
+    a.download = `onyxshot-${Date.now()}.png`;
     a.click();
     soundEngine.playSnap();
   };
@@ -365,7 +365,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
       {/* Footer Export Action Strip */}
       <div className="flex items-center justify-between border-t border-border-subtle bg-surface-panel/95 px-4 py-2 text-xs">
         <div className="flex items-center gap-2 font-mono text-[10px] text-content-tertiary">
-          <span>FlowShot v0.2</span>
+          <span>OnyxShot v0.2</span>
           <span>•</span>
           <span>Tool: {activeTool.toUpperCase()}</span>
         </div>

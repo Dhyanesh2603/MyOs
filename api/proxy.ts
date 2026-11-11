@@ -57,7 +57,6 @@ export default async function handler(req: Request) {
       if (str.startsWith('javascript:') || str.startsWith('data:') || str.startsWith('blob:') || str.startsWith('#')) return raw;
       var obj = new URL(str, currentBase);
       if (obj.origin === window.location.origin && obj.pathname.startsWith('/api/proxy')) return obj.href;
-      if (obj.hostname.includes('google.')) { obj.searchParams.set('igu', '1'); return obj.href; }
       if (obj.hostname.includes('youtube.com') && obj.searchParams.has('v')) {
         return 'https://www.youtube.com/embed/' + obj.searchParams.get('v') + '?autoplay=1&enablejsapi=1&rel=0';
       }

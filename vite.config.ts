@@ -148,11 +148,6 @@ function flowOsBrowserProxyPlugin(): Plugin {
       if (targetObj.origin === window.location.origin && targetObj.pathname.startsWith('/api/proxy')) {
         return targetObj.href;
       }
-      // Retain igu=1 for Google searches and links
-      if (targetObj.hostname.includes('google.')) {
-        targetObj.searchParams.set('igu', '1');
-        return targetObj.href;
-      }
       // Rewriting YouTube video links
       if (targetObj.hostname.includes('youtube.com') && targetObj.searchParams.has('v')) {
         var v = targetObj.searchParams.get('v');

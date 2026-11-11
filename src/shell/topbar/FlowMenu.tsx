@@ -133,7 +133,7 @@ export const FlowMenu: React.FC = () => {
           <button
             onClick={() => {
               setIsOpen(false);
-              window.dispatchEvent(new CustomEvent('flowos:lock'));
+              window.dispatchEvent(new CustomEvent('onyx:lock'));
             }}
             className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-content-secondary hover:bg-accent-primary hover:text-white transition-colors"
           >

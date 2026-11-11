@@ -158,8 +158,13 @@ export function getEffectiveIframeUrl(rawUrl: string, isReaderMode: boolean = fa
       return rawUrl;
     }
 
-    // Google with igu=1 is explicitly allowed by Google for iframe embedding
-    if (parsed.hostname.includes('google.')) {
+    // Google homepage with igu=1 is allowed by Google for direct iframe embedding
+    // Searches (/search?q=...) must route through the proxy because Google sets X-Frame-Options: SAMEORIGIN on searches
+    if (
+      parsed.hostname.includes('google.') &&
+      (parsed.pathname === '/' || parsed.pathname === '/webhp') &&
+      !parsed.searchParams.has('q')
+    ) {
       if (!parsed.searchParams.has('igu')) {
         parsed.searchParams.set('igu', '1');
       }

@@ -443,7 +443,7 @@ export const ScratchpadDrawer: React.FC = () => {
                 <div className="flex items-center justify-between pb-2 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">
                   <span className="flex items-center gap-1">
                     <Sparkles className="h-3 w-3 text-accent-primary" />
-                    Promote to Flow Personal OS
+                    Promote to Onyx Personal OS
                   </span>
                   <span>1-Click Momentum</span>
                 </div>

@@ -50,7 +50,7 @@ export const SEED_MISSIONS: Mission[] = [
     deadline: '2026-10-01',
     estimatedCompletion: '2 weeks remaining',
     objectives: [
-      { id: 'mo-f1', text: 'Implement FlowBoard infinite vector whiteboard with VFS export', completed: true },
+      { id: 'mo-f1', text: 'Implement OnyxBoard infinite vector whiteboard with VFS export', completed: true },
       { id: 'mo-f2', text: 'Design acoustic tactile soundscapes (Mechanical, Nothing, Retro)', completed: true },
       { id: 'mo-f3', text: 'Deploy Personal OS command hub with Home Momentum engine', completed: false, dueDate: '2026-09-22' },
       { id: 'mo-f4', text: 'Build interactive vector Knowledge Graph linking projects & skills', completed: false, dueDate: '2026-09-24' },
@@ -122,11 +122,11 @@ export const SEED_PROJECTS: Project[] = [
     status: 'active',
     progress: 94,
     repoUrl: 'https://github.com/Dhyanesh2603/MyOs',
-    demoUrl: 'http://localhost:3000',
+    demoUrl: 'https://os-onyx.vercel.app',
     techStack: ['React 19', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Web Audio API', 'IndexedDB'],
     architectureOverview: 'Single-page synthetic microkernel. Window manager uses bounded z-index stacks. VFS backed by transactional IndexedDB. Shaders implemented via HTML5 Canvas 2D / WebGL.',
     milestones: [
-      { id: 'pm-1', title: 'FlowBoard vector canvas & sticky cards', completed: true, dueDate: '2026-09-18' },
+      { id: 'pm-1', title: 'OnyxBoard vector canvas & sticky cards', completed: true, dueDate: '2026-09-18' },
       { id: 'pm-2', title: 'Acoustic keyboard soundscape engine', completed: true, dueDate: '2026-09-19' },
       { id: 'pm-3', title: 'Onyx OS v2 Personal Operating System', completed: false, dueDate: '2026-09-22' },
       { id: 'pm-4', title: 'Interactive vector Knowledge Graph', completed: false, dueDate: '2026-09-24' },

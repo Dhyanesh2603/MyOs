@@ -37,6 +37,10 @@ export const FILE_EXTENSIONS_MAP: Record<string, string> = {
   svg: 'gallery',
   webp: 'gallery',
   gif: 'gallery',
+
+  // System Backup Images
+  onyx: 'system-settings',
+  flowos: 'system-settings',
 };
 
 /**

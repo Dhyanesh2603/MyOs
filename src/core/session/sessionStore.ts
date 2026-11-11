@@ -30,6 +30,9 @@ export const useSessionStore = create<SessionStoreState>((set, get) => ({
 
 // Listen to custom OS lock event from TopMenuBar or CommandPalette
 if (typeof window !== 'undefined') {
+  window.addEventListener('onyx:lock', () => {
+    useSessionStore.getState().lock();
+  });
   window.addEventListener('flowos:lock', () => {
     useSessionStore.getState().lock();
   });

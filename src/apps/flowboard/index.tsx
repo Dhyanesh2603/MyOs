@@ -546,16 +546,16 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
       ctx.font = 'bold 14px monospace';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'bottom';
-      ctx.fillText('FLOWBOARD CANVAS • ONYX OS', canvas.width - 24, canvas.height - 20);
+      ctx.fillText('ONYXBOARD CANVAS • ONYX OS', canvas.width - 24, canvas.height - 20);
 
       const dataUrl = canvas.toDataURL('image/png');
-      const filename = `FlowBoard_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.png`;
+      const filename = `OnyxBoard_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.png`;
       const path = `/home/user/Pictures/${filename}`;
 
       await writeFile(path, dataUrl);
       soundEngine.playChime();
       notify({
-        title: 'FlowBoard Canvas Saved',
+        title: 'OnyxBoard Canvas Saved',
         message: `High-res whiteboard snapshot exported to ${path}`,
         type: 'success',
       });
@@ -599,7 +599,7 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
           </div>
           <div>
             <div className="text-xs font-semibold tracking-wide text-neutral-100 flex items-center gap-1.5">
-              <span>FlowBoard</span>
+              <span>OnyxBoard</span>
               <span className="rounded bg-sky-500/20 px-1 py-0.2 font-mono text-[9px] text-sky-300">
                 VECTOR
               </span>

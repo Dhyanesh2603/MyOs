@@ -23,7 +23,7 @@ interface GameItem {
   color: string;
 }
 
-const FLOW_GAMES: GameItem[] = [
+const ONYX_GAMES: GameItem[] = [
   {
     id: 'cyber-pong',
     name: 'CyberPong Arena',
@@ -44,7 +44,7 @@ const FLOW_GAMES: GameItem[] = [
   },
   {
     id: 'connect-four',
-    name: 'Connect 4',
+    name: 'Onyx Connect 4',
     category: 'Tactical / Strategy',
     description: 'Turn-based vertical gravity grid with Minimax AI & P2P duel',
     icon: CircleDot,
@@ -53,7 +53,7 @@ const FLOW_GAMES: GameItem[] = [
   },
   {
     id: 'retro-2048',
-    name: 'Flow 2048',
+    name: 'Onyx 2048',
     category: 'Puzzle',
     description: 'Tactile 4x4 sliding tile numerical puzzle with procedural audio',
     icon: Grid,
@@ -62,7 +62,7 @@ const FLOW_GAMES: GameItem[] = [
   },
   {
     id: 'retro-sweeper',
-    name: 'FlowSweeper',
+    name: 'Onyx Sweeper',
     category: 'Classic',
     description: 'Minimalist Dieter Rams tactile Minesweeper with safe first clicks',
     icon: Sparkles,
@@ -114,16 +114,16 @@ export const GamesMenu: React.FC = () => {
           <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border-subtle/60 mb-1">
             <div className="flex items-center gap-2">
               <Trophy className="h-3.5 w-3.5 text-amber-400" />
-              <span className="font-bold text-xs text-content-primary">Flow Arcade</span>
+              <span className="font-bold text-xs text-content-primary">Onyx Arcade</span>
             </div>
             <span className="text-[10px] text-content-tertiary font-mono">
-              {FLOW_GAMES.length} Titles
+              {ONYX_GAMES.length} Titles
             </span>
           </div>
 
           {/* Game List */}
           <div className="space-y-0.5 max-h-[360px] overflow-y-auto">
-            {FLOW_GAMES.map((game) => {
+            {ONYX_GAMES.map((game) => {
               const running = isAppRunning(game.id);
               return (
                 <button

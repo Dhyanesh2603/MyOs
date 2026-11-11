@@ -54,7 +54,7 @@ export const AppStoreApp: React.FC<AppProps> = () => {
             <ShoppingBag className="h-4 w-4" />
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-tight text-white">Flow App Store</h1>
+            <h1 className="text-sm font-bold tracking-tight text-white">Onyx App Store</h1>
             <p className="text-[10px] text-neutral-400">
               Discover and install verified community apps and plugins
             </p>

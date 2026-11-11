@@ -25,7 +25,7 @@ export const ClockWidget: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-content-secondary">
-            FLOW TIME
+            ONYX TIME
           </span>
         </div>
         <span className="font-mono text-[9px] text-content-tertiary">

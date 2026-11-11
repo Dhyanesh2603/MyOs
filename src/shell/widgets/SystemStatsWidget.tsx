@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useFlowOS } from '@core/sdk/useFlowOS';
+import { useOnyxOS } from '@core/sdk/useFlowOS';
 import { Cpu, HardDrive, Layers, Activity } from 'lucide-react';
 
 export const SystemStatsWidget: React.FC = () => {
-  const { runningProcesses, windows, fs } = useFlowOS();
+  const { runningProcesses, windows, fs } = useOnyxOS();
   const [uptimeSec, setUptimeSec] = useState(0);
 
   useEffect(() => {

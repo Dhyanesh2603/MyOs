@@ -105,7 +105,7 @@ export const App: React.FC = () => {
         return;
       }
 
-      // FlowShot Screen Capture: Ctrl+Shift+S or PrintScreen
+      // OnyxShot Screen Capture: Ctrl+Shift+S or PrintScreen
       if (
         e.key === 'PrintScreen' ||
         ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's')
@@ -226,7 +226,7 @@ export const App: React.FC = () => {
       {/* System Clipboard History Manager Modal */}
       <ClipboardHistoryModal />
 
-      {/* FlowShot Screen Capture Marquee Overlay */}
+      {/* OnyxShot Screen Capture Marquee Overlay */}
       <ScreenCaptureOverlay />
 
       {/* Ambient Nothing-style ScreenSaver */}
@@ -244,7 +244,7 @@ export const App: React.FC = () => {
       {/* Stage Manager Left Strip */}
       <StageManagerStrip />
 
-      {/* Spatial FlowDrop AirBridge Radar Modal */}
+      {/* Spatial OnyxDrop AirBridge Radar Modal */}
       <FlowDropModal />
 
       {/* Spatial FancyZones Snap Wireframe Overlay */}

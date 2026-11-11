@@ -611,7 +611,7 @@ export const ConnectFourApp: React.FC<AppProps> = () => {
 
 export const connectFourManifest: AppManifest = {
   id: 'connect-four',
-  name: 'Connect 4',
+  name: 'Onyx Connect 4',
   description: 'Tactical 2-player multiplayer gravity grid with pass-and-play, Minimax AI bot, and AirBridge P2P sync.',
   category: 'productivity',
   icon: CircleDot,

@@ -150,7 +150,7 @@ export const SystemTray: React.FC<SystemTrayProps> = ({ direction = 'up' }) => {
         <SlidersHorizontal className="h-3.5 w-3.5" />
       </button>
 
-      {/* FlowOS AI Copilot */}
+      {/* Onyx AI Copilot */}
       <button
         onClick={() => {
           soundEngine.playClick();

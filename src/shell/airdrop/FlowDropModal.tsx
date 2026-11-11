@@ -74,7 +74,7 @@ export const FlowDropModal: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-mono text-sm font-bold text-white tracking-wide">
-                    FLOWDROP RADAR
+                    ONYXDROP RADAR
                   </h3>
                   <span className="flex items-center gap-1 font-mono text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

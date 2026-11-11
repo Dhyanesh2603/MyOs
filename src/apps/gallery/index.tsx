@@ -200,7 +200,7 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
             <ImageIcon className="h-10 w-10 opacity-30" />
             <h4 className="font-sans text-sm font-semibold text-white">No Images Found</h4>
             <p className="max-w-xs text-xs text-neutral-400">
-              Draw an image in FlowPaint or drag and drop photos from your PC to display them here.
+              Draw an image in Onyx Paint or drag and drop photos from your PC to display them here.
             </p>
           </div>
         ) : currentDataUrl ? (

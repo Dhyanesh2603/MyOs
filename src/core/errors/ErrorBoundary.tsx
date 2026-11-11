@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('FlowOS ErrorBoundary caught an unhandled exception:', error, errorInfo);
+    console.error('Onyx OS ErrorBoundary caught an unhandled exception:', error, errorInfo);
   }
 
   public handleReset = () => {

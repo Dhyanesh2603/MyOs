@@ -9,7 +9,7 @@ import type { ToastOptions } from '@contracts/notification';
  * Onyx OS Application SDK
  * Universal hook providing decoupled access to all OS subsystems.
  */
-export function useFlowOS() {
+export function useOnyxOS() {
   const { launchApp, terminateProcess, processes } = useProcessStore();
   const { windows, activeWindowId, focusWindow, closeWindow, minimizeWindow } =
     useWindowStore();
@@ -52,4 +52,4 @@ export function useFlowOS() {
   };
 }
 
-export const useOnyxOS = useFlowOS;
+export const useFlowOS = useOnyxOS;

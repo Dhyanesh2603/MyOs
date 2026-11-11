@@ -135,7 +135,7 @@ export const TaskManagerApp: React.FC<AppProps> = ({ processId }) => {
             <span className="text-[10px] text-neutral-400 font-mono">({totalWindows} win)</span>
           </div>
           <div className="mt-2.5 flex items-center gap-1 font-mono text-[9px] text-neutral-500">
-            <span>Flow Kernel v0.2</span>
+            <span>Onyx Kernel v2.0</span>
           </div>
         </div>
       </div>
