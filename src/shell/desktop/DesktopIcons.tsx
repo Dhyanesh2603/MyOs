@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, useMotionValue } from 'motion/react';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { useProcessStore } from '@core/process/processStore';
 import { useVFSStore } from '@core/vfs/vfsStore';
 import { useContextMenuStore } from '@core/menu/contextMenuStore';
@@ -20,74 +20,91 @@ import {
   useDesktopStore,
   DesktopShortcut,
   IconPosition,
+  snapToGrid,
   ORIGIN_X,
   ORIGIN_Y,
   GRID_WIDTH,
   GRID_HEIGHT,
+  getMaxRows,
 } from '@core/desktop/desktopStore';
 
 interface DesktopIconItemProps {
   item: DesktopShortcut;
   pos: IconPosition;
+  isDragging: boolean;
   isSelected: boolean;
   onSelect: (id: string) => void;
   onOpen: (item: DesktopShortcut) => void;
   onContextMenu: (e: React.MouseEvent, item: DesktopShortcut) => void;
-  onPositionChange: (id: string, x: number, y: number) => void;
+  onDragStart: (id: string, initialPos: IconPosition) => void;
+  onDragMove: (id: string, currentX: number, currentY: number) => void;
+  onDragEnd: (id: string, finalX: number, finalY: number) => void;
 }
 
 const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
   item,
   pos,
+  isDragging,
   isSelected,
   onSelect,
   onOpen,
   onContextMenu,
-  onPositionChange,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
 }) => {
-  const x = useMotionValue(pos.x);
-  const y = useMotionValue(pos.y);
-  const isDraggingRef = useRef(false);
-
-  // Synchronize motion values if pos changes externally (e.g., auto-arrange grid)
-  useEffect(() => {
-    x.set(pos.x);
-    y.set(pos.y);
-  }, [pos.x, pos.y, x, y]);
+  const dragOffsetRef = useRef({ x: 46, y: 48 });
+  const hasDraggedRef = useRef(false);
 
   return (
     <motion.div
       data-desktop-icon="true"
       drag
       dragMomentum={false}
-      dragElastic={0}
+      dragElastic={0.06}
+      animate={isDragging ? undefined : { x: pos.x, y: pos.y }}
+      transition={{ type: 'spring', damping: 28, stiffness: 380, mass: 0.8 }}
       style={{
-        x,
-        y,
         position: 'absolute',
         top: 0,
         left: 0,
+        zIndex: isDragging ? 100 : isSelected ? 30 : 10,
       }}
-      onDragStart={() => {
-        isDraggingRef.current = true;
+      onDragStart={(e, info) => {
+        hasDraggedRef.current = true;
+        const targetRect = (e.target as HTMLElement)
+          .closest('[data-desktop-icon]')
+          ?.getBoundingClientRect();
+        if (targetRect) {
+          dragOffsetRef.current = {
+            x: info.point.x - targetRect.left,
+            y: info.point.y - targetRect.top,
+          };
+        }
+        onDragStart(item.id, pos);
       }}
-      onDragEnd={() => {
-        const curX = Math.round(x.get());
-        const curY = Math.round(y.get());
-        onPositionChange(item.id, curX, curY);
+      onDrag={(_, info) => {
+        const currentIconX = info.point.x - dragOffsetRef.current.x;
+        const currentIconY = info.point.y - dragOffsetRef.current.y;
+        onDragMove(item.id, currentIconX, currentIconY);
+      }}
+      onDragEnd={(_, info) => {
+        const finalIconX = info.point.x - dragOffsetRef.current.x;
+        const finalIconY = info.point.y - dragOffsetRef.current.y;
+        onDragEnd(item.id, finalIconX, finalIconY);
         setTimeout(() => {
-          isDraggingRef.current = false;
+          hasDraggedRef.current = false;
         }, 120);
       }}
       onClick={(e) => {
         e.stopPropagation();
-        if (isDraggingRef.current) return;
+        if (hasDraggedRef.current) return;
         soundEngine.playClick();
         onSelect(item.id);
       }}
       onDoubleClick={(e) => {
         e.stopPropagation();
-        if (isDraggingRef.current) return;
+        if (hasDraggedRef.current) return;
         onOpen(item);
       }}
       onContextMenu={(e) => {
@@ -103,7 +120,7 @@ const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
         }
       }}
       tabIndex={0}
-      className={`group flex w-22 flex-col items-center gap-1.5 rounded-2xl p-2 cursor-grab active:cursor-grabbing transition-colors outline-none pointer-events-auto select-none ${
+      className={`group flex w-[92px] flex-col items-center gap-1.5 rounded-2xl p-2 cursor-grab active:cursor-grabbing transition-colors outline-none pointer-events-auto select-none ${
         isSelected
           ? 'bg-white/20 ring-1 ring-white/40 backdrop-blur-md'
           : 'hover:bg-white/10 focus-visible:ring-1 focus-visible:ring-white/40'
@@ -141,25 +158,10 @@ export const DesktopIcons: React.FC = () => {
 
   const selectedId = useDesktopStore((state) => state.selectedIconId);
   const setSelectedId = useDesktopStore((state) => state.setSelectedIconId);
-  const positions = useDesktopStore((state) => state.positions);
+  const storedPositions = useDesktopStore((state) => state.positions);
   const shortcuts = useDesktopStore((state) => state.shortcuts);
-  const updatePosition = useDesktopStore((state) => state.updatePosition);
+  const setAllPositions = useDesktopStore((state) => state.setAllPositions);
   const removeAppShortcut = useDesktopStore((state) => state.removeAppShortcut);
-
-  // Global listener: clicking anywhere outside desktop icons deselects current icon
-  useEffect(() => {
-    const handleGlobalPointerDown = (e: PointerEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      if (target.closest('[data-desktop-icon]') || target.closest('[data-context-menu]')) {
-        return;
-      }
-      setSelectedId(null);
-    };
-
-    window.addEventListener('pointerdown', handleGlobalPointerDown);
-    return () => window.removeEventListener('pointerdown', handleGlobalPointerDown, true);
-  }, [setSelectedId]);
 
   // Dynamic user files & folders created inside /home/user/Desktop
   const desktopNodes = Object.values(nodes).filter(
@@ -174,6 +176,99 @@ export const DesktopIcons: React.FC = () => {
   }));
 
   const allShortcuts = [...shortcuts, ...userItems];
+
+  // Live preview positions for smooth spring rearrangement during drag
+  const [livePositions, setLivePositions] = useState<Record<string, IconPosition>>(storedPositions);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const dragOriginPosRef = useRef<IconPosition>({ x: 0, y: 0 });
+  const lastHoverTargetRef = useRef<string | null>(null);
+
+  // Keep livePositions in sync with storedPositions when not actively dragging
+  useEffect(() => {
+    if (!draggingId) {
+      setLivePositions(storedPositions);
+    }
+  }, [storedPositions, draggingId]);
+
+  // Global listener: clicking anywhere outside desktop icons deselects current icon
+  useEffect(() => {
+    const handleGlobalPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (
+        target.closest('[data-desktop-icon]') ||
+        target.closest('[data-context-menu]')
+      ) {
+        return;
+      }
+      setSelectedId(null);
+    };
+
+    window.addEventListener('pointerdown', handleGlobalPointerDown);
+    return () => window.removeEventListener('pointerdown', handleGlobalPointerDown, true);
+  }, [setSelectedId]);
+
+  const handleDragStart = (id: string, initialPos: IconPosition) => {
+    setDraggingId(id);
+    dragOriginPosRef.current = { ...initialPos };
+    lastHoverTargetRef.current = null;
+    setLivePositions({ ...storedPositions });
+  };
+
+  const handleDragMove = (id: string, currentX: number, currentY: number) => {
+    const targetSlot = snapToGrid(currentX, currentY);
+    const targetKey = `${targetSlot.x},${targetSlot.y}`;
+
+    if (lastHoverTargetRef.current === targetKey) return;
+
+    // Find if another shortcut currently occupies this slot
+    const other = allShortcuts.find((s) => {
+      if (s.id === id) return false;
+      const p = livePositions[s.id] || storedPositions[s.id];
+      return p && p.x === targetSlot.x && p.y === targetSlot.y;
+    });
+
+    if (other) {
+      lastHoverTargetRef.current = targetKey;
+      soundEngine.playSnap();
+
+      // Rearrange / swap: The other icon glides to the slot vacated by the dragged icon
+      const vacatedPos = { ...dragOriginPosRef.current };
+      dragOriginPosRef.current = { ...targetSlot };
+
+      setLivePositions((prev) => ({
+        ...prev,
+        [other.id]: vacatedPos,
+        [id]: targetSlot,
+      }));
+    }
+  };
+
+  const handleDragEnd = (id: string, finalX: number, finalY: number) => {
+    const targetSlot = snapToGrid(finalX, finalY);
+
+    setLivePositions((prev) => {
+      const next = { ...prev };
+
+      // Ensure no collision in final positions
+      const conflicting = Object.keys(next).find(
+        (key) => key !== id && next[key]?.x === targetSlot.x && next[key]?.y === targetSlot.y
+      );
+
+      if (conflicting) {
+        next[conflicting] = { ...dragOriginPosRef.current };
+      }
+      next[id] = targetSlot;
+
+      // Commit to desktop store and persist to localStorage
+      setAllPositions(next);
+      return next;
+    });
+
+    soundEngine.playSnap();
+    setDraggingId(null);
+    lastHoverTargetRef.current = null;
+  };
 
   const handleOpen = (item: DesktopShortcut) => {
     soundEngine.playClick();
@@ -278,34 +373,38 @@ export const DesktopIcons: React.FC = () => {
     ]);
   };
 
+  const maxRows = getMaxRows();
+
   return (
     <div
       aria-label="Desktop Surface Icons"
       className="fixed inset-0 z-[20] pointer-events-none select-none overflow-hidden"
     >
       {allShortcuts.map((item, index) => {
-        // Calculate default grid position if not yet placed
-        const maxRows = typeof window !== 'undefined'
-          ? Math.max(3, Math.floor((window.innerHeight - ORIGIN_Y - 120) / GRID_HEIGHT))
-          : 6;
         const col = Math.floor(index / maxRows);
         const row = index % maxRows;
         const defaultX = ORIGIN_X + col * GRID_WIDTH;
         const defaultY = ORIGIN_Y + row * GRID_HEIGHT;
 
-        const pos = positions[item.id] || { x: defaultX, y: defaultY };
+        const pos =
+          livePositions[item.id] ||
+          storedPositions[item.id] || { x: defaultX, y: defaultY };
         const isSelected = selectedId === item.id;
+        const isDragging = draggingId === item.id;
 
         return (
           <DesktopIconItem
             key={item.id}
             item={item}
             pos={pos}
+            isDragging={isDragging}
             isSelected={isSelected}
             onSelect={setSelectedId}
             onOpen={handleOpen}
             onContextMenu={handleContextMenu}
-            onPositionChange={updatePosition}
+            onDragStart={handleDragStart}
+            onDragMove={handleDragMove}
+            onDragEnd={handleDragEnd}
           />
         );
       })}

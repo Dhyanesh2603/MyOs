@@ -423,7 +423,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     setLayoutMode('grid');
                     useNotificationStore.getState().notify({
                       title: 'Grid Layout Enabled',
-                      message: 'Desktop icons now snap to fixed 96x100 grid cells.',
+                      message: 'Desktop icons now snap to fixed 92x96 grid cells with live hover rearrangement.',
                       type: 'info',
                     });
                   }}
@@ -441,7 +441,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     )}
                   </div>
                   <p className="text-[11px] text-neutral-400">
-                    Icons snap precisely to orderly columns and rows. Dragging automatically locks to the nearest grid cell.
+                    Icons snap precisely to orderly columns and rows with live anti-overlap rearrangement. Dragging automatically locks to the nearest grid cell.
                   </p>
                 </button>
 

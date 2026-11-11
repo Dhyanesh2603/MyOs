@@ -16,9 +16,9 @@ export interface IconPosition {
   y: number;
 }
 
-export const GRID_WIDTH = 96;
-export const GRID_HEIGHT = 100;
-export const ORIGIN_X = 28;
+export const GRID_WIDTH = 92;
+export const GRID_HEIGHT = 96;
+export const ORIGIN_X = 24;
 export const ORIGIN_Y = 56;
 
 const POSITIONS_STORAGE_KEY = 'flowos_desktop_icon_positions_v3';
@@ -30,15 +30,73 @@ export const INITIAL_DEFAULT_APPS: DesktopShortcut[] = [
   { id: 'app-browser', name: 'Browser', type: 'app', target: 'browser' },
   { id: 'app-code', name: 'Code', type: 'app', target: 'code-editor' },
   { id: 'app-notes', name: 'Notes', type: 'app', target: 'notes' },
+  { id: 'app-personal-os', name: 'Personal OS', type: 'app', target: 'personal-os' },
   { id: 'app-terminal', name: 'Terminal', type: 'app', target: 'terminal' },
 ];
 
-function loadSavedPositions(): Record<string, IconPosition> {
+export function snapToGrid(rawX: number, rawY: number): IconPosition {
+  const col = Math.max(0, Math.round((rawX - ORIGIN_X) / GRID_WIDTH));
+  const row = Math.max(0, Math.round((rawY - ORIGIN_Y) / GRID_HEIGHT));
+  return {
+    x: ORIGIN_X + col * GRID_WIDTH,
+    y: ORIGIN_Y + row * GRID_HEIGHT,
+  };
+}
+
+export function getMaxRows(height: number = typeof window !== 'undefined' ? window.innerHeight : 900): number {
+  return Math.max(3, Math.floor((height - ORIGIN_Y - 110) / GRID_HEIGHT));
+}
+
+function loadSavedPositions(shortcuts: DesktopShortcut[]): Record<string, IconPosition> {
+  let loaded: Record<string, IconPosition> = {};
   try {
     const raw = localStorage.getItem(POSITIONS_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) loaded = JSON.parse(raw);
   } catch {}
-  return {};
+
+  const maxRows = getMaxRows();
+  const sanitized: Record<string, IconPosition> = {};
+  const occupiedSlots = new Set<string>();
+
+  // Snap all valid positions and discard collisions
+  for (const shortcut of shortcuts) {
+    const pos = loaded[shortcut.id];
+    if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+      const snapped = snapToGrid(pos.x, pos.y);
+      const key = `${snapped.x},${snapped.y}`;
+      if (!occupiedSlots.has(key)) {
+        occupiedSlots.add(key);
+        sanitized[shortcut.id] = snapped;
+      }
+    }
+  }
+
+  // Any unplaced or collided shortcuts get assigned orderly, non-overlapping grid slots
+  let col = 0;
+  let row = 0;
+  for (const shortcut of shortcuts) {
+    if (!sanitized[shortcut.id]) {
+      while (occupiedSlots.has(`${ORIGIN_X + col * GRID_WIDTH},${ORIGIN_Y + row * GRID_HEIGHT}`)) {
+        row++;
+        if (row >= maxRows) {
+          row = 0;
+          col++;
+        }
+      }
+      const freePos = {
+        x: ORIGIN_X + col * GRID_WIDTH,
+        y: ORIGIN_Y + row * GRID_HEIGHT,
+      };
+      occupiedSlots.add(`${freePos.x},${freePos.y}`);
+      sanitized[shortcut.id] = freePos;
+    }
+  }
+
+  try {
+    localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(sanitized));
+  } catch {}
+
+  return sanitized;
 }
 
 function loadSavedShortcuts(): DesktopShortcut[] {
@@ -46,7 +104,14 @@ function loadSavedShortcuts(): DesktopShortcut[] {
     const raw = localStorage.getItem(SHORTCUTS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Ensure default core apps like Personal OS are included if missing
+        const hasPersonalOs = parsed.some((s) => s.target === 'personal-os' || s.id === 'app-personal-os');
+        if (!hasPersonalOs) {
+          parsed.splice(4, 0, { id: 'app-personal-os', name: 'Personal OS', type: 'app', target: 'personal-os' });
+        }
+        return parsed;
+      }
     }
   } catch {}
   return INITIAL_DEFAULT_APPS;
@@ -57,16 +122,7 @@ function loadSavedLayoutMode(): DesktopLayoutMode {
     const mode = localStorage.getItem(LAYOUT_MODE_KEY) as DesktopLayoutMode;
     if (mode === 'grid' || mode === 'freeform') return mode;
   } catch {}
-  return 'freeform';
-}
-
-export function snapToGrid(rawX: number, rawY: number): IconPosition {
-  const col = Math.max(0, Math.round((rawX - ORIGIN_X) / GRID_WIDTH));
-  const row = Math.max(0, Math.round((rawY - ORIGIN_Y) / GRID_HEIGHT));
-  return {
-    x: ORIGIN_X + col * GRID_WIDTH,
-    y: ORIGIN_Y + row * GRID_HEIGHT,
-  };
+  return 'grid'; // Grid is the primary default
 }
 
 export interface DesktopStoreState {
@@ -78,17 +134,20 @@ export interface DesktopStoreState {
   setSelectedIconId: (id: string | null) => void;
   setLayoutMode: (mode: DesktopLayoutMode) => void;
   updatePosition: (id: string, x: number, y: number) => void;
+  setAllPositions: (positions: Record<string, IconPosition>) => void;
   isAppOnDesktop: (appId: string) => boolean;
   addAppShortcut: (appId: string, customPosition?: IconPosition) => boolean;
   removeAppShortcut: (appIdOrShortcutId: string) => boolean;
   autoArrangeGrid: (allItemIds: string[]) => void;
 }
 
+const initialShortcuts = loadSavedShortcuts();
+
 export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
   selectedIconId: null,
   layoutMode: loadSavedLayoutMode(),
-  shortcuts: loadSavedShortcuts(),
-  positions: loadSavedPositions(),
+  shortcuts: initialShortcuts,
+  positions: loadSavedPositions(initialShortcuts),
 
   setSelectedIconId: (id) => set((s) => (s.selectedIconId === id ? s : { selectedIconId: id })),
 
@@ -109,16 +168,34 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
   },
 
   updatePosition: (id, rawX, rawY) => {
-    const mode = get().layoutMode;
-    const finalPos = mode === 'grid' ? snapToGrid(rawX, rawY) : { x: Math.round(rawX), y: Math.round(rawY) };
+    const finalPos = snapToGrid(rawX, rawY);
 
     set((state) => {
-      const nextPositions = { ...state.positions, [id]: finalPos };
+      const nextPositions = { ...state.positions };
+
+      // Prevent overlaps: find if another icon occupies finalPos
+      const conflictingId = Object.keys(nextPositions).find(
+        (key) => key !== id && nextPositions[key]?.x === finalPos.x && nextPositions[key]?.y === finalPos.y
+      );
+
+      if (conflictingId && state.positions[id]) {
+        // Swap conflicting icon into id's previous slot
+        nextPositions[conflictingId] = { ...state.positions[id]! };
+      }
+      nextPositions[id] = finalPos;
+
       try {
         localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(nextPositions));
       } catch {}
       return { positions: nextPositions };
     });
+  },
+
+  setAllPositions: (newPositions) => {
+    try {
+      localStorage.setItem(POSITIONS_STORAGE_KEY, JSON.stringify(newPositions));
+    } catch {}
+    set({ positions: newPositions });
   },
 
   isAppOnDesktop: (appId: string) => {
@@ -158,19 +235,42 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
       localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(nextShortcuts));
     } catch {}
 
-    // Compute initial coordinate
+    // Compute initial coordinate without collision
+    const occupiedSlots = new Set(
+      Object.values(state.positions).map((p) => `${p.x},${p.y}`)
+    );
+    const maxRows = getMaxRows();
+
     let initialPos: IconPosition;
     if (customPosition) {
-      initialPos = state.layoutMode === 'grid'
-        ? snapToGrid(customPosition.x, customPosition.y)
-        : { x: Math.round(customPosition.x), y: Math.round(customPosition.y) };
+      const snapped = snapToGrid(customPosition.x, customPosition.y);
+      if (!occupiedSlots.has(`${snapped.x},${snapped.y}`)) {
+        initialPos = snapped;
+      } else {
+        let col = 0;
+        let row = 0;
+        while (occupiedSlots.has(`${ORIGIN_X + col * GRID_WIDTH},${ORIGIN_Y + row * GRID_HEIGHT}`)) {
+          row++;
+          if (row >= maxRows) {
+            row = 0;
+            col++;
+          }
+        }
+        initialPos = {
+          x: ORIGIN_X + col * GRID_WIDTH,
+          y: ORIGIN_Y + row * GRID_HEIGHT,
+        };
+      }
     } else {
-      const totalCount = nextShortcuts.length;
-      const maxRows = typeof window !== 'undefined'
-        ? Math.max(3, Math.floor((window.innerHeight - ORIGIN_Y - 120) / GRID_HEIGHT))
-        : 6;
-      const col = Math.floor((totalCount - 1) / maxRows);
-      const row = (totalCount - 1) % maxRows;
+      let col = 0;
+      let row = 0;
+      while (occupiedSlots.has(`${ORIGIN_X + col * GRID_WIDTH},${ORIGIN_Y + row * GRID_HEIGHT}`)) {
+        row++;
+        if (row >= maxRows) {
+          row = 0;
+          col++;
+        }
+      }
       initialPos = {
         x: ORIGIN_X + col * GRID_WIDTH,
         y: ORIGIN_Y + row * GRID_HEIGHT,
@@ -216,9 +316,7 @@ export const useDesktopStore = create<DesktopStoreState>((set, get) => ({
   },
 
   autoArrangeGrid: (allItemIds) => {
-    const maxRows = typeof window !== 'undefined'
-      ? Math.max(3, Math.floor((window.innerHeight - ORIGIN_Y - 120) / GRID_HEIGHT))
-      : 6;
+    const maxRows = getMaxRows();
 
     const newPositions: Record<string, IconPosition> = {};
     allItemIds.forEach((id, index) => {
