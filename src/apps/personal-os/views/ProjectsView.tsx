@@ -173,15 +173,15 @@ export const ProjectsView: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 p-6 font-sans text-white">
       {/* 1. Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-indigo-900/70">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <div className="flex items-center gap-2">
-            <FolderGit2 className="h-5 w-5 text-cyan-200/90" />
+            <FolderGit2 className="h-5 w-5 text-neutral-300" />
             <h2 className="text-xl font-medium tracking-tight text-white">
               Engineering Project Studio
             </h2>
           </div>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs text-neutral-300 mt-1">
             Deep architectural specs, tech stacks, milestones, known bugs, and changelogs.
           </p>
         </div>
@@ -198,11 +198,11 @@ export const ProjectsView: React.FC = () => {
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-1.5 text-xs font-mono transition-all shrink-0 cursor-pointer ${
                 activeProject?.id === proj.id
                   ? 'border-white/30 bg-white/15 text-white font-medium shadow-sm'
-                  : 'border-indigo-900/70 bg-[#0c1328] text-slate-300 hover:border-white/20 hover:text-white'
+                  : 'border-white/[0.08] bg-[#10121a] text-neutral-300 hover:border-white/20 hover:text-white'
               }`}
             >
               <span>{proj.name}</span>
-              <span className="rounded bg-white/10 px-1.5 py-0.2 text-[10px] text-cyan-200/90">
+              <span className="rounded bg-white/10 px-1.5 py-0.2 text-[10px] text-neutral-300">
                 {proj.progress}%
               </span>
             </button>
@@ -219,10 +219,10 @@ export const ProjectsView: React.FC = () => {
       </div>
 
       {projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-indigo-900/70 bg-[#090e1c] p-8">
-          <FolderGit2 className="h-12 w-12 text-slate-400 mb-3" />
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-white/[0.08] bg-[#0d0e14] p-8">
+          <FolderGit2 className="h-12 w-12 text-neutral-400 mb-3" />
           <h3 className="text-base font-semibold text-white">No Projects in Studio</h3>
-          <p className="text-xs text-slate-300 mt-1 max-w-md">
+          <p className="text-xs text-neutral-300 mt-1 max-w-md">
             Create your first engineering project to track system architecture, milestone progress, tech stack, and git logs.
           </p>
           <button
@@ -238,25 +238,25 @@ export const ProjectsView: React.FC = () => {
           {/* Left: Architecture & Tech Stack (7 cols) */}
           <div className="lg:col-span-7 flex flex-col gap-5">
             {/* Overview Card */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-white/[0.08]">
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-white tracking-tight">
                       {activeProject.name}
                     </h3>
-                    <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-200/90">
+                    <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
                       {activeProject.status}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1">{activeProject.tagline}</p>
+                  <p className="text-xs text-neutral-300 mt-1">{activeProject.tagline}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleOpenEditModal}
                     title="Edit Project Spec"
-                    className="flex items-center gap-1 rounded-lg border border-indigo-800/80 bg-white/5 px-2.5 py-1.5 text-xs font-mono text-cyan-200/90 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                    className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-mono text-neutral-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                   >
                     <Edit3 className="h-3.5 w-3.5" />
                     <span>Edit</span>
@@ -273,7 +273,7 @@ export const ProjectsView: React.FC = () => {
                       href={activeProject.repoUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-1.5 rounded-lg border border-indigo-800/80 bg-white/5 px-2.5 py-1.5 text-xs font-mono text-cyan-200/90 hover:bg-white/10 hover:text-white transition-colors"
+                      className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-mono text-neutral-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
                       <FolderGit2 className="h-3.5 w-3.5" />
                       <span>Repo</span>
@@ -294,28 +294,28 @@ export const ProjectsView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-3.5 text-xs leading-relaxed text-cyan-200/90">
+              <div className="mt-3.5 text-xs leading-relaxed text-neutral-300">
                 {activeProject.description}
               </div>
 
               {/* Connected Mission & Skills linkage */}
-              <div className="mt-4 pt-3.5 border-t border-indigo-900/70 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs">
                 {associatedMission && (
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase text-slate-300">Mission:</span>
+                    <span className="font-mono text-[10px] uppercase text-neutral-300">Mission:</span>
                     <button
                       onClick={() => {
                         soundEngine.playClick();
                         setActiveTab('missions');
                       }}
-                      className="rounded-lg border border-indigo-900/70 bg-white/5 px-2 py-0.5 font-mono text-[11px] text-white hover:bg-white/10 transition-colors"
+                      className="rounded-lg border border-white/[0.08] bg-white/5 px-2 py-0.5 font-mono text-[11px] text-white hover:bg-white/10 transition-colors"
                     >
                       {associatedMission.title}
                     </button>
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[10px] uppercase text-slate-300">Skills:</span>
+                  <span className="font-mono text-[10px] uppercase text-neutral-300">Skills:</span>
                   {activeProject.skillIds.map((sid) => {
                     const skill = skills.find((s) => s.id === sid);
                     return (
@@ -325,7 +325,7 @@ export const ProjectsView: React.FC = () => {
                           soundEngine.playClick();
                           setActiveTab('learning');
                         }}
-                        className="rounded bg-white/5 px-2 py-0.5 font-mono text-[10px] text-cyan-200/90 hover:bg-white/10"
+                        className="rounded bg-white/5 px-2 py-0.5 font-mono text-[10px] text-neutral-300 hover:bg-white/10"
                       >
                         {skill?.name || sid}
                       </button>
@@ -336,25 +336,25 @@ export const ProjectsView: React.FC = () => {
             </div>
 
             {/* Architecture Overview */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-indigo-900/70">
-                <Cpu className="h-4 w-4 text-cyan-200/90" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/[0.08]">
+                <Cpu className="h-4 w-4 text-neutral-300" />
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                   Architecture Specifications
                 </h4>
               </div>
-              <div className="mt-3.5 rounded-xl border border-indigo-950/80 bg-[#070b16]/60 p-3.5 font-mono text-xs leading-relaxed text-cyan-200/90">
+              <div className="mt-3.5 rounded-xl border border-white/[0.06] bg-[#070b16]/60 p-3.5 font-mono text-xs leading-relaxed text-neutral-300">
                 {activeProject.architectureOverview}
               </div>
 
               {/* Tech Stack Chips */}
-              <div className="mt-4 pt-3 border-t border-indigo-900/70">
-                <div className="text-[10px] font-mono uppercase text-slate-300 mb-2">Tech Stack Matrix</div>
+              <div className="mt-4 pt-3 border-t border-white/[0.08]">
+                <div className="text-[10px] font-mono uppercase text-neutral-300 mb-2">Tech Stack Matrix</div>
                 <div className="flex flex-wrap gap-1.5">
                   {activeProject.techStack.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded-lg border border-indigo-900/70 bg-[#0f1730] px-2.5 py-1 text-xs font-mono text-white"
+                      className="rounded-lg border border-white/[0.08] bg-[#141622] px-2.5 py-1 text-xs font-mono text-white"
                     >
                       {tech}
                     </span>
@@ -364,16 +364,16 @@ export const ProjectsView: React.FC = () => {
             </div>
 
             {/* Ideas & Future Roadmap */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/[0.08]">
                 <Sparkles className="h-4 w-4 text-amber-400" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                   Explorations & Future Plans
                 </h4>
               </div>
               <div className="mt-3.5 flex flex-col gap-2">
                 {activeProject.ideas.map((idea, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-xs text-cyan-200/90">
+                  <div key={i} className="flex items-start gap-2.5 text-xs text-neutral-300">
                     <span className="h-1.5 w-1.5 rounded-full bg-white/60 mt-1.5 shrink-0" />
                     <span>{idea}</span>
                   </div>
@@ -385,11 +385,11 @@ export const ProjectsView: React.FC = () => {
           {/* Right: Milestones, Known Bugs & Changelog (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Roadmap Milestones */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-cyan-200/90" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                  <Layers className="h-4 w-4 text-neutral-300" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                     Milestones Roadmap
                   </h4>
                 </div>
@@ -404,8 +404,8 @@ export const ProjectsView: React.FC = () => {
                     key={m.id}
                     className={`group flex items-start justify-between gap-2.5 rounded-xl border p-2.5 transition-all ${
                       m.completed
-                        ? 'border-indigo-950/80 bg-[#090e1c] text-slate-400 line-through'
-                        : 'border-indigo-900/70 bg-[#0c1328] text-white hover:border-white/20'
+                        ? 'border-white/[0.06] bg-[#0d0e14] text-neutral-400 line-through'
+                        : 'border-white/[0.08] bg-[#10121a] text-white hover:border-white/20'
                     }`}
                   >
                     <div
@@ -416,14 +416,14 @@ export const ProjectsView: React.FC = () => {
                       className="flex items-start gap-2.5 flex-1 min-w-0 cursor-pointer"
                     >
                       {m.completed ? (
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-300 mt-0.5" />
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-300 mt-0.5" />
                       ) : (
-                        <Circle className="h-4 w-4 shrink-0 text-slate-400 mt-0.5" />
+                        <Circle className="h-4 w-4 shrink-0 text-neutral-400 mt-0.5" />
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="text-xs">{m.title}</div>
                         {m.dueDate && (
-                          <div className="text-[10px] font-mono text-slate-300 mt-0.5">Due: {m.dueDate}</div>
+                          <div className="text-[10px] font-mono text-neutral-300 mt-0.5">Due: {m.dueDate}</div>
                         )}
                       </div>
                     </div>
@@ -435,7 +435,7 @@ export const ProjectsView: React.FC = () => {
                         deleteProjectMilestone(activeProject.id, m.id);
                       }}
                       title="Delete Milestone"
-                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-rose-400 transition-all cursor-pointer"
+                      className="opacity-0 group-hover:opacity-100 p-1 text-neutral-300 hover:text-rose-400 transition-all cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -449,7 +449,7 @@ export const ProjectsView: React.FC = () => {
                     placeholder="Add project milestone..."
                     value={newMilestoneText}
                     onChange={(e) => setNewMilestoneText(e.target.value)}
-                    className="flex-1 rounded-xl border border-indigo-900/70 bg-[#0d1428] px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
+                    className="flex-1 rounded-xl border border-white/[0.08] bg-[#0d0e14] px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
                   />
                   <button
                     type="submit"
@@ -463,11 +463,11 @@ export const ProjectsView: React.FC = () => {
             </div>
 
             {/* Known Bugs Tracker */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
                   <Bug className="h-4 w-4 text-rose-400" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                     Known Issues & Bugs ({activeProject.knownBugs.filter((b) => b.status === 'open').length})
                   </h4>
                 </div>
@@ -475,15 +475,15 @@ export const ProjectsView: React.FC = () => {
 
               <div className="mt-3.5 flex flex-col gap-2">
                 {activeProject.knownBugs.length === 0 ? (
-                  <div className="text-xs text-slate-400 py-2">No known issues reported. Clean pipeline.</div>
+                  <div className="text-xs text-neutral-400 py-2">No known issues reported. Clean pipeline.</div>
                 ) : (
                   activeProject.knownBugs.map((bug) => (
                     <div
                       key={bug.id}
                       className={`flex items-start justify-between gap-2 rounded-xl border p-2.5 text-xs ${
                         bug.status === 'resolved'
-                          ? 'border-indigo-950/80 bg-[#090e1c] text-slate-400 line-through'
-                          : 'border-indigo-900/70 bg-[#0c1328] text-white'
+                          ? 'border-white/[0.06] bg-[#0d0e14] text-neutral-400 line-through'
+                          : 'border-white/[0.08] bg-[#10121a] text-white'
                       }`}
                     >
                       <div>
@@ -492,7 +492,7 @@ export const ProjectsView: React.FC = () => {
                             className={`rounded px-1.5 py-0.2 font-mono text-[9px] uppercase tracking-wider ${
                               bug.severity === 'critical'
                                 ? 'bg-rose-500/20 text-rose-300'
-                                : 'bg-white/10 text-slate-300'
+                                : 'bg-white/10 text-neutral-300'
                             }`}
                           >
                             {bug.severity}
@@ -507,7 +507,7 @@ export const ProjectsView: React.FC = () => {
                             soundEngine.playClick();
                             resolveProjectBug(activeProject.id, bug.id);
                           }}
-                          className="flex items-center gap-1 rounded border border-indigo-800/80 bg-white/5 px-2 py-1 text-[10px] font-mono text-cyan-200/90 hover:bg-white/15 hover:text-white transition-colors"
+                          className="flex items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-mono text-neutral-300 hover:bg-white/15 hover:text-white transition-colors"
                           title="Mark Resolved"
                         >
                           <Check className="h-3 w-3" />
@@ -520,13 +520,13 @@ export const ProjectsView: React.FC = () => {
               </div>
 
               {/* Add Bug Form */}
-              <form onSubmit={handleAddBug} className="mt-3 pt-3 border-t border-indigo-900/70 flex flex-col gap-2">
+              <form onSubmit={handleAddBug} className="mt-3 pt-3 border-t border-white/[0.08] flex flex-col gap-2">
                 <input
                   type="text"
                   placeholder="Report an architectural or runtime edge case..."
                   value={newBugText}
                   onChange={(e) => setNewBugText(e.target.value)}
-                  className="rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
+                  className="rounded-xl border border-white/[0.08] bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
                 />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
@@ -536,7 +536,7 @@ export const ProjectsView: React.FC = () => {
                         type="button"
                         onClick={() => setNewBugSeverity(sev)}
                         className={`rounded px-2 py-0.5 text-[10px] font-mono uppercase ${
-                          newBugSeverity === sev ? 'bg-white/20 text-white font-bold' : 'text-slate-400 hover:text-white'
+                          newBugSeverity === sev ? 'bg-white/20 text-white font-bold' : 'text-neutral-400 hover:text-white'
                         }`}
                       >
                         {sev}
@@ -555,11 +555,11 @@ export const ProjectsView: React.FC = () => {
             </div>
 
             {/* Commits & Changelog */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <GitCommit className="h-4 w-4 text-cyan-200/90" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                  <GitCommit className="h-4 w-4 text-neutral-300" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                     Recent Commits & Versions
                   </h4>
                 </div>
@@ -585,12 +585,12 @@ export const ProjectsView: React.FC = () => {
                       setSelectedCommitHash(c.hash);
                       setIsGitModalOpen(true);
                     }}
-                    className="group flex items-center justify-between rounded-xl border border-indigo-950/80 bg-[#090e1c] p-2 text-xs font-mono text-slate-300 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04] transition-all cursor-pointer"
+                    className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-[#0d0e14] p-2 text-xs font-mono text-neutral-300 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04] transition-all cursor-pointer"
                   >
-                    <span className="truncate max-w-[220px] text-cyan-200/90 group-hover:text-emerald-300 transition-colors">
+                    <span className="truncate max-w-[220px] text-neutral-300 group-hover:text-emerald-300 transition-colors">
                       {c.message}
                     </span>
-                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-cyan-200/90 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors">
+                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-neutral-300 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors">
                       {c.hash}
                     </span>
                   </div>
@@ -598,12 +598,12 @@ export const ProjectsView: React.FC = () => {
               </div>
 
               {activeProject.changelog.length > 0 && (
-                <div className="mt-3.5 pt-3 border-t border-indigo-900/70">
-                  <div className="text-[10px] font-mono uppercase text-slate-300 mb-1.5">Latest Changelog</div>
+                <div className="mt-3.5 pt-3 border-t border-white/[0.08]">
+                  <div className="text-[10px] font-mono uppercase text-neutral-300 mb-1.5">Latest Changelog</div>
                   {activeProject.changelog.map((entry) => (
-                    <div key={entry.version} className="text-xs font-mono text-cyan-200/90">
+                    <div key={entry.version} className="text-xs font-mono text-neutral-300">
                       <div className="text-white font-semibold">{entry.version} ({entry.date})</div>
-                      <div className="text-[11px] text-slate-300 mt-0.5">{entry.notes.join(' • ')}</div>
+                      <div className="text-[11px] text-neutral-300 mt-0.5">{entry.notes.join(' • ')}</div>
                     </div>
                   ))}
                 </div>
@@ -625,8 +625,8 @@ export const ProjectsView: React.FC = () => {
       {/* Project Create / Edit Modal */}
       {isProjectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-2xl border border-indigo-800/80 bg-[#12161f] p-6 text-white shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70 mb-4">
+          <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#12141c] p-6 text-white shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
               <div className="flex items-center gap-2">
                 <FolderGit2 className="h-5 w-5 text-accent-primary" />
                 <h3 className="text-base font-semibold">
@@ -635,7 +635,7 @@ export const ProjectsView: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsProjectModalOpen(false)}
-                className="p-1 text-slate-300 hover:text-white rounded cursor-pointer"
+                className="p-1 text-neutral-300 hover:text-white rounded cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -644,22 +644,22 @@ export const ProjectsView: React.FC = () => {
             <form onSubmit={handleSaveProject} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Project Name *</label>
+                  <label className="block text-[11px] font-mono text-neutral-300 mb-1">Project Name *</label>
                   <input
                     type="text"
                     required
                     value={projName}
                     onChange={(e) => setProjName(e.target.value)}
                     placeholder="e.g. NeuralFlow Vector Engine"
-                    className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary"
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Status</label>
+                  <label className="block text-[11px] font-mono text-neutral-300 mb-1">Status</label>
                   <select
                     value={projStatus}
                     onChange={(e) => setProjStatus(e.target.value as ProjectStatus)}
-                    className="w-full rounded-xl border border-indigo-900/70 bg-[#1c2230] px-3 py-2 text-white outline-none focus:border-accent-primary"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#141620] px-3 py-2 text-white outline-none focus:border-white/30"
                   >
                     <option value="in_progress">In Progress</option>
                     <option value="active">Active</option>
@@ -670,90 +670,90 @@ export const ProjectsView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-300 mb-1">Tagline</label>
+                <label className="block text-[11px] font-mono text-neutral-300 mb-1">Tagline</label>
                 <input
                   type="text"
                   value={projTagline}
                   onChange={(e) => setProjTagline(e.target.value)}
                   placeholder="e.g. High-throughput distributed vector database in Rust"
-                  className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-300 mb-1">Description</label>
+                <label className="block text-[11px] font-mono text-neutral-300 mb-1">Description</label>
                 <textarea
                   rows={2}
                   value={projDescription}
                   onChange={(e) => setProjDescription(e.target.value)}
                   placeholder="Overview of project capabilities, purpose, and target metrics..."
-                  className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-mono text-slate-300 mb-1">GitHub Repo URL</label>
+                  <label className="block text-[11px] font-mono text-neutral-300 mb-1">GitHub Repo URL</label>
                   <input
                     type="url"
                     value={projRepoUrl}
                     onChange={(e) => setProjRepoUrl(e.target.value)}
                     placeholder="https://github.com/user/repo"
-                    className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary font-mono text-[11px]"
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30 font-mono text-[11px]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Live Demo URL (Optional)</label>
+                  <label className="block text-[11px] font-mono text-neutral-300 mb-1">Live Demo URL (Optional)</label>
                   <input
                     type="url"
                     value={projDemoUrl}
                     onChange={(e) => setProjDemoUrl(e.target.value)}
                     placeholder="https://myproject.dev"
-                    className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary font-mono text-[11px]"
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30 font-mono text-[11px]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-300 mb-1">Tech Stack (comma-separated)</label>
+                <label className="block text-[11px] font-mono text-neutral-300 mb-1">Tech Stack (comma-separated)</label>
                 <input
                   type="text"
                   value={projTechStack}
                   onChange={(e) => setProjTechStack(e.target.value)}
                   placeholder="e.g. Rust, Actix, Tokio, WebAssembly, SIMD"
-                  className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary font-mono text-[11px]"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30 font-mono text-[11px]"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-300 mb-1">Architecture Overview</label>
+                <label className="block text-[11px] font-mono text-neutral-300 mb-1">Architecture Overview</label>
                 <textarea
                   rows={2}
                   value={projArchitecture}
                   onChange={(e) => setProjArchitecture(e.target.value)}
                   placeholder="Architectural design patterns, concurrency model, pipeline flow..."
-                  className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                 />
               </div>
 
               {projectModalMode === 'create' && (
                 <div>
-                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Initial Milestones (comma-separated)</label>
+                  <label className="block text-[11px] font-mono text-neutral-300 mb-1">Initial Milestones (comma-separated)</label>
                   <input
                     type="text"
                     value={projMilestones}
                     onChange={(e) => setProjMilestones(e.target.value)}
                     placeholder="Scaffold repo, Implement core storage engine, Deploy benchmark runner"
-                    className="w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-accent-primary"
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                   />
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-indigo-900/70">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsProjectModalOpen(false)}
-                  className="rounded-xl border border-indigo-900/70 px-4 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] px-4 py-2 text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/5 cursor-pointer"
                 >
                   Cancel
                 </button>

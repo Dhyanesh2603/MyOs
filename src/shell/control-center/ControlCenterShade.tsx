@@ -109,13 +109,13 @@ export const ControlCenterShade: React.FC = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -12 }}
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-11 right-3 z-[9500] w-[370px] max-h-[92vh] overflow-y-auto no-scrollbar rounded-[26px] border border-white/[0.14] bg-[#0c0d12]/92 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)_inset] backdrop-blur-3xl text-white select-none space-y-3"
+        className="fixed top-11 right-3 z-[9500] w-[370px] max-h-[92vh] overflow-y-auto no-scrollbar rounded-[26px] border border-white/[0.16] bg-[#101117] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.08)_inset] text-white select-none space-y-3"
       >
         {/* Top Header Bar */}
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-white/70 font-semibold">
+            <span className="h-2 w-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+            <span className="text-[11px] font-mono uppercase tracking-wider text-white/90 font-bold">
               Control Center
             </span>
           </div>
@@ -128,7 +128,7 @@ export const ControlCenterShade: React.FC = () => {
                 closeControlCenter();
                 useSessionStore.getState().lock();
               }}
-              className="flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.06] hover:bg-white/[0.12] px-2.5 py-1 text-[11px] font-medium text-white/80 hover:text-white transition-all cursor-pointer"
+              className="flex items-center gap-1.5 rounded-full border border-white/15 bg-[#1a1c26] hover:bg-[#252836] px-3 py-1 text-[11px] font-medium text-white transition-all cursor-pointer"
               title="Lock System"
             >
               <Lock className="h-3 w-3" />
@@ -149,7 +149,7 @@ export const ControlCenterShade: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 1: Tactile Monochrome Connectivity Matrix (2x2) */}
+        {/* Section 1: Solid Tactile Monochrome Connectivity Matrix (2x2) */}
         <div className="grid grid-cols-2 gap-2">
           {/* Wi-Fi Card */}
           <button
@@ -157,24 +157,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleWifi();
             }}
-            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isWifiEnabled
-                ? 'bg-white text-black font-semibold shadow-[0_4px_16px_rgba(255,255,255,0.18)]'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isWifiEnabled
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               {isWifiEnabled ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Wi-Fi</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isWifiEnabled ? (navigator.onLine ? 'Connected' : 'Offline') : 'Off'}
               </div>
             </div>
@@ -186,24 +186,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleBluetooth();
             }}
-            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isBluetoothEnabled
-                ? 'bg-white text-black font-semibold shadow-[0_4px_16px_rgba(255,255,255,0.18)]'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isBluetoothEnabled
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               <Bluetooth className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Bluetooth</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isBluetoothEnabled ? 'Ready' : 'Off'}
               </div>
             </div>
@@ -217,24 +217,24 @@ export const ControlCenterShade: React.FC = () => {
               useFlowDropStore.getState().openFlowDrop();
               closeControlCenter();
             }}
-            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isAirBridgeActive
-                ? 'bg-white text-black font-semibold shadow-[0_4px_16px_rgba(255,255,255,0.18)]'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isAirBridgeActive
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               <UploadCloud className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Host Bridge</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isAirBridgeActive ? 'Drop Ready' : 'Paused'}
               </div>
             </div>
@@ -246,43 +246,43 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleFocusMode();
             }}
-            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-3 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isFocusMode
-                ? 'bg-white text-black font-semibold shadow-[0_4px_16px_rgba(255,255,255,0.18)]'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isFocusMode
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               <Moon className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Focus</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isFocusMode ? 'Do Not Disturb' : 'Off'}
               </div>
             </div>
           </button>
         </div>
 
-        {/* Section 2: Hardware Capsule Sliders (Monochrome) */}
+        {/* Section 2: Solid Hardware Sliders (Crisp High-Contrast) */}
         <div className="space-y-2">
           {/* Display Brightness Slider */}
-          <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-2.5">
-            <Sun className="h-4 w-4 shrink-0 text-white/70 ml-1" />
+          <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#181922] p-3">
+            <Sun className="h-4 w-4 shrink-0 text-white/80 ml-0.5" />
             <div className="relative flex-1 flex flex-col justify-center">
-              <div className="flex justify-between items-center text-[10px] font-mono text-white/70 mb-1">
+              <div className="flex justify-between items-center text-[10px] font-mono text-white/80 mb-1.5 font-medium">
                 <span>Display Brightness</span>
-                <span>{Math.round(brightness * 100)}%</span>
+                <span className="font-bold text-white">{Math.round(brightness * 100)}%</span>
               </div>
-              <div className="relative h-2 w-full rounded-full bg-white/10 overflow-hidden">
+              <div className="relative h-2.5 w-full rounded-full bg-[#282a36] overflow-hidden">
                 <div
-                  className="h-full bg-white rounded-full transition-all duration-75"
+                  className="h-full bg-white rounded-full transition-all duration-75 shadow-sm"
                   style={{ width: `${Math.round(brightness * 100)}%` }}
                 />
                 <input
@@ -306,7 +306,7 @@ export const ControlCenterShade: React.FC = () => {
               className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-medium border transition-all cursor-pointer shrink-0 ${
                 isNightShift
                   ? 'bg-white text-black border-white font-semibold shadow-sm'
-                  : 'bg-white/[0.06] text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                  : 'bg-[#252736] text-white/80 border-white/10 hover:bg-[#303344] hover:text-white'
               }`}
               title="Warm color temperature"
             >
@@ -316,20 +316,20 @@ export const ControlCenterShade: React.FC = () => {
           </div>
 
           {/* Master Volume Slider */}
-          <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-2.5">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#181922] p-3">
             {isMuted ? (
-              <VolumeX className="h-4 w-4 shrink-0 text-white/40 ml-1" />
+              <VolumeX className="h-4 w-4 shrink-0 text-white/40 ml-0.5" />
             ) : (
-              <Volume2 className="h-4 w-4 shrink-0 text-white/70 ml-1" />
+              <Volume2 className="h-4 w-4 shrink-0 text-white/80 ml-0.5" />
             )}
             <div className="relative flex-1 flex flex-col justify-center">
-              <div className="flex justify-between items-center text-[10px] font-mono text-white/70 mb-1">
+              <div className="flex justify-between items-center text-[10px] font-mono text-white/80 mb-1.5 font-medium">
                 <span>Master Volume</span>
-                <span>{isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}</span>
+                <span className="font-bold text-white">{isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}</span>
               </div>
-              <div className="relative h-2 w-full rounded-full bg-white/10 overflow-hidden">
+              <div className="relative h-2.5 w-full rounded-full bg-[#282a36] overflow-hidden">
                 <div
-                  className="h-full bg-white rounded-full transition-all duration-75"
+                  className="h-full bg-white rounded-full transition-all duration-75 shadow-sm"
                   style={{ width: `${isMuted ? 0 : Math.round(volume * 100)}%` }}
                 />
                 <input
@@ -357,7 +357,7 @@ export const ControlCenterShade: React.FC = () => {
               className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[10px] font-medium border transition-all cursor-pointer shrink-0 ${
                 isMuted
                   ? 'bg-white text-black border-white font-semibold shadow-sm'
-                  : 'bg-white/[0.06] text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                  : 'bg-[#252736] text-white/80 border-white/10 hover:bg-[#303344] hover:text-white'
               }`}
               title="Mute system sound"
             >
@@ -375,24 +375,24 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               toggleStageManager();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isStageManagerEnabled
-                ? 'bg-white text-black font-semibold shadow-md'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isStageManagerEnabled
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               <LayoutGrid className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Stage Mgr</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isStageManagerEnabled ? 'Active' : 'Off'}
               </div>
             </div>
@@ -405,24 +405,24 @@ export const ControlCenterShade: React.FC = () => {
               toggleCopilot();
               closeControlCenter();
             }}
-            className={`flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] ${
+            className={`flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] border ${
               isCopilotOpen
-                ? 'bg-white text-black font-semibold shadow-md'
-                : 'bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]'
+                ? 'bg-white text-black font-semibold border-white shadow-md'
+                : 'bg-[#181922] hover:bg-[#20222e] text-white/70 border-white/[0.08]'
             }`}
           >
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
                 isCopilotOpen
                   ? 'bg-black/10 text-black'
-                  : 'bg-white/10 text-white/50'
+                  : 'bg-[#252736] text-white/60'
               }`}
             >
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">AI Copilot</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 {isCopilotOpen ? 'Open' : 'Ready'}
               </div>
             </div>
@@ -434,14 +434,14 @@ export const ControlCenterShade: React.FC = () => {
               soundEngine.playClick();
               setTheme(themeId === 'dark' ? 'light' : 'dark');
             }}
-            className="flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]"
+            className="flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] bg-[#181922] hover:bg-[#20222e] text-white/70 border border-white/[0.08]"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white/70">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#252736] text-white/70">
               {themeId === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Appearance</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5 capitalize">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono capitalize">
                 {themeId}
               </div>
             </div>
@@ -452,14 +452,14 @@ export const ControlCenterShade: React.FC = () => {
             onClick={() => {
               soundEngine.playClick();
             }}
-            className="flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] bg-white/[0.05] hover:bg-white/[0.09] text-white/70 border border-white/[0.08]"
+            className="flex items-center gap-2.5 rounded-2xl p-2.5 transition-all text-left cursor-pointer active:scale-[0.98] bg-[#181922] hover:bg-[#20222e] text-white/70 border border-white/[0.08]"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white/70">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#252736] text-white/70">
               <BatteryCharging className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1 leading-tight">
               <div className="text-xs font-semibold">Power Mode</div>
-              <div className="truncate text-[10px] opacity-80 mt-0.5">
+              <div className="truncate text-[10px] opacity-80 mt-0.5 font-mono">
                 Max Performance
               </div>
             </div>
@@ -467,15 +467,15 @@ export const ControlCenterShade: React.FC = () => {
         </div>
 
         {/* Section 4: Now Playing Media Controller */}
-        <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white border border-white/10">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#181922] p-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#252736] text-white border border-white/10">
             <Disc3 className={`h-5 w-5 ${isPlaying ? 'animate-spin' : ''}`} />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-xs font-semibold text-white/95">
+            <div className="truncate text-xs font-semibold text-white">
               {currentTrack?.title || 'No track playing'}
             </div>
-            <div className="truncate text-[10px] text-white/60">
+            <div className="truncate text-[10px] text-white/60 font-mono">
               {currentTrack?.artist || 'FlowOS Audio Engine'}
             </div>
           </div>
@@ -485,7 +485,7 @@ export const ControlCenterShade: React.FC = () => {
                 soundEngine.playClick();
                 togglePlay();
               }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black hover:scale-105 transition-transform cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black hover:scale-105 transition-transform cursor-pointer shadow-sm"
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <Pause className="h-3.5 w-3.5 fill-black" /> : <Play className="h-3.5 w-3.5 fill-black ml-0.5" />}
@@ -495,7 +495,7 @@ export const ControlCenterShade: React.FC = () => {
                 soundEngine.playClick();
                 nextTrack();
               }}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#252736] hover:bg-[#323546] text-white transition-colors cursor-pointer border border-white/10"
               title="Next Track"
             >
               <SkipForward className="h-3.5 w-3.5" />
@@ -504,20 +504,20 @@ export const ControlCenterShade: React.FC = () => {
         </div>
 
         {/* Section 5: Acoustic Soundscapes & Lo-Fi Noise */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 space-y-2.5">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#181922] p-3 space-y-2.5">
           {/* Keyboard Soundscapes */}
           <div>
-            <div className="flex items-center justify-between text-xs font-semibold text-white/90 mb-1.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
               <div className="flex items-center gap-1.5">
                 <Keyboard className="h-4 w-4 text-white/70" />
                 <span>Keyboard Acoustics</span>
               </div>
-              <span className="text-[10px] font-mono text-white/60 uppercase">
+              <span className="text-[10px] font-mono text-white/70 uppercase">
                 {audioTheme}
               </span>
             </div>
 
-            <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
+            <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-[#101117] border border-white/[0.06]">
               {(
                 [
                   { id: 'mechanical', label: 'Mechanical' },
@@ -551,12 +551,12 @@ export const ControlCenterShade: React.FC = () => {
 
           {/* Lo-Fi Ambient Noise */}
           <div className="pt-2 border-t border-white/[0.06]">
-            <div className="flex items-center justify-between text-xs font-semibold text-white/90 mb-1.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
               <div className="flex items-center gap-1.5">
                 <Headphones className="h-4 w-4 text-white/70" />
                 <span>Lo-Fi Ambient Noise</span>
               </div>
-              <span className="text-[10px] font-mono text-white/60 uppercase">
+              <span className="text-[10px] font-mono text-white/70 uppercase">
                 {ambientTrack}
               </span>
             </div>
@@ -588,7 +588,7 @@ export const ControlCenterShade: React.FC = () => {
                     className={`flex flex-col items-center gap-1 p-2 rounded-xl border text-center transition-all cursor-pointer ${
                       active
                         ? 'bg-white text-black border-white shadow-sm font-semibold'
-                        : 'bg-white/[0.03] text-white/60 border-white/[0.06] hover:bg-white/[0.08] hover:text-white'
+                        : 'bg-[#12131a] text-white/70 border-white/[0.06] hover:bg-[#20222e] hover:text-white'
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5" />
@@ -602,7 +602,7 @@ export const ControlCenterShade: React.FC = () => {
 
         {/* Footer Build Info */}
         <div className="flex items-center justify-between px-1 font-mono text-[9px] text-white/40 pt-0.5">
-          <span>FlowOS 0.2 • Obsidian Glass</span>
+          <span>FlowOS 0.2 • Solid Slate</span>
           <span>Kernel Active</span>
         </div>
       </motion.div>

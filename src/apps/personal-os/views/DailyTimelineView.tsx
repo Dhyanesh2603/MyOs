@@ -105,21 +105,21 @@ export const DailyTimelineView: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 p-6 font-sans text-white">
       {/* 1. Header & Section Switcher */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-indigo-900/70">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-cyan-200/90" />
+            <Calendar className="h-5 w-5 text-neutral-300" />
             <h2 className="text-xl font-medium tracking-tight text-white">
               Daily System & Unified Timeline
             </h2>
           </div>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs text-neutral-300 mt-1">
             Morning intentional planning, deep work timer, evening reflection, and unified chronological stream.
           </p>
         </div>
 
         {/* Switcher */}
-        <div className="flex items-center gap-1.5 rounded-xl border border-indigo-900/70 bg-[#0c1328] p-1">
+        <div className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#10121a] p-1">
           <button
             onClick={() => {
               soundEngine.playClick();
@@ -128,7 +128,7 @@ export const DailyTimelineView: React.FC = () => {
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-mono transition-all ${
               activeTab === 'planner'
                 ? 'bg-white/15 text-white font-medium shadow-sm'
-                : 'text-slate-300 hover:text-white'
+                : 'text-neutral-300 hover:text-white'
             }`}
           >
             <Clock className="h-3.5 w-3.5" />
@@ -142,7 +142,7 @@ export const DailyTimelineView: React.FC = () => {
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-mono transition-all ${
               activeTab === 'timeline'
                 ? 'bg-white/15 text-white font-medium shadow-sm'
-                : 'text-slate-300 hover:text-white'
+                : 'text-neutral-300 hover:text-white'
             }`}
           >
             <GitCommit className="h-3.5 w-3.5" />
@@ -156,22 +156,22 @@ export const DailyTimelineView: React.FC = () => {
           {/* Left Column: Morning Plan & Priorities (7 cols) */}
           <div className="lg:col-span-7 flex flex-col gap-5">
             {/* Today's Goals Card */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-cyan-200/90" />
+                  <Zap className="h-4 w-4 text-neutral-300" />
                   <h3 className="text-sm font-semibold tracking-wide text-white">
                     Morning Plan & Core Priorities
                   </h3>
                 </div>
-                <span className="font-mono text-xs text-slate-300">
+                <span className="font-mono text-xs text-neutral-300">
                   {completedPriorities} of {totalPriorities} cleared
                 </span>
               </div>
 
               <div className="mt-3.5 flex flex-col gap-2">
                 {dailyPlan.morningPriorities.length === 0 ? (
-                  <div className="p-4 text-center text-xs font-mono text-slate-400 border border-dashed border-indigo-900/70 rounded-xl">
+                  <div className="p-4 text-center text-xs font-mono text-neutral-400 border border-dashed border-white/[0.08] rounded-xl">
                     No morning priorities set yet. Add your critical targets below.
                   </div>
                 ) : (
@@ -184,22 +184,22 @@ export const DailyTimelineView: React.FC = () => {
                       }}
                       className={`group flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer ${
                         item.completed
-                          ? 'border-indigo-950/80 bg-[#090e1c] text-slate-400 line-through'
-                          : 'border-indigo-900/70 bg-[#0c1328] text-white hover:border-white/20'
+                          ? 'border-white/[0.06] bg-[#0d0e14] text-neutral-400 line-through'
+                          : 'border-white/[0.08] bg-[#10121a] text-white hover:border-white/20'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         {item.completed ? (
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-300" />
+                          <CheckCircle2 className="h-4 w-4 shrink-0 text-neutral-300" />
                         ) : (
-                          <Circle className="h-4 w-4 shrink-0 text-slate-400" />
+                          <Circle className="h-4 w-4 shrink-0 text-neutral-400" />
                         )}
                         <span className="text-xs truncate">{item.text}</span>
                       </div>
 
                       <div className="flex items-center gap-2">
                         {item.tag && (
-                          <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-200/90">
+                          <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
                             {item.tag}
                           </span>
                         )}
@@ -209,7 +209,7 @@ export const DailyTimelineView: React.FC = () => {
                             soundEngine.playClick();
                             deleteMorningPriority(item.id);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-rose-400 transition-opacity"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-neutral-300 hover:text-rose-400 transition-opacity"
                           title="Delete Priority"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -221,18 +221,18 @@ export const DailyTimelineView: React.FC = () => {
               </div>
 
               {/* Add Priority Input Form */}
-              <form onSubmit={handleAddPriority} className="mt-4 pt-3 border-t border-indigo-900/70 flex items-center gap-2">
+              <form onSubmit={handleAddPriority} className="mt-4 pt-3 border-t border-white/[0.08] flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="Set an intentional priority for today..."
                   value={priorityText}
                   onChange={(e) => setPriorityText(e.target.value)}
-                  className="flex-1 rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
+                  className="flex-1 rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30"
                 />
                 <select
                   value={priorityTag}
                   onChange={(e) => setPriorityTag(e.target.value)}
-                  className="rounded-xl border border-indigo-900/70 bg-[#0a0f1e] px-2.5 py-2 text-xs font-mono text-cyan-200/90 outline-none cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#0a0f1e] px-2.5 py-2 text-xs font-mono text-neutral-300 outline-none cursor-pointer"
                 >
                   <option value="ENGINEERING">ENG</option>
                   <option value="DSA">DSA</option>
@@ -250,20 +250,20 @@ export const DailyTimelineView: React.FC = () => {
             </div>
 
             {/* Evening Reflection Card */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <Award className="h-4 w-4 text-cyan-200/90" />
+                  <Award className="h-4 w-4 text-neutral-300" />
                   <h3 className="text-sm font-semibold tracking-wide text-white">
                     Evening Reflection & Takeaways
                   </h3>
                 </div>
-                <span className="font-mono text-[11px] text-slate-300">{dailyPlan.date}</span>
+                <span className="font-mono text-[11px] text-neutral-300">{dailyPlan.date}</span>
               </div>
 
               {/* Reflection Notes Textarea */}
               <form onSubmit={handleSaveNotes} className="mt-3.5">
-                <div className="flex items-center justify-between mb-1.5 text-[10px] font-mono uppercase text-slate-300">
+                <div className="flex items-center justify-between mb-1.5 text-[10px] font-mono uppercase text-neutral-300">
                   <span>General Synthesis & Notes</span>
                   {isNotesSaved && <span className="text-emerald-400 font-semibold">Saved!</span>}
                 </div>
@@ -272,12 +272,12 @@ export const DailyTimelineView: React.FC = () => {
                   placeholder="Record overall reflections, insights, or mental state..."
                   value={reflectionNotes}
                   onChange={(e) => setReflectionNotes(e.target.value)}
-                  className="w-full rounded-xl border border-indigo-900/70 bg-white/5 p-2.5 text-xs text-white outline-none focus:border-white/30 font-mono"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/5 p-2.5 text-xs text-white outline-none focus:border-white/30 font-mono"
                 />
                 <div className="flex justify-end mt-1.5">
                   <button
                     type="submit"
-                    className="flex items-center gap-1 rounded-lg border border-indigo-800/80 bg-white/5 px-2.5 py-1 text-[11px] font-mono text-white hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-mono text-white hover:bg-white/10 transition-colors"
                   >
                     <Save className="h-3 w-3" />
                     <span>Save Notes</span>
@@ -286,7 +286,7 @@ export const DailyTimelineView: React.FC = () => {
               </form>
 
               {/* Wins */}
-              <div className="mt-4 pt-3 border-t border-indigo-900/70">
+              <div className="mt-4 pt-3 border-t border-white/[0.08]">
                 <div className="text-[10px] font-mono uppercase text-emerald-400 mb-1.5">What went exceptionally well (Wins)</div>
                 <form onSubmit={handleAddWin} className="mb-2 flex items-center gap-2">
                   <input
@@ -294,7 +294,7 @@ export const DailyTimelineView: React.FC = () => {
                     placeholder="Log an engineering win or breakthrough..."
                     value={newWinText}
                     onChange={(e) => setNewWinText(e.target.value)}
-                    className="flex-1 rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
+                    className="flex-1 rounded-xl border border-white/[0.08] bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
                   />
                   <button
                     type="submit"
@@ -307,7 +307,7 @@ export const DailyTimelineView: React.FC = () => {
 
                 <div className="flex flex-col gap-1.5">
                   {dailyPlan.eveningReflection.wins.map((w, i) => (
-                    <div key={i} className="group flex items-center justify-between gap-2 text-xs text-cyan-200/90 rounded-lg p-1.5 hover:bg-[#0c1328]">
+                    <div key={i} className="group flex items-center justify-between gap-2 text-xs text-neutral-300 rounded-lg p-1.5 hover:bg-[#10121a]">
                       <div className="flex items-start gap-2 min-w-0 flex-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
                         <span className="truncate">{w}</span>
@@ -317,7 +317,7 @@ export const DailyTimelineView: React.FC = () => {
                           soundEngine.playClick();
                           deleteDailyWin(i);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-rose-400 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-300 hover:text-rose-400 transition-opacity"
                         title="Delete Win"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -328,7 +328,7 @@ export const DailyTimelineView: React.FC = () => {
               </div>
 
               {/* Mistakes */}
-              <div className="mt-4 pt-3 border-t border-indigo-900/70">
+              <div className="mt-4 pt-3 border-t border-white/[0.08]">
                 <div className="text-[10px] font-mono uppercase text-rose-400 mb-1.5">Mistakes & Anti-Patterns to Prevent</div>
                 <form onSubmit={handleAddMistake} className="mb-2 flex items-center gap-2">
                   <input
@@ -336,7 +336,7 @@ export const DailyTimelineView: React.FC = () => {
                     placeholder="Log a mistake, bug, or anti-pattern..."
                     value={newMistakeText}
                     onChange={(e) => setNewMistakeText(e.target.value)}
-                    className="flex-1 rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
+                    className="flex-1 rounded-xl border border-white/[0.08] bg-white/5 px-3 py-1.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white/30 font-mono"
                   />
                   <button
                     type="submit"
@@ -349,7 +349,7 @@ export const DailyTimelineView: React.FC = () => {
 
                 <div className="flex flex-col gap-1.5">
                   {dailyPlan.eveningReflection.mistakes.map((m, i) => (
-                    <div key={i} className="group flex items-center justify-between gap-2 text-xs text-cyan-200/90 rounded-lg p-1.5 hover:bg-[#0c1328]">
+                    <div key={i} className="group flex items-center justify-between gap-2 text-xs text-neutral-300 rounded-lg p-1.5 hover:bg-[#10121a]">
                       <div className="flex items-start gap-2 min-w-0 flex-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-rose-400 mt-1.5 shrink-0" />
                         <span className="truncate">{m}</span>
@@ -359,7 +359,7 @@ export const DailyTimelineView: React.FC = () => {
                           soundEngine.playClick();
                           deleteDailyMistake(i);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-rose-400 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-300 hover:text-rose-400 transition-opacity"
                         title="Delete Mistake"
                       >
                         <Trash2 className="h-3 w-3" />
@@ -374,11 +374,11 @@ export const DailyTimelineView: React.FC = () => {
           {/* Right Column: Deep Work Engine & Telemetry (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Deep Work Engine Card */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-cyan-200/90" />
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                  <Clock className="h-4 w-4 text-neutral-300" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                     Deep Work Engine
                   </h4>
                 </div>
@@ -388,11 +388,11 @@ export const DailyTimelineView: React.FC = () => {
               </div>
 
               <div className="mt-4 flex flex-col gap-3">
-                <div className="rounded-xl border border-indigo-950/80 bg-[#0d1428] p-4 flex items-center justify-between">
+                <div className="rounded-xl border border-white/[0.06] bg-[#0d0e14] p-4 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] font-mono uppercase text-slate-300">Total Logged Today</div>
+                    <div className="text-[10px] font-mono uppercase text-neutral-300">Total Logged Today</div>
                     <div className="text-3xl font-bold text-white font-mono mt-0.5">
-                      {dailyPlan.deepWorkLoggedMinutes} <span className="text-sm font-normal text-slate-300">mins</span>
+                      {dailyPlan.deepWorkLoggedMinutes} <span className="text-sm font-normal text-neutral-300">mins</span>
                     </div>
                   </div>
                   <button
@@ -409,13 +409,13 @@ export const DailyTimelineView: React.FC = () => {
 
                 {/* Quick Add Minutes */}
                 <div className="flex items-center gap-2 pt-1 font-mono text-xs">
-                  <span className="text-slate-300 text-[10px] uppercase">Quick Log:</span>
+                  <span className="text-neutral-300 text-[10px] uppercase">Quick Log:</span>
                   <button
                     onClick={() => {
                       soundEngine.playClick();
                       logDeepWorkMinutes(15);
                     }}
-                    className="rounded-lg border border-indigo-900/70 bg-white/5 px-2.5 py-1 text-cyan-200/90 hover:bg-white/10"
+                    className="rounded-lg border border-white/[0.08] bg-white/5 px-2.5 py-1 text-neutral-300 hover:bg-white/10"
                   >
                     +15m
                   </button>
@@ -424,7 +424,7 @@ export const DailyTimelineView: React.FC = () => {
                       soundEngine.playClick();
                       logDeepWorkMinutes(30);
                     }}
-                    className="rounded-lg border border-indigo-900/70 bg-white/5 px-2.5 py-1 text-cyan-200/90 hover:bg-white/10"
+                    className="rounded-lg border border-white/[0.08] bg-white/5 px-2.5 py-1 text-neutral-300 hover:bg-white/10"
                   >
                     +30m
                   </button>
@@ -433,7 +433,7 @@ export const DailyTimelineView: React.FC = () => {
                       soundEngine.playClick();
                       logDeepWorkMinutes(60);
                     }}
-                    className="rounded-lg border border-indigo-900/70 bg-white/5 px-2.5 py-1 text-cyan-200/90 hover:bg-white/10"
+                    className="rounded-lg border border-white/[0.08] bg-white/5 px-2.5 py-1 text-neutral-300 hover:bg-white/10"
                   >
                     +60m
                   </button>
@@ -442,18 +442,18 @@ export const DailyTimelineView: React.FC = () => {
             </div>
 
             {/* Daily Telemetry Gauges */}
-            <div className="rounded-2xl border border-indigo-900/70 bg-[#0c1328] p-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-indigo-900/70">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#10121a] p-5">
+              <div className="flex items-center gap-2 pb-3 border-b border-white/[0.08]">
                 <Flame className="h-4 w-4 text-amber-400" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-200/90 font-mono">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono">
                   Productivity Telemetry
                 </h4>
               </div>
 
               <div className="grid grid-cols-2 gap-3 mt-4 text-xs font-mono">
                 {/* Focus Level Interactive Rating */}
-                <div className="rounded-xl border border-indigo-950/80 bg-[#0c1328] p-3">
-                  <div className="text-[10px] text-slate-300 uppercase">Focus Level</div>
+                <div className="rounded-xl border border-white/[0.06] bg-[#10121a] p-3">
+                  <div className="text-[10px] text-neutral-300 uppercase">Focus Level</div>
                   <div className="text-lg font-bold text-white mt-1">
                     {dailyPlan.eveningReflection.focusLevel} / 5
                   </div>
@@ -468,7 +468,7 @@ export const DailyTimelineView: React.FC = () => {
                         className={`h-6 w-6 rounded text-[10px] font-semibold transition-all ${
                           dailyPlan.eveningReflection.focusLevel === lvl
                             ? 'bg-emerald-400 text-black shadow-sm'
-                            : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                            : 'bg-white/10 text-neutral-300 hover:bg-white/20'
                         }`}
                       >
                         {lvl}
@@ -478,8 +478,8 @@ export const DailyTimelineView: React.FC = () => {
                 </div>
 
                 {/* Energy Level Interactive Rating */}
-                <div className="rounded-xl border border-indigo-950/80 bg-[#0c1328] p-3">
-                  <div className="text-[10px] text-slate-300 uppercase">Energy Level</div>
+                <div className="rounded-xl border border-white/[0.06] bg-[#10121a] p-3">
+                  <div className="text-[10px] text-neutral-300 uppercase">Energy Level</div>
                   <div className="text-lg font-bold text-white mt-1">
                     {dailyPlan.eveningReflection.energyLevel} / 5
                   </div>
@@ -494,7 +494,7 @@ export const DailyTimelineView: React.FC = () => {
                         className={`h-6 w-6 rounded text-[10px] font-semibold transition-all ${
                           dailyPlan.eveningReflection.energyLevel === lvl
                             ? 'bg-sky-400 text-black shadow-sm'
-                            : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                            : 'bg-white/10 text-neutral-300 hover:bg-white/20'
                         }`}
                       >
                         {lvl}
@@ -509,8 +509,8 @@ export const DailyTimelineView: React.FC = () => {
       ) : (
         /* 2. Unified Chronological Timeline Stream */
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between pb-2 border-b border-indigo-950/80">
-            <span className="text-xs font-mono uppercase tracking-wider text-slate-300">
+          <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+            <span className="text-xs font-mono uppercase tracking-wider text-neutral-300">
               Chronological Activity Log
             </span>
             <button
@@ -528,26 +528,26 @@ export const DailyTimelineView: React.FC = () => {
             </button>
           </div>
 
-          <div className="relative pl-6 border-l border-indigo-900/70 flex flex-col gap-5 mt-2">
+          <div className="relative pl-6 border-l border-white/[0.08] flex flex-col gap-5 mt-2">
             {timeline.map((event) => (
               <div key={event.id} className="relative group">
                 {/* Timeline node dot */}
                 <div className="absolute -left-[31px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#0f141e] bg-white group-hover:scale-125 transition-transform" />
 
-                <div className="rounded-xl border border-indigo-950/80 bg-[#0c1328] p-3.5 hover:border-indigo-800/80 hover:bg-[#0d1428] transition-all">
+                <div className="rounded-xl border border-white/[0.06] bg-[#10121a] p-3.5 hover:border-white/10 hover:bg-[#0d0e14] transition-all">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="rounded bg-white/10 px-1.5 py-0.2 font-mono text-[9px] uppercase tracking-wider text-cyan-200/90">
+                      <span className="rounded bg-white/10 px-1.5 py-0.2 font-mono text-[9px] uppercase tracking-wider text-neutral-300">
                         {event.type}
                       </span>
                       <span className="text-xs font-semibold text-white">{event.title}</span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400 shrink-0">
+                    <span className="font-mono text-[10px] text-neutral-400 shrink-0">
                       {event.timestamp.slice(0, 16).replace('T', ' ')}
                     </span>
                   </div>
                   {event.subtitle && (
-                    <div className="text-xs text-slate-300 mt-0.5 font-mono">{event.subtitle}</div>
+                    <div className="text-xs text-neutral-300 mt-0.5 font-mono">{event.subtitle}</div>
                   )}
                 </div>
               </div>
@@ -560,11 +560,11 @@ export const DailyTimelineView: React.FC = () => {
       {isEventModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="w-full max-w-sm rounded-2xl border border-white/20 bg-[#0a0f1e] p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-indigo-900/70">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <h3 className="text-sm font-semibold text-white font-mono">Log Timeline Event</h3>
               <button
                 onClick={() => setIsEventModalOpen(false)}
-                className="rounded-lg p-1 text-slate-300 hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-1 text-neutral-300 hover:bg-white/10 hover:text-white"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -572,11 +572,11 @@ export const DailyTimelineView: React.FC = () => {
 
             <form onSubmit={handleSaveEvent} className="mt-4 flex flex-col gap-3 font-mono text-xs">
               <div>
-                <label className="text-slate-300 uppercase text-[10px]">Event Type</label>
+                <label className="text-neutral-300 uppercase text-[10px]">Event Type</label>
                 <select
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value as 'assignment' | 'dsa' | 'commit' | 'task' | 'milestone' | 'reflection')}
-                  className="mt-1 w-full rounded-xl border border-indigo-900/70 bg-[#0a0f1e] px-3 py-2 text-white outline-none"
+                  className="mt-1 w-full rounded-xl border border-white/[0.08] bg-[#0a0f1e] px-3 py-2 text-white outline-none"
                 >
                   <option value="commit">Git Commit</option>
                   <option value="dsa">DSA Solved</option>
@@ -588,33 +588,33 @@ export const DailyTimelineView: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-slate-300 uppercase text-[10px]">Title *</label>
+                <label className="text-neutral-300 uppercase text-[10px]">Title *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Completed NeuralCache benchmark suite"
                   value={eventTitle}
                   onChange={(e) => setEventTitle(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
+                  className="mt-1 w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                 />
               </div>
 
               <div>
-                <label className="text-slate-300 uppercase text-[10px]">Subtitle / Details</label>
+                <label className="text-neutral-300 uppercase text-[10px]">Subtitle / Details</label>
                 <input
                   type="text"
                   placeholder="e.g. 5,000 req/sec sustained throughput"
                   value={eventSubtitle}
                   onChange={(e) => setEventSubtitle(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-indigo-900/70 bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
+                  className="mt-1 w-full rounded-xl border border-white/[0.08] bg-white/5 px-3 py-2 text-white outline-none focus:border-white/30"
                 />
               </div>
 
-              <div className="mt-2 flex justify-end gap-2 border-t border-indigo-900/70 pt-3">
+              <div className="mt-2 flex justify-end gap-2 border-t border-white/[0.08] pt-3">
                 <button
                   type="button"
                   onClick={() => setIsEventModalOpen(false)}
-                  className="rounded-xl border border-indigo-900/70 px-3 py-1.5 text-slate-300 hover:bg-white/5"
+                  className="rounded-xl border border-white/[0.08] px-3 py-1.5 text-neutral-300 hover:bg-white/5"
                 >
                   Cancel
                 </button>
