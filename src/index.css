@@ -477,27 +477,130 @@ body[data-theme='light'],
 
 /* Quick Hub / Control Center Card in Light Mode */
 [data-theme='light'] [data-control-center-panel="true"] {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
-}
-
-[data-theme='light'] [data-control-center-panel="true"] :is(.text-white, .text-neutral-100, .text-neutral-200) {
+  background-color: rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
   color: #0f172a !important;
 }
 
-[data-theme='light'] [data-control-center-panel="true"] :is(.text-neutral-300, .text-neutral-400) {
+/* Header indicator dot */
+[data-theme='light'] [data-control-center-panel="true"] .bg-white.shadow-\[0_0_8px_rgba\(255\,255\,255\,0\.8\)\] {
+  background-color: #0f172a !important;
+  box-shadow: 0 0 8px rgba(15, 23, 42, 0.3) !important;
+}
+
+/* Header text and hierarchy */
+[data-theme='light'] [data-control-center-panel="true"] :is(.text-white, .text-white\/90) {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(.text-white\/80, .text-white\/70, .text-white\/60) {
   color: #475569 !important;
 }
 
-[data-theme='light'] [data-control-center-panel="true"] .bg-white\/5,
-[data-theme='light'] [data-control-center-panel="true"] .bg-white\/10 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+[data-theme='light'] [data-control-center-panel="true"] :is(.text-white\/50, .text-white\/40) {
+  color: #64748b !important;
 }
 
-[data-theme='light'] [data-control-center-panel="true"] .border-white\/10,
-[data-theme='light'] [data-control-center-panel="true"] .border-white\/15 {
+/* Base Card Surfaces (Wi-Fi, Sliders, Utilities, Media, Keyboard, Soundscapes) */
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  .bg-\[\#181922\],
+  .bg-\[\#1a1c26\],
+  .bg-\[\#12131a\],
+  .bg-\[\#101117\]
+) {
+  background-color: #f1f3f8 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  .hover\:bg-\[\#20222e\]:hover,
+  .hover\:bg-\[\#252836\]:hover
+) {
+  background-color: #e6eaf2 !important;
+}
+
+/* Inner Icon Circles & Secondary Chips */
+[data-theme='light'] [data-control-center-panel="true"] .bg-\[\#252736\] {
+  background-color: #e2e6f0 !important;
+  color: #334155 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] .bg-\[\#252736\] * {
+  color: #334155 !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] .hover\:bg-\[\#303344\]:hover,
+[data-theme='light'] [data-control-center-panel="true"] .hover\:bg-\[\#323546\]:hover {
+  background-color: #d8deeb !important;
+}
+
+/* Active State Inversion: Toggled ON Cards & Buttons (Wi-Fi on, Bluetooth on, etc.) */
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  button.bg-white,
+  .bg-white.text-black
+) {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.22) !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  button.bg-white,
+  .bg-white.text-black
+) * {
+  color: #ffffff !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  button.bg-white,
+  .bg-white.text-black
+) .bg-black\/10 {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  button.bg-white,
+  .bg-white.text-black
+) .opacity-80 {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* Sliders */
+[data-theme='light'] [data-control-center-panel="true"] .bg-\[\#282a36\] {
+  background-color: #e2e6f0 !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] .bg-\[\#282a36\] > .bg-white {
+  background-color: #0f172a !important;
+}
+
+/* Media Controller Play Icon SVG Fill */
+[data-theme='light'] [data-control-center-panel="true"] button.bg-white svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Borders in Control Center */
+[data-theme='light'] [data-control-center-panel="true"] :is(
+  .border-white\/\[0\.06\],
+  .border-white\/\[0\.08\],
+  .border-white\/\[0\.16\],
+  .border-white\/10,
+  .border-white\/15
+) {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Translucent hover / pill fills */
+[data-theme='light'] [data-control-center-panel="true"] .hover\:bg-white\/10:hover,
+[data-theme='light'] [data-control-center-panel="true"] .hover\:bg-white\/\[0\.06\]:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Context Menus in Light Mode */

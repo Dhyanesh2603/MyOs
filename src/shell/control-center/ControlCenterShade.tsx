@@ -105,6 +105,7 @@ export const ControlCenterShade: React.FC = () => {
     <AnimatePresence>
       <motion.div
         ref={containerRef}
+        data-control-center-panel="true"
         initial={{ opacity: 0, scale: 0.95, y: -12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -12 }}
