@@ -66,12 +66,12 @@ const matrixManifest: AppManifest = {
 const MarkdownViewerApp: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col bg-surface-panel p-6 text-content-primary overflow-y-auto select-text font-sans">
-      <h1 className="text-2xl font-bold border-b border-border-subtle pb-2 mb-4">FlowOS Documentation</h1>
+      <h1 className="text-2xl font-bold border-b border-border-subtle pb-2 mb-4">Onyx OS Documentation</h1>
       <p className="text-sm leading-relaxed text-content-secondary mb-4">
-        Welcome to the FlowOS Markdown Reader. This community application renders high-performance GitHub Flavored Markdown with KaTeX math rendering, syntax-highlighted code fences, and responsive layout styling.
+        Welcome to the Onyx OS Markdown Reader. This community application renders high-performance GitHub Flavored Markdown with KaTeX math rendering, syntax-highlighted code fences, and responsive layout styling.
       </p>
       <div className="rounded-xl border border-border-subtle bg-surface-subtle p-4 font-mono text-xs mb-4">
-        <code>$ flowos --system-check --benchmark</code>
+        <code>$ onyx --system-check --benchmark</code>
       </div>
       <div className="flex items-center gap-2 font-mono text-xs text-content-tertiary">
         <Sparkles className="h-3.5 w-3.5 text-accent" />
@@ -101,7 +101,7 @@ const BenchmarkerApp: React.FC = () => {
       <div className="flex items-center justify-between border-b border-border-subtle pb-3">
         <div className="flex items-center gap-2">
           <Gauge className="h-5 w-5 text-accent" />
-          <span className="font-semibold text-sm">FlowOS Core Benchmarker</span>
+          <span className="font-semibold text-sm">Onyx OS Core Benchmarker</span>
         </div>
         <span className="rounded bg-accent/15 px-2 py-0.5 text-xs text-accent font-bold">
           Score: 9,840 pts
@@ -163,7 +163,7 @@ const CATALOG: FlowPackage[] = [
     description: 'Full-featured GitHub Markdown documentation and book reader.',
     version: '2.0.4',
     category: 'productivity',
-    author: 'FlowOS Community',
+    author: 'Onyx OS Community',
     sizeKb: 58,
     rating: 4.8,
     installed: false,

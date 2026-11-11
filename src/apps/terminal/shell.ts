@@ -538,7 +538,7 @@ export async function executeCommand(
       }
 
       if (sub === 'diff') {
-        return { output: 'diff --git a/flowos.config.ts b/flowos.config.ts\n--- a/flowos.config.ts\n+++ b/flowos.config.ts\n@@ -1,3 +1,4 @@\n+export const IOS_ICONS_ENABLED = true;\n+export const IFRAME_DIRECT_EMBED = true;' };
+        return { output: 'diff --git a/onyx.config.ts b/onyx.config.ts\n--- a/onyx.config.ts\n+++ b/onyx.config.ts\n@@ -1,3 +1,4 @@\n+export const IOS_ICONS_ENABLED = true;\n+export const IFRAME_DIRECT_EMBED = true;' };
       }
 
       return { output: `git: '${sub}' is not a git command. See 'git --help'.` };
@@ -1165,7 +1165,7 @@ export async function executeCommand(
       const devStore = useDeviceStorageStore.getState();
       const header = 'FILESYSTEM            TYPE            MOUNTPOINT';
       const rows = [
-        'idb://flowos_vfs      IndexedDB       /',
+        'idb://onyx_vfs      IndexedDB       /',
         'procfs                Virtual         /proc',
         ...devStore.mountedFolders.map((f) => `host://local-fs       FileSysAccess   ${f.vfsPath}`),
       ];
@@ -1176,7 +1176,7 @@ export async function executeCommand(
       return {
         output: [
           'Filesystem       1K-blocks      Used Available Use% Mounted on',
-          'idb://flowos_vfs  10485760    142850  10342910   2% /',
+          'idb://onyx_vfs  10485760    142850  10342910   2% /',
           'host://device     52428800   1842000  50586800   4% /device',
         ].join('\n'),
       };

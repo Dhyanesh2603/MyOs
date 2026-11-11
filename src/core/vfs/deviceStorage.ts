@@ -368,7 +368,7 @@ export const useDeviceStorageStore = create<DeviceStorageState>((set) => ({
 
       notify({
         title: 'Folder Unmounted',
-        message: `Disconnected ${vfsPath} from FlowOS.`,
+        message: `Disconnected ${vfsPath} from Onyx OS.`,
         type: 'info',
       });
     } catch (err: unknown) {

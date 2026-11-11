@@ -4,7 +4,6 @@ import {
   Palette,
   Sliders,
   Accessibility,
-  Info,
   Sun,
   Moon,
   Eye,
@@ -25,7 +24,7 @@ import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useDockStore, type DockAutoHideMode } from '@shell/dock/dockStore';
 
-type SettingsTab = 'appearance' | 'desktop' | 'geometry' | 'accessibility' | 'about';
+type SettingsTab = 'appearance' | 'desktop' | 'geometry' | 'accessibility';
 
 const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
@@ -119,17 +118,7 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
             Accessibility
           </button>
 
-          <button
-            onClick={() => setActiveTab('about')}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors cursor-pointer ${
-              activeTab === 'about'
-                ? 'bg-white/10 text-white font-semibold border border-white/10 shadow-sm'
-                : 'text-neutral-400 hover:bg-white/[0.05] hover:text-white border border-transparent'
-            }`}
-          >
-            <Info className="h-3.5 w-3.5" />
-            About Onyx OS
-          </button>
+          
         </div>
 
         <div className="space-y-0.5 px-2.5 py-1 font-mono text-[9px] text-neutral-500">
@@ -612,27 +601,6 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
           </div>
         )}
 
-        {/* TAB 5: ABOUT */}
-        {activeTab === 'about' && (
-          <div className="space-y-4 text-xs text-neutral-300 leading-relaxed">
-            <div>
-              <h3 className="text-sm font-bold tracking-tight text-white">Onyx OS v2.0</h3>
-              <p className="text-[11px] text-neutral-400 font-mono mt-0.5">
-                Artisanal Web Operating System Architecture
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-[#12141c] p-4 font-mono text-[10px] space-y-2">
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">Design Language</span> <span className="text-white">Opus 5.5 Bespoke Artisanal</span></div>
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">Window Manager</span> <span className="text-white">Fluid Floating Windows (Top-Right Controls)</span></div>
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">Desktop Layout</span> <span className="text-white">Fixed Grid Snapping + Freeform Coordinates</span></div>
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">File System</span> <span className="text-white">POSIX IndexedDB + Physical PC Mount</span></div>
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">Terminal Shell</span> <span className="text-white">Warp Execution Cards</span></div>
-              <div className="flex justify-between border-b border-white/[0.06] pb-1.5"><span className="text-neutral-400">Browser</span> <span className="text-white">Direct Embed, Universal YouTube, Jina Reader</span></div>
-              <div className="flex justify-between"><span className="text-neutral-400">Status Island</span> <span className="text-white">Detached Dynamic Capsule Island</span></div>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

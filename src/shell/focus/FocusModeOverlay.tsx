@@ -58,7 +58,7 @@ export const FocusModeOverlay: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400" />
           <span className="font-mono text-xs uppercase tracking-widest text-neutral-400">
-            Flow OS • Deep Focus Mode
+            Onyx OS • Deep Focus Mode
           </span>
         </div>
 

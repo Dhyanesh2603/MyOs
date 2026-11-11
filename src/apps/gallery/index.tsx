@@ -269,7 +269,7 @@ export const GalleryApp: React.FC<AppProps> = ({ windowId }) => {
 export const galleryManifest: AppManifest = {
   id: 'gallery',
   name: 'Gallery',
-  description: 'High-resolution photo viewer, slideshow and picture browser for the FlowOS VFS.',
+  description: 'High-resolution photo viewer, slideshow and picture browser for the Onyx OS VFS.',
   category: 'media',
   icon: ImageIcon,
   defaultSize: { width: 740, height: 520 },

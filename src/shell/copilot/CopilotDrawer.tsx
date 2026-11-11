@@ -89,7 +89,7 @@ export const CopilotDrawer: React.FC = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 font-semibold text-xs text-content-primary">
-                    <span>FlowOS Copilot</span>
+                    <span>Onyx Copilot</span>
                     </div>
                   <div className="font-mono text-[10px] text-content-tertiary">
                     Raycast Intelligence sidecar
@@ -237,7 +237,7 @@ export const CopilotDrawer: React.FC = () => {
               </div>
               <div className="mt-1 flex items-center justify-between px-1 font-mono text-[9px] text-content-tertiary">
                 <span>Press Enter to send • Shift+Esc to close</span>
-                <span>FlowOS Enclave Safe</span>
+                <span>Onyx Enclave Safe</span>
               </div>
             </div>
           </motion.aside>

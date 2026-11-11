@@ -91,7 +91,7 @@ export const LockScreen: React.FC = () => {
         {/* Top Telemetry & Status Stamp */}
         <div className="flex w-full items-center justify-between text-xs font-mono text-white/50">
           <div className="flex items-center gap-2">
-            <span>FLOW_OS // SECURE_ENCLAVE</span>
+            <span>ONYX_OS // SECURE_ENCLAVE</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Lock className="h-3.5 w-3.5 text-white/40" />
@@ -187,7 +187,7 @@ export const LockScreen: React.FC = () => {
           className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 font-sans text-xs font-medium text-white/80 hover:bg-white/20 active:scale-95 transition-all shadow-lg"
         >
           <Unlock className="h-3.5 w-3.5 text-accent-primary" />
-          <span>Unlock FlowOS</span>
+          <span>Unlock Onyx OS</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </motion.div>

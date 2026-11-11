@@ -95,7 +95,7 @@ class VFSService {
           type: 'file',
           parentPath: '/home/user',
           content:
-            'Welcome to FlowOS.\n\nFlowOS is an original browser-based desktop operating system.\nEvery file here is persisted in your browser via IndexedDB.\n\nEnjoy the fluid kinetic experience!',
+            'Welcome to Onyx OS.\n\nOnyx OS is a modern browser-based desktop operating system.\nEvery file here is persisted in your browser via IndexedDB.\n\nEnjoy the fluid kinetic experience!',
           size: 165,
           createdAt: now,
           updatedAt: now,
@@ -107,7 +107,7 @@ class VFSService {
           parentPath: '/home/user',
           content: JSON.stringify(
             {
-              os: 'FlowOS',
+              os: 'Onyx OS',
               version: '0.1.0',
               architecture: 'Micro-Kernel Frontend',
               persistence: 'IndexedDB / VFS',

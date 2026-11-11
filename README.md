@@ -43,7 +43,7 @@ Onyx OS is engineered around an asynchronous micro-kernel pattern inside the bro
   - **Freeform Placement:** Allows arbitrary pixel positioning anywhere on the desktop canvas with coordinate clamping to viewport boundaries.
 - **Auto-Arrange Grid:** Programmatically scans all active shortcuts and desktop files to calculate optimal column-major layout distribution based on dynamic viewport height.
 - **Global Deselection Engine:** A high-priority pointer capture listener deselects active desktop icons whenever a click occurs outside `[data-desktop-icon]` elements, providing authentic desktop selection behavior.
-- **Launchpad Drag-and-Drop Pinning:** Native HTML5 Drag and Drop pipeline transfers app bundles (`application/flowos-app-id`) directly from the Launchpad app drawer onto the desktop wallpaper.
+- **Launchpad Drag-and-Drop Pinning:** Native HTML5 Drag and Drop pipeline transfers app bundles (`application/onyx-app-id`) directly from the Launchpad app drawer onto the desktop wallpaper.
 - **App Management & Context Actions:** Desktop icons support context menus to open, remove from desktop, or inspect app details.
 
 ### 3. Dynamic Activity Island (Minimal Capsule)

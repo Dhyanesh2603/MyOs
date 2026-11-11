@@ -73,7 +73,7 @@ export const CreateWebAppModal: React.FC = () => {
             <div>
               <h2 className="text-sm font-bold tracking-tight">Package Web App (PWA)</h2>
               <p className="text-[10px] text-content-tertiary">
-                Convert any website or local URL into a native FlowOS window
+                Convert any website or local URL into a native Onyx OS window
               </p>
             </div>
           </div>

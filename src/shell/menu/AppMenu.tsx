@@ -349,7 +349,7 @@ export const AppMenu: React.FC = () => {
                       key={app.id}
                       draggable
                       onDragStart={(e) => {
-                        e.dataTransfer.setData('application/flowos-app-id', app.id);
+                        e.dataTransfer.setData('application/onyx-app-id', app.id);
                         e.dataTransfer.setData('text/plain', app.id);
                         e.dataTransfer.effectAllowed = 'copy';
                         setTimeout(() => {

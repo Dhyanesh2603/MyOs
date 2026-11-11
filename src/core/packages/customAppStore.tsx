@@ -190,7 +190,7 @@ export const useCustomAppStore = create<CustomAppStoreState>((set, get) => ({
 
     useNotificationStore.getState().notify({
       title: 'App Uninstalled',
-      message: 'Custom web app removed from FlowOS',
+      message: 'Custom web app removed from Onyx OS',
       type: 'info',
     });
   },

@@ -89,7 +89,7 @@ export const ScratchpadDrawer: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Promotion Actions to Flow OS v2 Personal Operating System
+  // Promotion Actions to Onyx OS v2 Personal Operating System
   const handlePromoteToMission = () => {
     const content = (activeMode === 'code' ? codeText : scratchText).trim();
     if (!content) return;
@@ -121,7 +121,7 @@ export const ScratchpadDrawer: React.FC = () => {
     soundEngine.playClick();
     notify({
       title: 'Logged to Project Studio',
-      message: `Issue attached to "${targetProject?.name || 'Flow OS'}".`,
+      message: `Issue attached to "${targetProject?.name || 'Onyx OS'}".`,
       type: 'success',
     });
   };

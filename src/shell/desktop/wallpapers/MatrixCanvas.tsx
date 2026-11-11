@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンFlowOS';
+const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンOnyxOS';
 
 export const MatrixCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

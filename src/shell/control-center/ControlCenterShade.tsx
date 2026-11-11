@@ -476,7 +476,7 @@ export const ControlCenterShade: React.FC = () => {
               {currentTrack?.title || 'No track playing'}
             </div>
             <div className="truncate text-[10px] text-white/60 font-mono">
-              {currentTrack?.artist || 'FlowOS Audio Engine'}
+              {currentTrack?.artist || 'Onyx Audio Engine'}
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
@@ -602,7 +602,7 @@ export const ControlCenterShade: React.FC = () => {
 
         {/* Footer Build Info */}
         <div className="flex items-center justify-between px-1 font-mono text-[9px] text-white/40 pt-0.5">
-          <span>FlowOS 0.2 • Solid Slate</span>
+          <span>Onyx OS 2.0 • Solid Slate</span>
           <span>Kernel Active</span>
         </div>
       </motion.div>

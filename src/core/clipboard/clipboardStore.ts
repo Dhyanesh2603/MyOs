@@ -63,7 +63,7 @@ function detectType(text: string): ClipboardContentType {
 const INITIAL_ENTRIES: ClipboardEntry[] = [
   {
     id: 'clip-1',
-    content: 'https://flowos.dev/docs/architecture',
+    content: 'https://os-onyx.vercel.app',
     type: 'url',
     timestamp: Date.now() - 1000 * 60 * 5,
     isPinned: true,
@@ -87,7 +87,7 @@ const INITIAL_ENTRIES: ClipboardEntry[] = [
   },
   {
     id: 'clip-4',
-    content: 'FlowOS: Tactile ambient web desktop operating system',
+    content: 'Onyx OS: Tactile ambient web desktop operating system',
     type: 'text',
     timestamp: Date.now() - 1000 * 60 * 60,
     isPinned: false,

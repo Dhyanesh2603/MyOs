@@ -54,14 +54,14 @@ export async function exportSystemImage(): Promise<void> {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `flowos-system-image-${new Date().toISOString().slice(0, 10)}.flowos`;
+    a.download = `onyx-system-image-${new Date().toISOString().slice(0, 10)}.flowos`;
     a.click();
     URL.revokeObjectURL(url);
 
     soundEngine.playChime();
     useNotificationStore.getState().notify({
       title: 'System Image Exported',
-      message: `Complete FlowOS state archived (${Object.keys(vfsFiles).length} files).`,
+      message: `Complete Onyx OS state archived (${Object.keys(vfsFiles).length} files).`,
       type: 'success',
     });
   } catch (err: any) {
@@ -80,7 +80,7 @@ export async function restoreSystemImage(file: File): Promise<boolean> {
     const image = JSON.parse(text) as FlowOSSystemImage;
 
     if (!image.version || !image.vfsFiles) {
-      throw new Error('Invalid .flowos system image format.');
+      throw new Error('Invalid .onyx system image format.');
     }
 
     const vfsStore = useVFSStore.getState();
@@ -113,7 +113,7 @@ export async function restoreSystemImage(file: File): Promise<boolean> {
     soundEngine.playChime();
     useNotificationStore.getState().notify({
       title: 'System Restored Successfully',
-      message: `Reloading FlowOS environment...`,
+      message: `Reloading Onyx OS environment...`,
       type: 'success',
     });
 

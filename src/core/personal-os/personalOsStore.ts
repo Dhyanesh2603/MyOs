@@ -183,7 +183,7 @@ export interface PersonalOsState {
   getAttendanceAlerts: () => AcademicSubject[];
 }
 
-const STORAGE_KEY = 'flowos_personal_os_state_v3';
+const STORAGE_KEY = 'onyx_personal_os_state_v1';
 
 export const EMPTY_CGPA_PLAN: CgpaPlan = {
   currentCgpa: 0,
@@ -211,9 +211,10 @@ function loadPersistedState(): Partial<PersonalOsState> {
   try {
     // Clear old mock seed storage if present
     localStorage.removeItem('flowos_personal_os_state_v2');
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('flowos_personal_os_state_v3');
     if (!raw) return {};
-    return JSON.parse(raw) as Partial<PersonalOsState>;
+    const migrated = raw.replaceAll('Flow OS', 'Onyx OS').replaceAll('FlowOS', 'Onyx OS');
+    return JSON.parse(migrated) as Partial<PersonalOsState>;
   } catch {
     return {};
   }

@@ -71,7 +71,7 @@ const DEFAULT_DEVICES: FlowDropDevice[] = [
     id: 'device-studio',
     name: 'AirBridge Host PC',
     type: 'desktop',
-    os: 'FlowOS Relay',
+    os: 'Onyx Relay',
     avatarGlyph: '🖥️',
     angle: 215,
     distance: 140,
@@ -90,7 +90,7 @@ export const useFlowDropStore = create<FlowDropState>((set, get) => ({
     set({
       isOpen: true,
       selectedFile: file ?? {
-        name: 'FlowOS_Document.pdf',
+        name: 'Onyx_Document.pdf',
         size: 1024 * 480,
       },
       activeTransfer: null,

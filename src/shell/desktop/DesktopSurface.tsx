@@ -304,7 +304,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
       onDragOver={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (e.dataTransfer.types.includes('application/flowos-app-id')) {
+        if (e.dataTransfer.types.includes('application/onyx-app-id') || e.dataTransfer.types.includes('application/flowos-app-id')) {
           e.dataTransfer.dropEffect = 'copy';
         } else {
           setIsDragOver(true);
@@ -321,7 +321,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
         setIsDragOver(false);
 
         // Check if an app was dropped from Launchpad
-        const appId = e.dataTransfer.getData('application/flowos-app-id');
+        const appId = e.dataTransfer.getData('application/onyx-app-id') || e.dataTransfer.getData('application/flowos-app-id');
         if (appId) {
           const added = useDesktopStore.getState().addAppShortcut(appId, {
             x: e.clientX - 44,
@@ -373,7 +373,7 @@ export const DesktopSurface: React.FC<DesktopSurfaceProps> = ({ children }) => {
             Drop Physical Files to Import
           </h3>
           <p className="mt-1 font-mono text-xs text-content-tertiary">
-            Will be written directly to /home/user/Desktop in FlowOS VFS
+            Will be written directly to /home/user/Desktop in Onyx OS VFS
           </p>
         </div>
       )}

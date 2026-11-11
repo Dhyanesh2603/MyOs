@@ -166,7 +166,7 @@ export const ActiveAppMenu: React.FC = () => {
         label="Help"
         items={[
           {
-            label: 'FlowOS Documentation',
+            label: 'Onyx OS Documentation',
             action: () => launchApp('browser', { filePath: 'https://en.wikipedia.org/wiki/Operating_system' }),
           },
           {

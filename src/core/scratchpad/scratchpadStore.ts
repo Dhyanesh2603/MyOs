@@ -34,14 +34,14 @@ export interface ScratchpadState {
 }
 
 const DEFAULT_SCRATCH = `# Quick Scratchpad
-- [ ] Align architecture spec for Flow OS v2 Personal Operating System
+- [ ] Align architecture spec for Onyx OS v2 Personal Operating System
 - [ ] Review Monotonic Stack hard problem template
 - [ ] Draft database indexing checklist for CAT exam
 
 > Momentum answers: "What should I work on next?"
 `;
 
-const DEFAULT_CODE = `// Flow OS Scratch Buffer
+const DEFAULT_CODE = `// Onyx OS Scratch Buffer
 export function calculateVelocity(completed: number, total: number): number {
   if (total === 0) return 0;
   return Math.round((completed / total) * 100);

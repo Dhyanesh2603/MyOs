@@ -36,8 +36,8 @@ export const FlowMenu: React.FC = () => {
   const handleAbout = () => {
     setIsOpen(false);
     notify({
-      title: 'About FlowOS',
-      message: 'FlowOS v0.2.0 (Flagship Edition) • Kernel v2.4.0 • Linear/Obsidian Design Core',
+      title: 'About Onyx OS',
+      message: 'Onyx OS v2.0 • Modern Web Desktop Operating System',
       type: 'info',
     });
   };
@@ -52,7 +52,7 @@ export const FlowMenu: React.FC = () => {
             : 'text-content-primary hover:bg-surface-subtle/60'
         }`}
       >
-        <span>FlowOS</span>
+        <span>Onyx OS</span>
       </button>
 
       {isOpen && (
@@ -65,7 +65,7 @@ export const FlowMenu: React.FC = () => {
               <Info className="h-3.5 w-3.5" />
               <span>About Onyx OS</span>
             </div>
-            <span className="font-mono text-[9px] opacity-70">v0.2</span>
+            <span className="font-mono text-[9px] opacity-70">v2.0</span>
           </button>
 
           <button
