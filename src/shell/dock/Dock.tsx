@@ -204,7 +204,7 @@ export const Dock: React.FC<DockProps> = ({
         onMouseEnter={handleDockMouseEnter}
         className="fixed bottom-3 left-1/2 z-[500] flex items-end gap-1.5 rounded-2xl border border-white/20 bg-neutral-900/60 dark:bg-black/50 px-3 py-2 shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-3xl saturate-150"
       >
-        {/* Apple-style Launchpad / App Library Trigger */}
+        {/* Nothing OS Dot-Matrix Launchpad / App Library Trigger */}
         <button
           onClick={() => {
             soundEngine.playClick();
@@ -213,17 +213,18 @@ export const Dock: React.FC<DockProps> = ({
           className="relative flex flex-col items-center justify-center p-0.5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group mb-1 shrink-0"
           title="App Library (All Apps)"
         >
-          <div className={`h-11 w-11 ${shapeClass} bg-gradient-to-b from-neutral-700 via-neutral-800 to-neutral-900 border border-white/20 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform`}>
-            <div className="grid grid-cols-3 gap-1 p-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-200" />
+          <div className={`h-11 w-11 ${shapeClass} bg-[#0c0d12] border border-white/[0.14] shadow-[0_4px_16px_rgba(0,0,0,0.6)] flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden relative`}>
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a1c24] via-[#111218] to-[#090a0e]" />
+            <div className="relative grid grid-cols-3 gap-1.5 p-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d71921]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+              <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
             </div>
           </div>
           <span className="text-[10px] font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 whitespace-nowrap bg-black/75 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md shadow-lg pointer-events-none">
