@@ -75,13 +75,13 @@ export const useCopilotStore = create<CopilotState>((set) => ({
       reply = `Inspected context for **${activeWin?.title ?? 'Active Project'}**.\n\nHere is an optimized architectural routine for safe execution and error containment in your Onyx OS environment:`;
       codeBlock = `// Sandboxed Worker Task Orchestrator\nexport async function executeSandboxTask(routine: () => Promise<unknown>) {\n  try {\n    const start = performance.now();\n    const outcome = await Promise.race([\n      routine(),\n      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout 5000ms')), 5000))\n    ]);\n    return { success: true, duration: performance.now() - start, data: outcome };\n  } catch (err: any) {\n    return { success: false, error: err.message };\n  }\n}`;
       codeLanguage = 'typescript';
-    } else if (lower.includes('terminal') || lower.includes('script') || lower.includes('bash') || lower.includes('flowsh')) {
-      reply = `Here is a custom \`flowsh\` command sequence to automate your VFS project directory and test execution:`;
+    } else if (lower.includes('terminal') || lower.includes('script') || lower.includes('bash') || lower.includes('onyxsh') || lower.includes('flowsh')) {
+      reply = `Here is a custom \`onyxsh\` command sequence to automate your VFS project directory and test execution:`;
       codeBlock = `# Onyx OS Automated Pipeline\nmkdir -p /home/user/Workspace/scripts\ntouch /home/user/Workspace/scripts/benchmark.js\npkg list\nrun /home/user/Workspace/scripts/benchmark.js`;
       codeLanguage = 'bash';
     } else if (lower.includes('note') || lower.includes('draft') || lower.includes('summarize')) {
       reply = `Here is a structured executive summary formatted with Obsidian-style tags ready for your Notes app:`;
-      codeBlock = `# Onyx OS Sprint Objectives\n#flowos #roadmap #architecture\n\n- [x] Multi-Desktop Spaces (Ctrl+1..4)\n- [x] Sandboxed WebWorker Execution\n- [x] Ambient Generative Canvas Shaders\n- [ ] Deploy Cloud Sync Bridge`;
+      codeBlock = `# Onyx OS Sprint Objectives\n#onyxos #roadmap #architecture\n\n- [x] Multi-Desktop Spaces (Ctrl+1..4)\n- [x] Sandboxed WebWorker Execution\n- [x] Ambient Generative Canvas Shaders\n- [ ] Deploy Cloud Sync Bridge`;
       codeLanguage = 'markdown';
     } else if (lower.includes('system') || lower.includes('health') || lower.includes('diagnos') || lower.includes('stat')) {
       const winCount = Object.keys(windows).length;

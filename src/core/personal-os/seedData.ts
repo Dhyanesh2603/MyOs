@@ -141,7 +141,7 @@ export const SEED_PROJECTS: Project[] = [
       'Custom shader background generator using GLSL fragment scripts',
     ],
     changelog: [
-      { version: '0.2.4', date: '2026-09-19', notes: ['Added FlowBoard, FlowCam, Flow Tape, and acoustic keyboard soundscapes'] },
+      { version: '0.2.4', date: '2026-09-19', notes: ['Added OnyxBoard, OnyxCam, Onyx Tape, and acoustic keyboard soundscapes'] },
       { version: '0.2.0', date: '2026-09-17', notes: ['Introduced Raycast Copilot drawer, Spotlight math, and Lo-Fi soundscapes'] },
       { version: '0.1.0', date: '2026-09-10', notes: ['Core kernel, WindowManager, VFS, and 12 baseline applications'] },
     ],

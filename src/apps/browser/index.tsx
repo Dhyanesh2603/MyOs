@@ -14,6 +14,9 @@ import {
   FolderOpen,
   Laptop,
   FileCode,
+  BookOpen,
+  ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { useVFSStore } from '@core/vfs/vfsStore';
@@ -25,10 +28,12 @@ interface BrowserTab {
   url: string;
   displayUrl: string;
   srcDoc?: string;
-  history: { url: string; title: string; srcDoc?: string }[];
+  history: { url: string; title: string; srcDoc?: string; isReaderMode?: boolean }[];
   historyIdx: number;
   isLoading: boolean;
   refreshKey: number;
+  isReaderMode?: boolean;
+  hasLoadError?: boolean;
 }
 
 const DEFAULT_HOME_URL = 'https://www.google.com/webhp?igu=1';
@@ -36,13 +41,13 @@ const DEFAULT_HOME_URL = 'https://www.google.com/webhp?igu=1';
 const DEFAULT_BOOKMARKS = [
   { name: 'Google', url: 'https://www.google.com/webhp?igu=1' },
   { name: 'DuckDuckGo', url: 'https://html.duckduckgo.com/html/' },
+  { name: 'Wikipedia', url: 'https://en.wikipedia.org' },
   { name: 'Hacker News', url: 'https://news.ycombinator.com' },
   { name: 'Localhost:3000', url: 'http://localhost:3000' },
 ];
 
 /**
- * Normalizes input text into a direct embeddable URL for the iframe.
- * No hardcoded website special-casing; straightforward URL resolution.
+ * Normalizes input text into a direct destination URL.
  */
 function normalizeUrl(input: string): { url: string; title: string } {
   const trimmed = input.trim();
@@ -61,6 +66,19 @@ function normalizeUrl(input: string): { url: string; title: string } {
           title: parsed.searchParams.get('q') ? `${parsed.searchParams.get('q')} - Google Search` : 'Google',
         };
       }
+      if (parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be')) {
+        if (!parsed.pathname.startsWith('/embed/')) {
+          const videoId =
+            parsed.searchParams.get('v') ||
+            (parsed.hostname.includes('youtu.be') ? parsed.pathname.replace(/^\//, '') : '');
+          if (videoId) {
+            return {
+              url: `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0`,
+              title: 'YouTube Video',
+            };
+          }
+        }
+      }
       return {
         url: trimmed,
         title: parsed.hostname || 'Web',
@@ -70,7 +88,7 @@ function normalizeUrl(input: string): { url: string; title: string } {
     }
   }
 
-  // 2. Domain without protocol (e.g. news.ycombinator.com, github.com, etc.)
+  // 2. Domain without protocol (e.g. news.ycombinator.com, wikipedia.org, github.com)
   if (
     trimmed.includes('.') &&
     !trimmed.includes(' ') &&
@@ -98,6 +116,78 @@ function normalizeUrl(input: string): { url: string; title: string } {
 }
 
 /**
+ * Calculates the actual iframe src to load.
+ * Routes external websites through the unblock proxy to bypass X-Frame-Options
+ * and Content-Security-Policy restrictions.
+ */
+export function getEffectiveIframeUrl(rawUrl: string, isReaderMode: boolean = false): string {
+  if (!rawUrl) return DEFAULT_HOME_URL;
+
+  // Local/VFS files are rendered via srcDoc
+  if (
+    rawUrl.startsWith('file:///') ||
+    rawUrl.startsWith('vfs:///') ||
+    rawUrl.startsWith('/device/') ||
+    rawUrl.startsWith('/home/')
+  ) {
+    return '';
+  }
+
+  // Reader Mode: Jina Reader provides distraction-free framing for any article
+  if (isReaderMode) {
+    const cleanUrl = rawUrl.replace(/^\/api\/proxy\?url=/, '');
+    const decoded = cleanUrl.startsWith('http') ? cleanUrl : decodeURIComponent(cleanUrl);
+    return `https://r.jina.ai/${decoded}`;
+  }
+
+  // Already routed through proxy or data/blob URI
+  if (rawUrl.startsWith('/api/proxy') || rawUrl.startsWith('data:') || rawUrl.startsWith('blob:')) {
+    return rawUrl;
+  }
+
+  try {
+    const parsed = new URL(rawUrl);
+
+    // Localhost / Loopback URLs - directly embeddable
+    if (
+      parsed.hostname === 'localhost' ||
+      parsed.hostname === '127.0.0.1' ||
+      parsed.hostname === '0.0.0.0' ||
+      parsed.hostname === '[::1]'
+    ) {
+      return rawUrl;
+    }
+
+    // Google with igu=1 is explicitly allowed by Google for iframe embedding
+    if (parsed.hostname.includes('google.')) {
+      if (!parsed.searchParams.has('igu')) {
+        parsed.searchParams.set('igu', '1');
+      }
+      return parsed.toString();
+    }
+
+    // YouTube /embed/ is explicitly allowed for iframe embedding
+    if (parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be')) {
+      if (parsed.pathname.startsWith('/embed/')) {
+        return rawUrl;
+      }
+      const videoId =
+        parsed.searchParams.get('v') ||
+        (parsed.hostname.includes('youtu.be') ? parsed.pathname.replace(/^\//, '') : '');
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&rel=0`;
+      }
+    }
+  } catch {
+    return rawUrl;
+  }
+
+  // External websites that block iframes (X-Frame-Options / frame-ancestors):
+  // Route through unblock proxy which strips restrictive response headers
+  return `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+}
+
+/**
  * Escapes raw strings for safe inclusion in generated HTML.
  */
 function escapeHtml(str: string): string {
@@ -116,10 +206,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
       title: 'Google',
       url: DEFAULT_HOME_URL,
       displayUrl: 'https://www.google.com',
-      history: [{ url: DEFAULT_HOME_URL, title: 'Google' }],
+      history: [{ url: DEFAULT_HOME_URL, title: 'Google', isReaderMode: false }],
       historyIdx: 0,
       isLoading: false,
       refreshKey: 0,
+      isReaderMode: false,
+      hasLoadError: false,
     },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
@@ -138,14 +230,15 @@ export const BrowserApp: React.FC<AppProps> = () => {
   }, []);
 
   /**
-   * Main navigation dispatcher - routes everything into the iframe
+   * Main navigation dispatcher
    */
   const handleNavigate = useCallback(
-    async (target: string, pushToHistory = true) => {
+    async (target: string, pushToHistory = true, forceReaderMode?: boolean) => {
       const rawTarget = target.trim();
       if (!rawTarget) return;
 
       const currentTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0]!;
+      const isReader = forceReaderMode !== undefined ? forceReaderMode : false;
       let finalUrl = rawTarget;
       let displayUrl = rawTarget;
       let title = 'Web';
@@ -193,7 +286,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
       let newIdx = currentTab.historyIdx;
       if (pushToHistory) {
         newHistory = currentTab.history.slice(0, currentTab.historyIdx + 1);
-        newHistory.push({ url: finalUrl, title, srcDoc });
+        newHistory.push({ url: finalUrl, title, srcDoc, isReaderMode: isReader });
         newIdx = newHistory.length - 1;
       }
 
@@ -206,6 +299,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
                 url: finalUrl,
                 displayUrl,
                 srcDoc,
+                isReaderMode: isReader,
+                hasLoadError: false,
                 history: newHistory,
                 historyIdx: newIdx,
                 isLoading: true,
@@ -229,8 +324,9 @@ export const BrowserApp: React.FC<AppProps> = () => {
       if (prevEntry) {
         updateTab(activeTabId, {
           historyIdx: activeTab.historyIdx - 1,
+          isReaderMode: prevEntry.isReaderMode || false,
         });
-        handleNavigate(prevEntry.url, false);
+        handleNavigate(prevEntry.url, false, prevEntry.isReaderMode);
       }
     }
   };
@@ -244,8 +340,9 @@ export const BrowserApp: React.FC<AppProps> = () => {
       if (nextEntry) {
         updateTab(activeTabId, {
           historyIdx: activeTab.historyIdx + 1,
+          isReaderMode: nextEntry.isReaderMode || false,
         });
-        handleNavigate(nextEntry.url, false);
+        handleNavigate(nextEntry.url, false, nextEntry.isReaderMode);
       }
     }
   };
@@ -256,6 +353,20 @@ export const BrowserApp: React.FC<AppProps> = () => {
   const handleReload = () => {
     updateTab(activeTabId, {
       isLoading: true,
+      hasLoadError: false,
+      refreshKey: activeTab.refreshKey + 1,
+    });
+  };
+
+  /**
+   * Toggle Reader Mode
+   */
+  const handleToggleReader = () => {
+    const nextReader = !activeTab.isReaderMode;
+    updateTab(activeTabId, {
+      isReaderMode: nextReader,
+      isLoading: true,
+      hasLoadError: false,
       refreshKey: activeTab.refreshKey + 1,
     });
   };
@@ -297,10 +408,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
         url: `file:///${file.name}`,
         displayUrl: `file:///${file.name}`,
         srcDoc,
-        history: [{ url: `file:///${file.name}`, title: file.name, srcDoc }],
+        history: [{ url: `file:///${file.name}`, title: file.name, srcDoc, isReaderMode: false }],
         historyIdx: 0,
         isLoading: false,
         refreshKey: 0,
+        isReaderMode: false,
+        hasLoadError: false,
       };
       setTabs((prev) => [...prev, newTab]);
       setActiveTabId(newId);
@@ -319,10 +432,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
       title: 'Google',
       url: DEFAULT_HOME_URL,
       displayUrl: 'https://www.google.com',
-      history: [{ url: DEFAULT_HOME_URL, title: 'Google' }],
+      history: [{ url: DEFAULT_HOME_URL, title: 'Google', isReaderMode: false }],
       historyIdx: 0,
       isLoading: true,
       refreshKey: 0,
+      isReaderMode: false,
+      hasLoadError: false,
     };
     setTabs((prev) => [...prev, newTab]);
     setActiveTabId(newId);
@@ -360,26 +475,46 @@ export const BrowserApp: React.FC<AppProps> = () => {
     setInputUrl(activeTab.displayUrl);
   }, [activeTab.displayUrl, activeTabId]);
 
-  // Listen for navigation messages from child iframes if any
+  // Safety timeout to dismiss stuck loading spinners
+  useEffect(() => {
+    if (!activeTab.isLoading) return;
+    const timer = setTimeout(() => {
+      updateTab(activeTabId, { isLoading: false });
+    }, 12000);
+    return () => clearTimeout(timer);
+  }, [activeTab.isLoading, activeTab.refreshKey, activeTabId, updateTab]);
+
+  // Listen for navigation messages from child iframes (from proxy interceptor)
   useEffect(() => {
     const handleFrameMessage = (event: MessageEvent) => {
       if (
         event.data &&
-        event.data.type === 'flowos:browser:navigate' &&
+        (event.data.type === 'onyx:browser:navigate' || event.data.type === 'flowos:browser:navigate') &&
         typeof event.data.url === 'string'
       ) {
-        const navigatedUrl = event.data.url;
+        let navigatedUrl = event.data.url;
+        if (navigatedUrl.startsWith('/api/proxy?url=')) {
+          navigatedUrl = decodeURIComponent(navigatedUrl.replace(/^\/api\/proxy\?url=/, ''));
+        }
         setInputUrl(navigatedUrl);
         updateTab(activeTabId, {
           url: navigatedUrl,
           displayUrl: navigatedUrl,
           title: navigatedUrl.replace(/^https?:\/\//, '').split('/')[0] || 'Web',
+          hasLoadError: false,
         });
       }
     };
     window.addEventListener('message', handleFrameMessage);
     return () => window.removeEventListener('message', handleFrameMessage);
   }, [activeTabId, updateTab]);
+
+  const effectiveIframeUrl = activeTab.srcDoc
+    ? undefined
+    : getEffectiveIframeUrl(activeTab.url, activeTab.isReaderMode);
+
+  const isProxied =
+    Boolean(effectiveIframeUrl && effectiveIframeUrl.startsWith('/api/proxy'));
 
   return (
     <div className="flex h-full w-full flex-col bg-[#0a0b10] text-neutral-100 select-none text-xs">
@@ -408,6 +543,8 @@ export const BrowserApp: React.FC<AppProps> = () => {
               <div className="flex items-center gap-2 truncate">
                 {tab.url.startsWith('file:///') ? (
                   <FileCode className="h-3 w-3 shrink-0 text-white/80" />
+                ) : tab.isReaderMode ? (
+                  <BookOpen className="h-3 w-3 shrink-0 text-amber-400" />
                 ) : (
                   <Globe className="h-3 w-3 shrink-0 text-white/80" />
                 )}
@@ -488,7 +625,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
         >
           <div className="flex items-center gap-1.5 text-neutral-400 mr-2 shrink-0">
             {inputUrl.startsWith('https://') ? (
-              <Lock className="h-3 w-3 text-white/80" />
+              <Lock className="h-3 w-3 text-emerald-400" />
             ) : inputUrl.startsWith('file:///') ? (
               <FileCode className="h-3 w-3 text-white/80" />
             ) : (
@@ -504,6 +641,24 @@ export const BrowserApp: React.FC<AppProps> = () => {
           />
         </form>
 
+        {/* Reader Mode Toggle Button */}
+        {activeTab.url.startsWith('http') && (
+          <button
+            onClick={handleToggleReader}
+            title={activeTab.isReaderMode ? 'Exit Reader Mode' : 'Reader Mode (Bypasses all frame restrictions)'}
+            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors cursor-pointer ${
+              activeTab.isReaderMode
+                ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
+                : 'border-white/10 bg-white/[0.02] text-neutral-300 hover:bg-white/[0.06] hover:text-white'
+            }`}
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline text-[11px] font-medium">
+              {activeTab.isReaderMode ? 'Reader On' : 'Reader'}
+            </span>
+          </button>
+        )}
+
         {/* Quick Action: Open Host Device File */}
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -514,13 +669,13 @@ export const BrowserApp: React.FC<AppProps> = () => {
           <span className="hidden sm:inline text-[11px] font-medium">Open File</span>
         </button>
 
-        {/* External Window Link */}
+        {/* Direct External Window Link */}
         {activeTab.url.startsWith('http') && (
           <a
             href={activeTab.url}
             target="_blank"
             rel="noopener noreferrer"
-            title="Open in native external browser window"
+            title="Open directly in native browser tab"
             className="flex items-center rounded-lg p-1.5 text-neutral-400 hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             <ExternalLink className="h-3.5 w-3.5" />
@@ -552,12 +707,12 @@ export const BrowserApp: React.FC<AppProps> = () => {
         )}
       </div>
 
-      {/* Browser Viewport: ALWAYS an Iframe for All URLs */}
+      {/* Browser Viewport */}
       <div className="relative flex-1 overflow-hidden bg-white">
         <iframe
           ref={iframeRef}
-          key={activeTab.refreshKey}
-          src={activeTab.srcDoc ? undefined : activeTab.url}
+          key={`${activeTab.refreshKey}-${activeTab.isReaderMode ? 'reader' : 'live'}`}
+          src={effectiveIframeUrl}
           srcDoc={activeTab.srcDoc}
           title={activeTab.title}
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-presentation allow-pointer-lock"
@@ -566,17 +721,98 @@ export const BrowserApp: React.FC<AppProps> = () => {
           allowFullScreen
           className="h-full w-full border-none bg-white"
           onLoad={() => {
-            updateTab(activeTab.id, { isLoading: false });
+            updateTab(activeTab.id, { isLoading: false, hasLoadError: false });
+          }}
+          onError={() => {
+            updateTab(activeTab.id, { isLoading: false, hasLoadError: true });
           }}
         />
 
-        {/* Subtle loading spinner overlay when switching tabs or navigating */}
+        {/* Loading Spinner Overlay */}
         {activeTab.isLoading && (
           <div className="absolute top-2 right-2 pointer-events-none flex items-center gap-1.5 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-1 text-[10px] text-white border border-white/10 shadow-lg">
             <RotateCw className="h-3 w-3 animate-spin text-white" />
             <span>Loading...</span>
           </div>
         )}
+
+        {/* Connection Fallback Card if Page Refuses or Fails */}
+        {activeTab.hasLoadError && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0d1117] p-6 text-center text-neutral-200">
+            <AlertCircle className="h-10 w-10 text-amber-400 mb-3" />
+            <h3 className="text-sm font-semibold text-white mb-1">Website Refused Direct Framing</h3>
+            <p className="max-w-md text-xs text-neutral-400 mb-4">
+              This website enforces strict bot verification or frame-ancestors headers. You can read it cleanly in Reader Mode or launch it in a direct browser tab.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleToggleReader}
+                className="flex items-center gap-1.5 rounded-lg bg-amber-500/20 px-3 py-1.5 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-colors font-medium cursor-pointer"
+              >
+                <BookOpen className="h-3.5 w-3.5" />
+                <span>Open in Reader Mode</span>
+              </button>
+              <a
+                href={activeTab.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-white border border-white/15 hover:bg-white/15 transition-colors font-medium"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span>Open in Native Window</span>
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modern Status & Security Footer */}
+      <div className="flex h-6 items-center justify-between border-t border-white/[0.08] bg-[#0c0e14] px-3 text-[10px] text-neutral-400">
+        <div className="flex items-center gap-1.5">
+          {activeTab.isReaderMode ? (
+            <>
+              <BookOpen className="h-3 w-3 text-amber-400" />
+              <span className="text-amber-400 font-medium">Reader Mode Active</span>
+              <span className="text-neutral-600">|</span>
+              <span className="text-neutral-500">Ad-free article extraction</span>
+            </>
+          ) : isProxied ? (
+            <>
+              <ShieldCheck className="h-3 w-3 text-emerald-400" />
+              <span className="text-emerald-400 font-medium">Unblock Proxy Active</span>
+              <span className="text-neutral-600">|</span>
+              <span className="text-neutral-500">Frame restrictions bypassed</span>
+            </>
+          ) : (
+            <>
+              <ShieldCheck className="h-3 w-3 text-white/80" />
+              <span className="text-neutral-300 font-medium">Direct Embed</span>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {activeTab.url.startsWith('http') && (
+            <button
+              onClick={handleToggleReader}
+              className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <BookOpen className="h-2.5 w-2.5" />
+              <span>{activeTab.isReaderMode ? 'Exit Reader' : 'Reader View'}</span>
+            </button>
+          )}
+          {activeTab.url.startsWith('http') && (
+            <a
+              href={activeTab.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <ExternalLink className="h-2.5 w-2.5" />
+              <span>External Tab</span>
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -585,7 +821,7 @@ export const BrowserApp: React.FC<AppProps> = () => {
 export const browserManifest: AppManifest = {
   id: 'browser',
   name: 'Browser',
-  description: 'Sandboxed web browser with direct iframe embed for all URLs and local storage.',
+  description: 'Sandboxed web browser with unblock proxy, direct embeds, and reader mode.',
   category: 'productivity',
   icon: Globe,
   defaultSize: { width: 880, height: 600 },
