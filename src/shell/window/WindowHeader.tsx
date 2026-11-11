@@ -186,8 +186,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
       onDoubleClick={handleDoubleClick}
       className={`no-select relative flex h-9.5 select-none items-center justify-between border-b px-3.5 transition-colors ${
         windowState.isFocused
-          ? 'border-white/[0.08] bg-white/[0.05] backdrop-blur-2xl'
-          : 'border-white/[0.04] bg-white/[0.02] backdrop-blur-xl'
+          ? 'border-border-strong bg-surface-overlay/80 backdrop-blur-2xl'
+          : 'border-border-subtle bg-surface-overlay/40 backdrop-blur-xl'
       } ${windowState.isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
     >
       {/* Top Left: App Icon & Title */}
@@ -198,8 +198,8 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
         <span
           className={`truncate text-xs font-semibold tracking-tight transition-colors ${
             windowState.isFocused
-              ? 'text-white/95'
-              : 'text-white/60'
+              ? 'text-content-primary'
+              : 'text-content-secondary'
           }`}
         >
           {windowState.title}
@@ -217,7 +217,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
             useWindowStore.getState().minimizeWindow(windowState.id);
           }}
           aria-label="Minimize Window"
-          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+          className="flex h-6 w-7 items-center justify-center rounded-md text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
         >
           <Minus className="h-3.5 w-3.5" />
         </button>
@@ -234,7 +234,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
             });
           }}
           aria-label={windowState.isMaximized ? 'Restore Window' : 'Maximize Window'}
-          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+          className="flex h-6 w-7 items-center justify-center rounded-md text-content-secondary hover:bg-surface-subtle hover:text-content-primary transition-colors cursor-pointer"
         >
           {windowState.isMaximized ? (
             <Copy className="h-3 w-3" />
@@ -252,7 +252,7 @@ export const WindowHeader: React.FC<WindowHeaderProps> = React.memo(({ windowSta
             useWindowStore.getState().closeWindow(windowState.id);
           }}
           aria-label="Close Window"
-          className="flex h-6 w-7 items-center justify-center rounded-md text-white/60 hover:bg-rose-500/80 hover:text-white transition-colors cursor-pointer"
+          className="flex h-6 w-7 items-center justify-center rounded-md text-content-secondary hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
         >
           <X className="h-3.5 w-3.5" />
         </button>

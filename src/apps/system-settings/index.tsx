@@ -17,12 +17,13 @@ import {
   PanelBottom,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
-import type { ThemeId, AccentColorId, IconShape, WindowMaterial } from '@contracts/theme';
+import type { ThemeId, AccentColorId, IconShape, IconPackId, WindowMaterial } from '@contracts/theme';
 import { useThemeStore, ACCENT_COLORS } from '@core/theme/themeStore';
 import { useWallpaperStore } from '@core/theme/wallpaperStore';
 import { useDesktopStore } from '@core/desktop/desktopStore';
 import { useNotificationStore } from '@core/notifications/notificationStore';
 import { useDockStore, type DockAutoHideMode } from '@shell/dock/dockStore';
+import { soundEngine } from '@core/audio/soundEngine';
 
 type SettingsTab = 'appearance' | 'desktop' | 'geometry' | 'accessibility';
 
@@ -46,6 +47,8 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
     setUiScale,
     iconShape,
     setIconShape,
+    iconPack,
+    setIconPack,
     windowMaterial,
     setWindowMaterial,
     windowOpacity,
@@ -157,6 +160,86 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     >
                       <Icon className="h-4 w-4" />
                       <span className="text-[11px] font-semibold">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Icon Pack Architecture */}
+            <div className="border-t border-white/[0.08] pt-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold tracking-tight text-white uppercase tracking-wider">Icon Pack Collection</h3>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Select your visual iconography style. Smoothly morphs across the desktop, dock, and launchpad.
+                  </p>
+                </div>
+                <span className="font-mono text-[10px] text-cyan-400 uppercase tracking-widest bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-full">
+                  {iconPack}
+                </span>
+              </div>
+
+              <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[
+                  {
+                    id: 'vibrant',
+                    label: 'Vibrant iOS',
+                    desc: 'Apple rich gradients, chromatic hues & specular gloss',
+                    preview: 'bg-gradient-to-tr from-sky-500 via-indigo-500 to-rose-500',
+                  },
+                  {
+                    id: 'monochrome',
+                    label: 'Obsidian Monochrome',
+                    desc: 'Nothing OS jet black matte, titanium white & dot matrix',
+                    preview: 'bg-gradient-to-tr from-[#111218] via-[#1a1c24] to-[#090a0e]',
+                  },
+                  {
+                    id: 'neon',
+                    label: 'Cyberpunk Neon',
+                    desc: 'Midnight violet, radioactive lime & glowing cyan halos',
+                    preview: 'bg-gradient-to-tr from-[#0b0717] via-[#1c0f33] to-[#06b6d4]',
+                  },
+                  {
+                    id: 'golden',
+                    label: 'Luxury Onyx Gold',
+                    desc: 'Deep carbon obsidian with 24K champagne gold foil',
+                    preview: 'bg-gradient-to-tr from-[#0a0906] via-[#241e12] to-[#f59e0b]',
+                  },
+                  {
+                    id: 'pastel',
+                    label: 'Nordic Soft Pastel',
+                    desc: 'Minimalist Scandinavian frosted watercolor pastels',
+                    preview: 'bg-gradient-to-tr from-[#bae6fd] via-[#e0e7ff] to-[#fce7f3]',
+                  },
+                ].map((pack) => {
+                  const isSelected = (iconPack || 'vibrant') === pack.id;
+                  return (
+                    <button
+                      key={pack.id}
+                      onClick={() => {
+                        soundEngine.playClick();
+                        setIconPack(pack.id as IconPackId);
+                        useNotificationStore.getState().notify({
+                          title: `Icon Pack: ${pack.label}`,
+                          message: 'All system app icons updated with smooth spring transition.',
+                          type: 'info',
+                        });
+                      }}
+                      className={`flex flex-col text-left rounded-xl border p-3.5 transition-all cursor-pointer relative overflow-hidden group ${
+                        isSelected
+                          ? 'border-white/40 bg-white/10 text-white shadow-lg ring-1 ring-white/30'
+                          : 'border-white/10 bg-[#12141c] text-neutral-400 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`h-6 w-6 rounded-lg ${pack.preview} shadow-sm border border-white/20`} />
+                          <span className="text-xs font-semibold text-white">{pack.label}</span>
+                        </div>
+                        {isSelected && <Sparkles className="h-3.5 w-3.5 text-cyan-400" />}
+                      </div>
+                      <p className="text-[10px] text-neutral-400 leading-relaxed">{pack.desc}</p>
                     </button>
                   );
                 })}

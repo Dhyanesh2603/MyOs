@@ -124,10 +124,10 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
 
   const materialClasses =
     windowMaterial === 'solid'
-      ? 'bg-[#090a0f] border-white/[0.10]'
+      ? 'bg-surface-panel border-border-strong'
       : windowMaterial === 'translucent'
-      ? 'bg-[#0e1017]/85 backdrop-blur-xl border-white/[0.14]'
-      : 'bg-black/60 backdrop-blur-3xl border-white/[0.18]';
+      ? 'bg-surface-panel/85 backdrop-blur-xl border-border-strong'
+      : 'bg-surface-panel/75 backdrop-blur-3xl border-border-subtle';
 
   return (
     <motion.div
@@ -163,8 +163,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = React.memo(({ windowState
         windowState.isMaximized
           ? 'shadow-none'
           : windowState.isFocused
-          ? 'shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.12)_inset]'
-          : 'shadow-[0_12px_36px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.06)_inset]'
+          ? 'shadow-window'
+          : 'shadow-window opacity-95'
       } ${isInteracting ? 'select-none pointer-events-auto' : ''}`}
     >
       {/* 8-Axis Resize Frame */}

@@ -1086,7 +1086,7 @@ export const FlowBoardApp: React.FC<AppProps> = () => {
 
 export const flowboardManifest: AppManifest = {
   id: 'flowboard',
-  name: 'FlowBoard',
+  name: 'OnyxBoard',
   description: 'Infinite vector whiteboard canvas with tactile sticky notes, shape nodes, and doodle pen.',
   category: 'productivity',
   icon: LayoutDashboard,

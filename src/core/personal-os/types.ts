@@ -252,6 +252,22 @@ export interface TimelineEvent {
   metadata?: Record<string, string>;
 }
 
+export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
+export type TaskCategory = 'engineering' | 'dsa' | 'career' | 'academics' | 'personal';
+
+export interface PersonalTask {
+  id: string;
+  title: string;
+  category: TaskCategory;
+  priority: TaskPriority;
+  completed: boolean;
+  dueDate?: string;
+  tags?: string[];
+  notes?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
 export interface KnowledgeNode {
   id: string;
   label: string;

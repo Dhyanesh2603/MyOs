@@ -19,10 +19,20 @@ import type {
   FocusModeState,
   MissionStatus,
   CareerStage,
+  PersonalTask,
+  TaskPriority,
+  TaskCategory,
 } from './types';
+
+export type {
+  PersonalTask,
+  TaskPriority,
+  TaskCategory,
+};
 
 export type PersonalOsTab =
   | 'home'
+  | 'tasks'
   | 'missions'
   | 'projects'
   | 'academics'
@@ -58,6 +68,7 @@ export interface PersonalOsState {
   timeline: TimelineEvent[];
   knowledgeNodes: KnowledgeNode[];
   knowledgeEdges: KnowledgeEdge[];
+  tasks: PersonalTask[];
   portfolioChecklist: { id: string; title: string; completed: boolean }[];
   resumeVersions: { id: string; name: string; tag: string; updated: string }[];
 
@@ -65,6 +76,12 @@ export interface PersonalOsState {
   focusMode: FocusModeState;
 
   // Actions
+  // Tasks & Todos
+  addTask: (task: Omit<PersonalTask, 'id' | 'createdAt'>) => void;
+  toggleTask: (taskId: string) => void;
+  deleteTask: (taskId: string) => void;
+  updateTask: (taskId: string, patch: Partial<PersonalTask>) => void;
+
   // Missions
   toggleMissionObjective: (missionId: string, objectiveId: string) => void;
   updateMissionStatus: (missionId: string, status: MissionStatus) => void;
@@ -206,6 +223,65 @@ export const EMPTY_DAILY_PLAN: DailyPlan = {
   },
 };
 
+export const DEFAULT_TASKS: PersonalTask[] = [
+  {
+    id: 'task-1',
+    title: 'Implement Onyx OS Light Mode across all window frames & apps',
+    category: 'engineering',
+    priority: 'critical',
+    completed: true,
+    dueDate: 'Today',
+    tags: ['System', 'Design'],
+    notes: 'Support smooth light mode toggle and CSS token synchronization.',
+    createdAt: new Date().toISOString(),
+    completedAt: new Date().toISOString(),
+  },
+  {
+    id: 'task-2',
+    title: 'Solve 3 Hard Dynamic Programming graph problems on LeetCode',
+    category: 'dsa',
+    priority: 'high',
+    completed: false,
+    dueDate: 'Tomorrow',
+    tags: ['Algorithms', 'Graphs'],
+    notes: 'Focus on Monotonic Stack and DP transition proofs.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'task-3',
+    title: 'Benchmark 60 FPS compositor and canvas shader visualizers',
+    category: 'engineering',
+    priority: 'medium',
+    completed: false,
+    dueDate: 'This Week',
+    tags: ['Performance'],
+    notes: 'Verify Web Audio API analyser loop with 128 FFT nodes.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'task-4',
+    title: 'Draft System Design Architecture document for Rate Limiter',
+    category: 'career',
+    priority: 'high',
+    completed: false,
+    dueDate: 'Oct 28',
+    tags: ['Interview', 'Backend'],
+    notes: 'Sliding window log vs token bucket distributed design.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'task-5',
+    title: 'Revise Operating Systems Paging & Virtual Memory mechanisms',
+    category: 'academics',
+    priority: 'medium',
+    completed: false,
+    dueDate: 'Nov 02',
+    tags: ['OS', 'VIT'],
+    notes: 'Inverted page tables, TLB miss handling, and LRU replacement.',
+    createdAt: new Date().toISOString(),
+  },
+];
+
 function loadPersistedState(): Partial<PersonalOsState> {
   if (typeof window === 'undefined') return {};
   try {
@@ -235,6 +311,7 @@ function saveState(state: Partial<PersonalOsState>): void {
       timeline: state.timeline,
       knowledgeNodes: state.knowledgeNodes,
       knowledgeEdges: state.knowledgeEdges,
+      tasks: state.tasks,
       portfolioChecklist: state.portfolioChecklist,
       resumeVersions: state.resumeVersions,
     };
@@ -261,6 +338,7 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
   timeline: initialSaved.timeline || [],
   knowledgeNodes: initialSaved.knowledgeNodes || [],
   knowledgeEdges: initialSaved.knowledgeEdges || [],
+  tasks: initialSaved.tasks || DEFAULT_TASKS,
   portfolioChecklist: initialSaved.portfolioChecklist || [],
   resumeVersions: initialSaved.resumeVersions || [],
 
@@ -271,6 +349,52 @@ export const usePersonalOsStore = create<PersonalOsState>((set, get) => ({
     timerRemainingSeconds: 25 * 60,
     isTimerRunning: false,
     targetMinutes: 25,
+  },
+
+  // Tasks & Todos
+  addTask: (task) => {
+    const newTask: PersonalTask = {
+      ...task,
+      id: `task-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      createdAt: new Date().toISOString(),
+    };
+    set((state) => {
+      const next = [newTask, ...state.tasks];
+      saveState({ ...state, tasks: next });
+      return { tasks: next };
+    });
+  },
+
+  toggleTask: (taskId) => {
+    set((state) => {
+      const next = state.tasks.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              completed: !t.completed,
+              completedAt: !t.completed ? new Date().toISOString() : undefined,
+            }
+          : t
+      );
+      saveState({ ...state, tasks: next });
+      return { tasks: next };
+    });
+  },
+
+  deleteTask: (taskId) => {
+    set((state) => {
+      const next = state.tasks.filter((t) => t.id !== taskId);
+      saveState({ ...state, tasks: next });
+      return { tasks: next };
+    });
+  },
+
+  updateTask: (taskId, patch) => {
+    set((state) => {
+      const next = state.tasks.map((t) => (t.id === taskId ? { ...t, ...patch } : t));
+      saveState({ ...state, tasks: next });
+      return { tasks: next };
+    });
   },
 
   // Missions

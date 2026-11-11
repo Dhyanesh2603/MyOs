@@ -8,12 +8,14 @@ import {
   Briefcase,
   Calendar,
   Network,
+  CheckSquare,
 } from 'lucide-react';
 import type { AppManifest, AppProps } from '@contracts/app';
 import { usePersonalOsStore, PersonalOsTab } from '@core/personal-os/personalOsStore';
 import { soundEngine } from '@core/audio/soundEngine';
 
 import { HomeMomentumView } from './views/HomeMomentumView';
+import { TasksTodosView } from './views/TasksTodosView';
 import { MissionsView } from './views/MissionsView';
 import { ProjectsView } from './views/ProjectsView';
 import { AcademicsView } from './views/AcademicsView';
@@ -24,6 +26,7 @@ import { KnowledgeGraphView } from './views/KnowledgeGraphView';
 
 const NAV_TABS: { id: PersonalOsTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'home', label: 'Momentum', icon: Compass },
+  { id: 'tasks', label: 'Tasks', icon: CheckSquare },
   { id: 'missions', label: 'Missions', icon: Zap },
   { id: 'projects', label: 'Projects', icon: FolderGit2 },
   { id: 'academics', label: 'Academics', icon: GraduationCap },
@@ -94,6 +97,7 @@ export const PersonalOsApp: React.FC<AppProps> = () => {
       {/* Main Content Router */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'home' && <HomeMomentumView />}
+        {activeTab === 'tasks' && <TasksTodosView />}
         {activeTab === 'missions' && <MissionsView />}
         {activeTab === 'projects' && <ProjectsView />}
         {activeTab === 'academics' && <AcademicsView />}

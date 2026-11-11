@@ -128,14 +128,27 @@
   }
 }
 
-/* Universal High-Contrast Dark Scrollbar Architecture (Unlayered for Maximum Specificity) */
-html, body, :root {
+/* Universal High-Contrast Dark & Light Scrollbar Architecture */
+html:not([data-theme='light']),
+body:not([data-theme='light']),
+:root:not([data-theme='light']) {
   color-scheme: dark !important;
+}
+
+html[data-theme='light'],
+body[data-theme='light'],
+:root[data-theme='light'],
+[data-theme='light'] {
+  color-scheme: light !important;
 }
 
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+[data-theme='light'] * {
+  scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -156,8 +169,170 @@ html, body, :root {
   background: rgba(255, 255, 255, 0.45);
 }
 
+[data-theme='light'] *::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+[data-theme='light'] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
 *::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* ==========================================================================
+   Comprehensive Light Mode Adaptation Engine
+   Seamlessly adapts all guest applications, toolbars, and panels to daylight
+   ========================================================================== */
+
+/* Daylight Root & Window Base */
+[data-theme='light'] {
+  --surface-canvas: 245 246 250;
+  --surface-panel: 255 255 255;
+  --surface-overlay: 242 243 247;
+  --surface-glass: 255 255 255;
+  --surface-subtle: 226 228 235;
+
+  --content-primary: 15 17 23;
+  --content-secondary: 75 85 99;
+  --content-tertiary: 140 145 158;
+  --content-inverse: 255 255 255;
+
+  --border-subtle: 0 0 0;
+  --border-subtle-alpha: 0.08;
+  --border-strong: 0 0 0;
+  --border-strong-alpha: 0.16;
+}
+
+/* App Canvas Base Overrides */
+[data-theme='light'] .bg-\[\#0a0b10\],
+[data-theme='light'] .bg-\[\#090a0f\],
+[data-theme='light'] .bg-\[\#08090a\],
+[data-theme='light'] .bg-\[\#0b0c11\],
+[data-theme='light'] .bg-\[\#050608\] {
+  background-color: #f6f7fb !important;
+}
+
+/* Toolbars, Headers, and Card Surfaces */
+[data-theme='light'] .bg-\[\#0f1118\],
+[data-theme='light'] .bg-\[\#10121a\],
+[data-theme='light'] .bg-\[\#111215\],
+[data-theme='light'] .bg-\[\#12131a\],
+[data-theme='light'] .bg-\[\#12141c\],
+[data-theme='light'] .bg-\[\#13141f\],
+[data-theme='light'] .bg-\[\#141620\],
+[data-theme='light'] .bg-\[\#161821\],
+[data-theme='light'] .bg-\[\#161822\] {
+  background-color: #ffffff !important;
+}
+
+/* Inner Sections, Secondary Chips, Input Containers */
+[data-theme='light'] .bg-\[\#181a24\],
+[data-theme='light'] .bg-\[\#1a1b26\],
+[data-theme='light'] .bg-\[\#1c1d22\],
+[data-theme='light'] .bg-\[\#1e2029\],
+[data-theme='light'] .bg-\[\#23242b\],
+[data-theme='light'] .bg-\[\#252732\] {
+  background-color: #edf0f5 !important;
+}
+
+/* Text Hierarchy in Light Mode */
+[data-theme='light'] .text-neutral-100,
+[data-theme='light'] .text-neutral-200,
+[data-theme='light'] .text-white,
+[data-theme='light'] .text-white\/95,
+[data-theme='light'] .text-white\/90 {
+  color: #111827 !important;
+}
+
+[data-theme='light'] .text-neutral-300,
+[data-theme='light'] .text-neutral-400,
+[data-theme='light'] .text-white\/80,
+[data-theme='light'] .text-white\/70,
+[data-theme='light'] .text-white\/60 {
+  color: #4b5563 !important;
+}
+
+[data-theme='light'] .text-neutral-500,
+[data-theme='light'] .text-white\/40,
+[data-theme='light'] .text-white\/50 {
+  color: #6b7280 !important;
+}
+
+/* Sub-pixel Hairline Borders in Light Mode */
+[data-theme='light'] .border-white\/\[0\.08\],
+[data-theme='light'] .border-white\/\[0\.06\],
+[data-theme='light'] .border-white\/\[0\.05\],
+[data-theme='light'] .border-white\/\[0\.04\],
+[data-theme='light'] .border-white\/\[0\.10\],
+[data-theme='light'] .border-white\/\[0\.12\],
+[data-theme='light'] .border-white\/\[0\.14\],
+[data-theme='light'] .border-white\/\[0\.15\],
+[data-theme='light'] .border-white\/\[0\.18\],
+[data-theme='light'] .border-white\/\[0\.20\],
+[data-theme='light'] .border-white\/5,
+[data-theme='light'] .border-white\/10,
+[data-theme='light'] .border-white\/15,
+[data-theme='light'] .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Translucent Pill Surfaces in Light Mode */
+[data-theme='light'] .bg-white\/\[0\.03\],
+[data-theme='light'] .bg-white\/\[0\.04\],
+[data-theme='light'] .bg-white\/\[0\.05\],
+[data-theme='light'] .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.035) !important;
+}
+
+[data-theme='light'] .bg-white\/\[0\.08\],
+[data-theme='light'] .bg-white\/10,
+[data-theme='light'] .bg-white\/15 {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme='light'] .hover\:bg-white\/5:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme='light'] .hover\:bg-white\/10:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] .hover\:bg-white\/15:hover {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Light Mode Dock Styling */
+[data-theme='light'] [data-dock="true"] {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme='light'] [data-dock="true"] button:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Desktop Icon Labels are Always High-Contrast with Shadow */
+[data-theme='light'] [data-desktop-icon] span {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Preserve White Text on High-Intensity Accent Buttons & Badges */
+[data-theme='light'] button[class*='bg-indigo'],
+[data-theme='light'] button[class*='bg-blue'],
+[data-theme='light'] button[class*='bg-emerald'],
+[data-theme='light'] button[class*='bg-red'],
+[data-theme='light'] button[class*='bg-rose'],
+[data-theme='light'] [class*='bg-indigo'] > span,
+[data-theme='light'] [class*='bg-blue'] > span,
+[data-theme='light'] [class*='bg-emerald'] > span,
+[data-theme='light'] [class*='bg-red'] > span,
+[data-theme='light'] [class*='bg-rose'] > span {
+  color: #ffffff !important;
 }
 
 /* Utility to completely hide scrollbars while preserving full scrollability */

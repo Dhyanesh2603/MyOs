@@ -6,10 +6,11 @@ import type {
   ThemePreferences,
   FontFamilyId,
   IconShape,
+  IconPackId,
   WindowMaterial,
 } from '@contracts/theme';
 
-export type { IconShape, WindowMaterial };
+export type { IconShape, IconPackId, WindowMaterial };
 
 export const ACCENT_COLORS: Record<AccentColorId, AccentColorDefinition> = {
   indigo: {
@@ -60,6 +61,7 @@ export interface ThemeStoreState extends ThemePreferences {
   fontFamily: FontFamilyId;
   uiScale: number;
   iconShape: IconShape;
+  iconPack: IconPackId;
   windowMaterial: WindowMaterial;
   windowOpacity: number;
   setTheme: (themeId: ThemeId) => void;
@@ -70,9 +72,26 @@ export interface ThemeStoreState extends ThemePreferences {
   setFontFamily: (font: FontFamilyId) => void;
   setUiScale: (scale: number) => void;
   setIconShape: (shape: IconShape) => void;
+  setIconPack: (pack: IconPackId) => void;
   setWindowMaterial: (material: WindowMaterial) => void;
   setWindowOpacity: (opacity: number) => void;
 }
+
+const getStoredThemeId = (): ThemeId => {
+  try {
+    const t = (localStorage.getItem('onyx_theme') || localStorage.getItem('flowos_theme')) as ThemeId;
+    if (t === 'dark' || t === 'light' || t === 'high-contrast') return t;
+  } catch {}
+  return 'dark';
+};
+
+const getStoredIconPack = (): IconPackId => {
+  try {
+    const p = (localStorage.getItem('onyx_icon_pack') || localStorage.getItem('flowos_icon_pack')) as IconPackId;
+    if (p === 'vibrant' || p === 'monochrome' || p === 'neon' || p === 'golden' || p === 'pastel') return p;
+  } catch {}
+  return 'vibrant';
+};
 
 const getStoredIconShape = (): IconShape => {
   try {
@@ -98,8 +117,23 @@ const getStoredWindowOpacity = (): number => {
   return 0.95;
 };
 
+// Immediate DOM sync on load
+try {
+  const initialTheme = getStoredThemeId();
+  const root = document.documentElement;
+  if (initialTheme === 'dark') {
+    root.removeAttribute('data-theme');
+    root.classList.remove('light', 'high-contrast');
+    root.classList.add('dark');
+  } else {
+    root.setAttribute('data-theme', initialTheme);
+    root.classList.remove('dark');
+    root.classList.add(initialTheme);
+  }
+} catch {}
+
 export const useThemeStore = create<ThemeStoreState>((set) => ({
-  themeId: 'dark',
+  themeId: getStoredThemeId(),
   accentColor: 'indigo',
   blurEnabled: true,
   reducedMotion: false,
@@ -108,15 +142,19 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
   fontFamily: 'inter',
   uiScale: 1.0,
   iconShape: getStoredIconShape(),
+  iconPack: getStoredIconPack(),
   windowMaterial: getStoredWindowMaterial(),
   windowOpacity: getStoredWindowOpacity(),
 
   setTheme: (themeId) => {
+    try {
+      localStorage.setItem('onyx_theme', themeId);
+    } catch {}
     set({ themeId });
     const root = document.documentElement;
     if (themeId === 'dark') {
       root.removeAttribute('data-theme');
-      root.classList.remove('light');
+      root.classList.remove('light', 'high-contrast');
       root.classList.add('dark');
     } else {
       root.setAttribute('data-theme', themeId);
@@ -176,6 +214,13 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
       localStorage.setItem('flowos_icon_shape', iconShape);
     } catch {}
     set({ iconShape });
+  },
+
+  setIconPack: (iconPack) => {
+    try {
+      localStorage.setItem('onyx_icon_pack', iconPack);
+    } catch {}
+    set({ iconPack });
   },
 
   setWindowMaterial: (windowMaterial) => {

@@ -406,7 +406,7 @@ export const FlowShotApp: React.FC<AppProps> = () => {
 
 export const flowshotManifest: AppManifest = {
   id: 'flowshot',
-  name: 'FlowShot',
+  name: 'OnyxShot',
   description: 'Screen capture, crop markup studio, and annotation tools.',
   category: 'utilities',
   icon: Camera,
