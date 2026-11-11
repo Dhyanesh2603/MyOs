@@ -31,7 +31,7 @@ export interface WallpaperDefinition {
 export type FontFamilyId = 'inter' | 'ndot' | 'jetbrains' | 'serif';
 
 export type IconShape = 'squircle' | 'circle' | 'rounded' | 'smooth';
-export type IconPackId = 'vibrant' | 'monochrome' | 'neon' | 'golden' | 'pastel';
+export type IconPackId = 'monochrome' | 'vibrant' | 'neon' | 'pastel';
 export type WindowMaterial = 'glass' | 'solid' | 'translucent';
 
 export interface ThemePreferences {

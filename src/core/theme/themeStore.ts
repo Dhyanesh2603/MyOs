@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useWallpaperStore } from './wallpaperStore';
 import type {
   AccentColorDefinition,
   AccentColorId,
@@ -88,9 +89,9 @@ const getStoredThemeId = (): ThemeId => {
 const getStoredIconPack = (): IconPackId => {
   try {
     const p = (localStorage.getItem('onyx_icon_pack') || localStorage.getItem('flowos_icon_pack')) as IconPackId;
-    if (p === 'vibrant' || p === 'monochrome' || p === 'neon' || p === 'golden' || p === 'pastel') return p;
+    if (p === 'monochrome' || p === 'vibrant' || p === 'neon' || p === 'pastel') return p;
   } catch {}
-  return 'vibrant';
+  return 'monochrome';
 };
 
 const getStoredIconShape = (): IconShape => {
@@ -156,9 +157,25 @@ export const useThemeStore = create<ThemeStoreState>((set) => ({
       root.removeAttribute('data-theme');
       root.classList.remove('light', 'high-contrast');
       root.classList.add('dark');
+      try {
+        const wp = useWallpaperStore.getState();
+        if (wp.currentWallpaperId === 'sequoia-light' || wp.currentWallpaperId === 'nordic-frost') {
+          wp.setWallpaper('sequoia-dark');
+        }
+      } catch {}
+    } else if (themeId === 'light') {
+      root.setAttribute('data-theme', themeId);
+      root.classList.remove('dark', 'high-contrast');
+      root.classList.add(themeId);
+      try {
+        const wp = useWallpaperStore.getState();
+        if (wp.currentWallpaperId === 'sequoia-dark' || wp.currentWallpaperId === 'obsidian-carbon') {
+          wp.setWallpaper('sequoia-light');
+        }
+      } catch {}
     } else {
       root.setAttribute('data-theme', themeId);
-      root.classList.remove('dark');
+      root.classList.remove('dark', 'light');
       root.classList.add(themeId);
     }
   },

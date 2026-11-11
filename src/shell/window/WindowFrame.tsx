@@ -50,7 +50,8 @@ const WindowContent = React.memo<WindowContentProps>(
 
     return (
       <div
-        className={`relative flex-1 overflow-auto ${bgClass} text-content-primary ${
+        data-app-id={appId}
+        className={`relative flex-1 overflow-auto ${bgClass} text-content-primary onyx-app-viewport ${
           isInteracting ? 'pointer-events-none select-none' : ''
         }`}
       >

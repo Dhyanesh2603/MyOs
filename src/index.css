@@ -205,104 +205,233 @@ body[data-theme='light'],
   --border-strong-alpha: 0.16;
 }
 
-/* App Canvas Base Overrides */
-[data-theme='light'] .bg-\[\#0a0b10\],
-[data-theme='light'] .bg-\[\#090a0f\],
-[data-theme='light'] .bg-\[\#08090a\],
-[data-theme='light'] .bg-\[\#0b0c11\],
-[data-theme='light'] .bg-\[\#050608\] {
+/* 1. App Base Canvases (Scoped to Productivity Apps) */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-\[\#0a0b10\],
+  .bg-\[\#090a0f\],
+  .bg-\[\#08090a\],
+  .bg-\[\#0b0c11\],
+  .bg-\[\#050608\],
+  .bg-\[\#08090d\],
+  .bg-\[\#07080b\],
+  .bg-\[\#080a0f\],
+  .bg-\[\#0b0f17\],
+  .bg-\[\#070b16\],
+  .bg-\[\#0a0f1e\],
+  .bg-\[\#0c0e14\],
+  .bg-\[\#0d0e14\],
+  .bg-\[\#0f141e\],
+  .bg-\[\#090d14\]
+) {
   background-color: #f6f7fb !important;
 }
 
-/* Toolbars, Headers, and Card Surfaces */
-[data-theme='light'] .bg-\[\#0f1118\],
-[data-theme='light'] .bg-\[\#10121a\],
-[data-theme='light'] .bg-\[\#111215\],
-[data-theme='light'] .bg-\[\#12131a\],
-[data-theme='light'] .bg-\[\#12141c\],
-[data-theme='light'] .bg-\[\#13141f\],
-[data-theme='light'] .bg-\[\#141620\],
-[data-theme='light'] .bg-\[\#161821\],
-[data-theme='light'] .bg-\[\#161822\] {
-  background-color: #ffffff !important;
-}
-
-/* Inner Sections, Secondary Chips, Input Containers */
-[data-theme='light'] .bg-\[\#181a24\],
-[data-theme='light'] .bg-\[\#1a1b26\],
-[data-theme='light'] .bg-\[\#1c1d22\],
-[data-theme='light'] .bg-\[\#1e2029\],
-[data-theme='light'] .bg-\[\#23242b\],
-[data-theme='light'] .bg-\[\#252732\] {
-  background-color: #edf0f5 !important;
-}
-
-/* Text Hierarchy in Light Mode */
-[data-theme='light'] .text-neutral-100,
-[data-theme='light'] .text-neutral-200,
-[data-theme='light'] .text-white,
-[data-theme='light'] .text-white\/95,
-[data-theme='light'] .text-white\/90 {
-  color: #111827 !important;
-}
-
-[data-theme='light'] .text-neutral-300,
-[data-theme='light'] .text-neutral-400,
-[data-theme='light'] .text-white\/80,
-[data-theme='light'] .text-white\/70,
-[data-theme='light'] .text-white\/60 {
-  color: #4b5563 !important;
-}
-
-[data-theme='light'] .text-neutral-500,
-[data-theme='light'] .text-white\/40,
-[data-theme='light'] .text-white\/50 {
-  color: #6b7280 !important;
-}
-
-/* Sub-pixel Hairline Borders in Light Mode */
-[data-theme='light'] .border-white\/\[0\.08\],
-[data-theme='light'] .border-white\/\[0\.06\],
-[data-theme='light'] .border-white\/\[0\.05\],
-[data-theme='light'] .border-white\/\[0\.04\],
-[data-theme='light'] .border-white\/\[0\.10\],
-[data-theme='light'] .border-white\/\[0\.12\],
-[data-theme='light'] .border-white\/\[0\.14\],
-[data-theme='light'] .border-white\/\[0\.15\],
-[data-theme='light'] .border-white\/\[0\.18\],
-[data-theme='light'] .border-white\/\[0\.20\],
-[data-theme='light'] .border-white\/5,
-[data-theme='light'] .border-white\/10,
-[data-theme='light'] .border-white\/15,
-[data-theme='light'] .border-white\/20 {
+/* 2. App Sidebars */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-\[\#0e1017\],
+  aside.bg-\[\#0e1017\]
+) {
+  background-color: #eef1f6 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Translucent Pill Surfaces in Light Mode */
-[data-theme='light'] .bg-white\/\[0\.03\],
-[data-theme='light'] .bg-white\/\[0\.04\],
-[data-theme='light'] .bg-white\/\[0\.05\],
-[data-theme='light'] .bg-white\/5 {
+/* 3. Toolbars, Headers, Footers, and Primary Elevated Cards */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-\[\#0f1118\],
+  .bg-\[\#10121a\],
+  .bg-\[\#111215\],
+  .bg-\[\#11131c\],
+  .bg-\[\#11131c\]\/90,
+  .bg-\[\#11131c\]\/50,
+  .bg-\[\#12131a\],
+  .bg-\[\#12141c\],
+  .bg-\[\#12141e\],
+  .bg-\[\#13141f\],
+  .bg-\[\#141620\],
+  .bg-\[\#141622\],
+  .bg-\[\#161821\],
+  .bg-\[\#161822\],
+  .bg-\[\#161824\],
+  .bg-\[\#0c0d12\],
+  .bg-\[\#121c3b\]
+) {
+  background-color: #ffffff !important;
+}
+
+/* 4. Inner Containers, Secondary Cards, Keypad Buttons, Input Containers */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-\[\#181a24\],
+  .bg-\[\#1a1b26\],
+  .bg-\[\#1c1d22\],
+  .bg-\[\#1e2029\],
+  .bg-\[\#23242b\],
+  .bg-\[\#252732\],
+  .bg-\[\#151724\],
+  .bg-\[\#181a28\],
+  .bg-\[\#1c1f30\],
+  .bg-\[\#202436\],
+  .bg-\[\#171924\],
+  .bg-\[\#141210\],
+  .bg-\[\#17140f\]
+) {
+  background-color: #f1f3f8 !important;
+}
+
+/* 5. Text Hierarchy in Light Mode */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .text-white,
+  .text-neutral-100,
+  .text-neutral-200,
+  .text-white\/95,
+  .text-white\/90
+) {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .text-neutral-300,
+  .text-neutral-400,
+  .text-white\/80,
+  .text-white\/70,
+  .text-white\/60
+) {
+  color: #475569 !important;
+}
+
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .text-neutral-500,
+  .text-white\/50,
+  .text-white\/40
+) {
+  color: #64748b !important;
+}
+
+/* 6. Hairline Borders in Light Mode */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .border-white\/\[0\.04\],
+  .border-white\/\[0\.05\],
+  .border-white\/\[0\.06\],
+  .border-white\/\[0\.08\],
+  .border-white\/\[0\.1\],
+  .border-white\/\[0\.10\],
+  .border-white\/\[0\.12\],
+  .border-white\/\[0\.14\],
+  .border-white\/\[0\.15\],
+  .border-white\/\[0\.18\],
+  .border-white\/\[0\.2\],
+  .border-white\/\[0\.20\],
+  .border-white\/5,
+  .border-white\/10,
+  .border-white\/15,
+  .border-white\/20,
+  .border-white\/30,
+  .border-white\/40
+) {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 7. Translucent Pills and Hover States */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-white\/\[0\.02\],
+  .bg-white\/\[0\.03\],
+  .bg-white\/\[0\.04\],
+  .bg-white\/\[0\.05\],
+  .bg-white\/5
+) {
   background-color: rgba(0, 0, 0, 0.035) !important;
 }
 
-[data-theme='light'] .bg-white\/\[0\.08\],
-[data-theme='light'] .bg-white\/10,
-[data-theme='light'] .bg-white\/15 {
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .bg-white\/\[0\.06\],
+  .bg-white\/\[0\.08\],
+  .bg-white\/10,
+  .bg-white\/15,
+  .bg-white\/20
+) {
+  background-color: rgba(0, 0, 0, 0.065) !important;
+}
+
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  .hover\:bg-white\/5:hover,
+  .hover\:bg-white\/\[0\.04\]:hover,
+  .hover\:bg-white\/\[0\.05\]:hover,
+  .hover\:bg-white\/\[0\.06\]:hover,
+  .hover\:bg-white\/10:hover,
+  .hover\:bg-white\/15:hover,
+  .hover\:bg-white\/20:hover
+) {
   background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-[data-theme='light'] .hover\:bg-white\/5:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+/* 8. Input Elements in Light Mode */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select
+) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
 }
 
-[data-theme='light'] .hover\:bg-white\/10:hover {
-  background-color: rgba(0, 0, 0, 0.08) !important;
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) input::placeholder,
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) textarea::placeholder {
+  color: #94a3b8 !important;
 }
 
-[data-theme='light'] .hover\:bg-white\/15:hover {
-  background-color: rgba(0, 0, 0, 0.12) !important;
+/* 9. Preserve White Text on High-Intensity Accent Buttons & Badges */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  button[class*='bg-indigo-'],
+  button[class*='bg-blue-'],
+  button[class*='bg-emerald-'],
+  button[class*='bg-red-'],
+  button[class*='bg-rose-'],
+  button[class*='bg-purple-'],
+  button[class*='bg-violet-'],
+  button[class*='bg-cyan-'],
+  [class*='bg-indigo-600'],
+  [class*='bg-blue-600'],
+  [class*='bg-emerald-600'],
+  [class*='bg-rose-600'],
+  [class*='bg-rose-500'],
+  .bg-rose-500
+),
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) :is(
+  button[class*='bg-indigo-'],
+  button[class*='bg-blue-'],
+  button[class*='bg-emerald-'],
+  button[class*='bg-red-'],
+  button[class*='bg-rose-'],
+  button[class*='bg-purple-'],
+  button[class*='bg-violet-'],
+  button[class*='bg-cyan-'],
+  [class*='bg-indigo-600'],
+  [class*='bg-blue-600'],
+  [class*='bg-emerald-600'],
+  [class*='bg-rose-600'],
+  [class*='bg-rose-500']
+) * {
+  color: #ffffff !important;
 }
+
+/* 10. Primary Button Inversion (bg-white buttons become solid dark with white text in light mode) */
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) button.bg-white {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) button.bg-white:hover {
+  background-color: #1e293b !important;
+}
+
+[data-theme='light'] .onyx-app-viewport:not([data-app-id='terminal'], [data-app-id='code-editor'], [data-app-id='retro-2048'], [data-app-id='cyber-pong'], [data-app-id='snake-arena'], [data-app-id='connect-four'], [data-app-id='synth'], [data-app-id='flowcam']) button.bg-white * {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Shell & OS Chrome Light Mode Styling
+   ========================================================================== */
 
 /* Light Mode Dock Styling */
 [data-theme='light'] [data-dock="true"] {
@@ -318,21 +447,72 @@ body[data-theme='light'],
 /* Desktop Icon Labels are Always High-Contrast with Shadow */
 [data-theme='light'] [data-desktop-icon] span {
   color: #ffffff !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+  text-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.9) !important;
 }
 
-/* Preserve White Text on High-Intensity Accent Buttons & Badges */
-[data-theme='light'] button[class*='bg-indigo'],
-[data-theme='light'] button[class*='bg-blue'],
-[data-theme='light'] button[class*='bg-emerald'],
-[data-theme='light'] button[class*='bg-red'],
-[data-theme='light'] button[class*='bg-rose'],
-[data-theme='light'] [class*='bg-indigo'] > span,
-[data-theme='light'] [class*='bg-blue'] > span,
-[data-theme='light'] [class*='bg-emerald'] > span,
-[data-theme='light'] [class*='bg-red'] > span,
-[data-theme='light'] [class*='bg-rose'] > span {
+/* Dynamic Island stays Obsidian with White Text & Icons */
+[data-theme='light'] [data-dynamic-island="true"],
+[data-theme='light'] [data-dynamic-island="true"] * {
   color: #ffffff !important;
+}
+
+/* Top Menu Bar Floating Glass Capsules in Light Mode */
+[data-theme='light'] .fixed.top-2\.5 .bg-black\/60 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] .fixed.top-2\.5 .bg-black\/60 :is(.text-white, .text-white\/90, .text-white\/70, span, p) {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] .fixed.top-2\.5 .bg-black\/60 .bg-white\/90 {
+  background-color: #0f172a !important;
+}
+
+[data-theme='light'] .fixed.top-2\.5 .bg-black\/60 .bg-white\/15 {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Quick Hub / Control Center Card in Light Mode */
+[data-theme='light'] [data-control-center-panel="true"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(.text-white, .text-neutral-100, .text-neutral-200) {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] :is(.text-neutral-300, .text-neutral-400) {
+  color: #475569 !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] .bg-white\/5,
+[data-theme='light'] [data-control-center-panel="true"] .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme='light'] [data-control-center-panel="true"] .border-white\/10,
+[data-theme='light'] [data-control-center-panel="true"] .border-white\/15 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Context Menus in Light Mode */
+[data-theme='light'] [data-context-menu="true"] {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme='light'] [data-context-menu="true"] :is(span, p, button) {
+  color: #0f172a !important;
+}
+
+[data-theme='light'] [data-context-menu="true"] button:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Utility to completely hide scrollbars while preserving full scrollability */

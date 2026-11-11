@@ -183,16 +183,16 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
               <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
                   {
+                    id: 'monochrome',
+                    label: 'Obsidian Monochrome (Default)',
+                    desc: 'Nothing OS jet black matte, titanium white & dot matrix',
+                    preview: 'bg-gradient-to-tr from-[#111218] via-[#1a1c24] to-[#090a0e]',
+                  },
+                  {
                     id: 'vibrant',
                     label: 'Vibrant iOS',
                     desc: 'Apple rich gradients, chromatic hues & specular gloss',
                     preview: 'bg-gradient-to-tr from-sky-500 via-indigo-500 to-rose-500',
-                  },
-                  {
-                    id: 'monochrome',
-                    label: 'Obsidian Monochrome',
-                    desc: 'Nothing OS jet black matte, titanium white & dot matrix',
-                    preview: 'bg-gradient-to-tr from-[#111218] via-[#1a1c24] to-[#090a0e]',
                   },
                   {
                     id: 'neon',
@@ -201,19 +201,13 @@ const SettingsApp: React.FC<AppProps> = ({ windowId, processId }) => {
                     preview: 'bg-gradient-to-tr from-[#0b0717] via-[#1c0f33] to-[#06b6d4]',
                   },
                   {
-                    id: 'golden',
-                    label: 'Luxury Onyx Gold',
-                    desc: 'Deep carbon obsidian with 24K champagne gold foil',
-                    preview: 'bg-gradient-to-tr from-[#0a0906] via-[#241e12] to-[#f59e0b]',
-                  },
-                  {
                     id: 'pastel',
                     label: 'Nordic Soft Pastel',
                     desc: 'Minimalist Scandinavian frosted watercolor pastels',
                     preview: 'bg-gradient-to-tr from-[#bae6fd] via-[#e0e7ff] to-[#fce7f3]',
                   },
                 ].map((pack) => {
-                  const isSelected = (iconPack || 'vibrant') === pack.id;
+                  const isSelected = (iconPack || 'monochrome') === pack.id;
                   return (
                     <button
                       key={pack.id}
