@@ -422,7 +422,28 @@ export const IosPersonalOsIcon: React.FC<IosIconProps> = ({ className = 'w-full 
 );
 
 // ─── App Icon Registry Mapping ────────────────────────────────────────────────
+// ─── 24. Launchpad / App Library ──────────────────────────────────────────────
+export const IosLaunchpadIcon: React.FC<IosIconProps> = ({ className = 'w-full h-full', size }) => (
+  <IosSquircle className={className} size={size}>
+    <svg viewBox="0 0 100 100" className="h-full w-full" fill="none">
+      {/* Outer subtle circular boundary */}
+      <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="2" strokeDasharray="3 3" opacity="0.35" />
+      {/* 3x3 Pure Monochrome Dot-Matrix Grid */}
+      <circle cx="30" cy="30" r="6" fill="#ffffff" />
+      <circle cx="50" cy="30" r="6" fill="#ffffff" />
+      <circle cx="70" cy="30" r="6" fill="#ffffff" />
+      <circle cx="30" cy="50" r="6" fill="#ffffff" />
+      <circle cx="50" cy="50" r="6" fill="#ffffff" />
+      <circle cx="70" cy="50" r="6" fill="#ffffff" />
+      <circle cx="30" cy="70" r="6" fill="#ffffff" />
+      <circle cx="50" cy="70" r="6" fill="#ffffff" />
+      <circle cx="70" cy="70" r="6" fill="#ffffff" />
+    </svg>
+  </IosSquircle>
+);
+
 export const IOS_APP_ICONS: Record<string, React.FC<IosIconProps>> = {
+  launchpad: IosLaunchpadIcon,
   browser: IosSafariIcon,
   'file-explorer': IosFilesIcon,
   'system-settings': IosSettingsIcon,
